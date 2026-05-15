@@ -1,0 +1,11 @@
+import api from './axiosInstance'
+
+export async function getNotifications() {
+  const res = await api.get('/notifications')
+  return res.data.data
+}
+
+export async function markAllNotificationsRead() {
+  const res = await api.patch('/notifications/read-all')
+  return res.data.data
+}

@@ -75,6 +75,14 @@ export default function TeamDashboardPage() {
                     <Badge tone={sheet.status === 'APPROVED' ? 'emerald' : sheet.status === 'SUBMITTED' ? 'amber' : 'slate'}>
                       {sheet.status}
                     </Badge>
+                    {sheet.status === 'APPROVED' ? (
+                      <Link
+                        className="text-sm font-semibold text-primary-700"
+                        to={`/manager/checkin/${sheet.user.id}`}
+                      >
+                        Check-in
+                      </Link>
+                    ) : null}
                     <Link
                       className="text-sm font-semibold text-primary-700"
                       to={`/manager/approve/${sheet.id}`}

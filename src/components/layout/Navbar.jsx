@@ -1,13 +1,35 @@
 import { BellIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
+import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { getNotifications, markAllNotificationsRead } from '../../api/notifications.api'
 import useAuth from '../../hooks/useAuth'
 import Badge from '../shared/Badge'
 import { NAV_LINKS } from '../../utils/navigation'
 
 export default function Navbar() {
   const { appUser, signOutUser } = useAuth()
+  const [open, setOpen] = useState(false)
+  const [notifications, setNotifications] = useState([])
   const role = appUser?.role || 'EMPLOYEE'
   const links = NAV_LINKS[role] || NAV_LINKS.EMPLOYEE
+  const unreadCount = notifications.filter((notification) => !notification.isRead).length
+
+  async function loadNotifications() {
+    try {
+      setNotifications(await getNotifications())
+    } catch (err) {
+      setNotifications([])
+    }
+  }
+
+  useEffect(() => {
+    loadNotifications()
+  }, [appUser?.id])
+
+  const handleMarkAllRead = async () => {
+    await markAllNotificationsRead()
+    await loadNotifications()
+  }
 
   return (
     <header className="sticky top-0 z-20 border-b border-ink-100 bg-white/80 backdrop-blur">
@@ -17,10 +39,41 @@ export default function Navbar() {
           <p className="text-lg font-semibold text-ink-900">Purposeful Performance</p>
         </div>
         <div className="flex items-center gap-4">
-          <button className="relative rounded-full bg-sand-100 p-2 text-ink-700 transition hover:bg-sand-200">
+          <div className="relative">
+          <button
+            onClick={() => setOpen((value) => !value)}
+            className="relative rounded-full bg-sand-100 p-2 text-ink-700 transition hover:bg-sand-200"
+          >
             <BellIcon className="h-5 w-5" />
-            <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-accent-500" />
+            {unreadCount ? (
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-500 px-1 text-[10px] font-bold text-white">
+                {unreadCount}
+              </span>
+            ) : null}
           </button>
+          {open ? (
+            <div className="absolute right-0 mt-3 w-80 rounded-xl border border-ink-100 bg-white p-3 shadow-lg">
+              <div className="flex items-center justify-between border-b border-ink-100 pb-2">
+                <p className="text-sm font-semibold text-ink-900">Notifications</p>
+                <button onClick={handleMarkAllRead} className="text-xs font-semibold text-primary-700">
+                  Mark all read
+                </button>
+              </div>
+              <div className="max-h-80 divide-y divide-ink-100 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <p className="py-4 text-sm text-ink-500">No notifications yet.</p>
+                ) : (
+                  notifications.map((notification) => (
+                    <div key={notification.id} className="py-3">
+                      <p className="text-sm font-semibold text-ink-900">{notification.title}</p>
+                      <p className="mt-1 text-xs text-ink-600">{notification.message}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          ) : null}
+          </div>
           <div className="flex items-center gap-2">
             <div className="text-right">
               <p className="text-sm font-semibold text-ink-900">{appUser?.name || 'Guest'}</p>

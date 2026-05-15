@@ -1,11 +1,8 @@
+import { useEffect, useState } from 'react'
+import { getCompletionReport } from '../../api/reports.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
-
-const completion = [
-  { name: 'Arjun Sharma', Q1: 'complete', Q2: 'pending', Q3: 'closed', Q4: 'closed' },
-  { name: 'Nisha Patel', Q1: 'complete', Q2: 'complete', Q3: 'closed', Q4: 'closed' },
-  { name: 'Kabir Rao', Q1: 'missed', Q2: 'pending', Q3: 'closed', Q4: 'closed' },
-]
+import StatCard from '../../components/shared/StatCard'
 
 const statusColor = {
   complete: 'bg-accent-500',
@@ -15,27 +12,53 @@ const statusColor = {
 }
 
 export default function CompletionDashboardPage() {
+  const [report, setReport] = useState({ rows: [], summary: { total: 0, q2Complete: 0, q2Percent: 0 } })
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    async function load() {
+      try {
+        setReport(await getCompletionReport())
+      } catch (err) {
+        setError(err.response?.data?.error?.message || 'Could not load completion report')
+      }
+    }
+    load()
+  }, [])
+
   return (
     <AppShell>
       <div className="space-y-8">
         <PageHeader
           title="Completion Dashboard"
-          subtitle="Monitor check-in completion across the org in real time." 
+          subtitle="Monitor check-in completion across the org in real time."
         />
+
+        {error ? <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <StatCard title="Employees" value={String(report.summary.total)} caption="With goal sheets" />
+          <StatCard title="Q2 Complete" value={String(report.summary.q2Complete)} caption="Manager completed" tone="emerald" />
+          <StatCard title="Q2 Rate" value={`${report.summary.q2Percent}%`} caption="Completion" />
+        </div>
 
         <div className="rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-ink-100">
           <div className="grid gap-4">
-            {completion.map((row) => (
-              <div key={row.name} className="grid items-center gap-4 md:grid-cols-[1.5fr_repeat(4,_1fr)]">
-                <p className="text-sm font-semibold text-ink-900">{row.name}</p>
-                {['Q1', 'Q2', 'Q3', 'Q4'].map((quarter) => (
-                  <div key={quarter} className="flex items-center gap-2">
-                    <span className={`h-3 w-3 rounded-full ${statusColor[row[quarter]]}`} />
-                    <span className="text-xs uppercase text-ink-500">{quarter}</span>
-                  </div>
-                ))}
-              </div>
-            ))}
+            {report.rows.length === 0 ? (
+              <p className="text-sm text-ink-600">No completion records yet.</p>
+            ) : (
+              report.rows.map((row) => (
+                <div key={row.userId} className="grid items-center gap-4 md:grid-cols-[1.5fr_repeat(4,_1fr)]">
+                  <p className="text-sm font-semibold text-ink-900">{row.name}</p>
+                  {['Q1', 'Q2', 'Q3', 'Q4'].map((quarter) => (
+                    <div key={quarter} className="flex items-center gap-2">
+                      <span className={`h-3 w-3 rounded-full ${statusColor[row[quarter]]}`} />
+                      <span className="text-xs uppercase text-ink-500">{quarter} {row[quarter]}</span>
+                    </div>
+                  ))}
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

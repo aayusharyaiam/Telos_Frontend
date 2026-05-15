@@ -7,6 +7,7 @@ import CheckinEntryPage from '../pages/employee/CheckinEntryPage'
 import TeamDashboardPage from '../pages/manager/TeamDashboardPage'
 import ApprovalPage from '../pages/manager/ApprovalPage'
 import ManagerCheckinPage from '../pages/manager/ManagerCheckinPage'
+import SharedGoalsPage from '../pages/manager/SharedGoalsPage'
 import AdminDashboardPage from '../pages/admin/AdminDashboardPage'
 import UserManagementPage from '../pages/admin/UserManagementPage'
 import CycleConfigPage from '../pages/admin/CycleConfigPage'
@@ -89,6 +90,14 @@ export default function AppRouter() {
           element={
             <ProtectedRoute allowedRoles={['MANAGER', 'ADMIN']}>
               <ManagerCheckinPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manager/shared-goals"
+          element={
+            <ProtectedRoute allowedRoles={['MANAGER', 'ADMIN']}>
+              <SharedGoalsPage />
             </ProtectedRoute>
           }
         />

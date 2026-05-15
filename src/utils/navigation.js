@@ -5,6 +5,7 @@ import {
   ClipboardDocumentListIcon,
   CogIcon,
   DocumentChartBarIcon,
+  ShareIcon,
   Squares2X2Icon,
   UsersIcon,
 } from '@heroicons/react/24/outline'
@@ -18,10 +19,12 @@ export const NAV_LINKS = {
     { label: 'Team Overview', to: '/manager/team', icon: UsersIcon },
     { label: 'Approvals', to: '/manager/approve/demo', icon: ClipboardDocumentCheckIcon },
     { label: 'Check-ins', to: '/manager/checkin/demo', icon: ClipboardDocumentListIcon },
+    { label: 'Shared Goals', to: '/manager/shared-goals', icon: ShareIcon },
   ],
   ADMIN: [
     { label: 'Admin Overview', to: '/admin', icon: Squares2X2Icon },
     { label: 'Users', to: '/admin/users', icon: UsersIcon },
+    { label: 'Shared Goals', to: '/manager/shared-goals', icon: ShareIcon },
     { label: 'Cycle Config', to: '/admin/cycles', icon: AdjustmentsHorizontalIcon },
     { label: 'Completion', to: '/admin/completion', icon: ClipboardDocumentCheckIcon },
     { label: 'Audit Trail', to: '/admin/audit', icon: DocumentChartBarIcon },

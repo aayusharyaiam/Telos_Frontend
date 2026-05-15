@@ -249,7 +249,10 @@ export default function GoalSheetPage() {
             {goals.map((goal) => (
               <div key={goal.id} className="grid gap-4 px-6 py-5 md:grid-cols-[2fr_1fr_1fr_auto]">
                 <div>
-                  <p className="text-sm font-semibold text-ink-900">{goal.title}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-ink-900">{goal.title}</p>
+                    {goal.isShared ? <Badge tone="indigo">Shared</Badge> : null}
+                  </div>
                   <p className="text-xs text-ink-500">{goal.thrustArea}</p>
                 </div>
                 <div className="text-sm text-ink-700">Target: {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}</div>
@@ -265,13 +268,15 @@ export default function GoalSheetPage() {
                   />
                   %
                 </label>
-                {canEdit ? (
+                {canEdit && !goal.isShared ? (
                   <button
                     className="text-sm font-semibold text-red-600"
                     onClick={() => handleDeleteGoal(goal.id)}
                   >
                     Delete
                   </button>
+                ) : canEdit && goal.isShared ? (
+                  <Badge tone="indigo">Target Locked</Badge>
                 ) : (
                   <Badge tone={goal.isLocked ? 'emerald' : 'slate'}>{goal.isLocked ? 'Locked' : sheet.status}</Badge>
                 )}
