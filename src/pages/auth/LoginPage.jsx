@@ -34,7 +34,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen w-full px-6 py-16">
       <div className="mx-auto grid max-w-5xl gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="flex flex-col justify-center">
+        <div className="order-2 flex flex-col justify-center lg:order-1">
           <p className="text-xs uppercase tracking-[0.35em] text-ink-500">Telos</p>
           <h1 className="mt-4 text-4xl font-semibold text-ink-900">
             Align every goal to purpose.
@@ -43,21 +43,26 @@ export default function LoginPage() {
             Sign in to manage goal sheets, approvals, check-ins, and analytics
             in one connected workspace.
           </p>
-          <div className="mt-10 grid gap-4 md:grid-cols-2">
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
             <div className="rounded-2xl bg-white/80 p-4 shadow-sm">
               <p className="text-xs uppercase tracking-[0.3em] text-ink-500">Employee</p>
               <p className="mt-2 text-sm font-semibold text-ink-800">employee@telos.demo</p>
               <p className="text-xs text-ink-500">Password: Demo@1234</p>
             </div>
             <div className="rounded-2xl bg-white/80 p-4 shadow-sm">
-              <p className="text-xs uppercase tracking-[0.3em] text-ink-500">Manager/Admin</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-ink-500">Manager</p>
               <p className="mt-2 text-sm font-semibold text-ink-800">manager@telos.demo</p>
+              <p className="text-xs text-ink-500">Password: Demo@1234</p>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4 shadow-sm">
+              <p className="text-xs uppercase tracking-[0.3em] text-ink-500">Admin</p>
+              <p className="mt-2 text-sm font-semibold text-ink-800">admin@telos.demo</p>
               <p className="text-xs text-ink-500">Password: Demo@1234</p>
             </div>
           </div>
         </div>
 
-        <div className="rounded-3xl bg-white/80 p-8 shadow-lg ring-1 ring-ink-100">
+        <div className="order-1 rounded-3xl bg-white/80 p-8 shadow-lg ring-1 ring-ink-100 lg:order-2">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-600 text-white">
               <LockClosedIcon className="h-6 w-6" />
