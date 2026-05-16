@@ -63,13 +63,8 @@ export default function LoginPage() {
 
       <div className="hidden lg:flex flex-col justify-center flex-1 px-12 xl:px-24 z-10 relative">
         <motion.div initial="initial" animate="animate" variants={stagger} className="max-w-2xl">
-          <motion.div variants={fadeSlide} className="flex items-center gap-3 mb-12">
-            <div className="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-on-primary shadow-sm">
-              <span className="font-display text-headline-md font-bold text-white">T</span>
-            </div>
-            <span className="font-display text-headline-md text-ink-900 dark:text-inverse-on-surface tracking-tight">
-              Telos AtomQuest
-            </span>
+          <motion.div variants={fadeSlide} className="mb-12">
+            <img src="/logo-with-name.png" alt="Telos AtomQuest" className="h-10" />
           </motion.div>
 
           <motion.h1
@@ -127,13 +122,8 @@ export default function LoginPage() {
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="w-full max-w-md"
         >
-          <div className="flex lg:hidden items-center gap-3 mb-8 justify-center">
-            <div className="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center text-white shadow-sm">
-              <span className="font-display text-headline-md font-bold text-[14px]">T</span>
-            </div>
-            <span className="font-display text-headline-md text-ink-900 dark:text-inverse-on-surface tracking-tight">
-              Telos AtomQuest
-            </span>
+          <div className="flex lg:hidden items-center justify-center mb-8">
+            <img src="/logo-with-name.png" alt="Telos AtomQuest" className="h-8" />
           </div>
 
           <motion.div

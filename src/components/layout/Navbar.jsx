@@ -32,15 +32,11 @@ export default function Navbar() {
     >
       <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 max-w-[1440px] mx-auto">
         <div className="md:hidden flex items-center gap-3 ml-10">
-          <p className="font-display text-headline-md font-semibold text-ink-900 dark:text-surface-bright">
-            Telos
-          </p>
+          <img src="/logo-mark.png" alt="Telos" className="h-8 w-8" />
         </div>
 
         <div className="hidden md:flex items-center gap-2">
-          <span className="font-display text-headline-md text-primary dark:text-primary-fixed-dim font-bold">
-            Telos AtomQuest
-          </span>
+          <img src="/logo-with-name.png" alt="Telos AtomQuest" className="h-8" />
           <span className="font-body-sm text-body-sm text-ink-500 dark:text-outline ml-2">
             Purposeful Performance
           </span>

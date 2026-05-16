@@ -32,13 +32,9 @@ export default function Sidebar() {
   const sidebarContent = (
     <div className="flex h-full flex-col">
       <div className="mb-6 flex items-center gap-3 px-2">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-container text-white font-display text-headline-md font-bold">
-          T
-        </div>
+        <img src="/logo-mark.png" alt="Telos" className="h-10 w-10 shrink-0" />
         <div className="min-w-0">
-          <h1 className="font-display text-headline-md text-ink-900 dark:text-surface-bright leading-tight truncate">
-            Telos AtomQuest
-          </h1>
+          <img src="/logo-with-name.png" alt="Telos AtomQuest" className="h-8" />
           <p className="font-caption text-caption text-ink-500 dark:text-outline">
             Executive-Tech Management
           </p>
