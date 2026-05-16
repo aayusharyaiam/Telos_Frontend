@@ -1,11 +1,5 @@
 # Telos AtomQuest Frontend
 
-<div align="center">
-  <img src="./public/logo-with-name.png" alt="Telos AtomQuest Logo" width="400" />
-  <br/><br/>
-  <img src="./public/logo-mark.png" alt="Telos AtomQuest Logo Mark" width="80" />
-</div>
-
 React 19 / Vite 8 / Tailwind CSS v4 / Firebase Auth / Framer Motion frontend for the Telos goal-setting and performance tracking portal.
 
 ---

@@ -23,6 +23,7 @@ const EscalationsPage = lazy(() => import('../pages/admin/EscalationsPage'))
 const UnlockGoalsPage = lazy(() => import('../pages/admin/UnlockGoalsPage'))
 const EmailLogPage = lazy(() => import('../pages/admin/EmailLogPage'))
 const SettingsPage = lazy(() => import('../pages/shared/SettingsPage'))
+const HelpPage = lazy(() => import('../pages/shared/HelpPage'))
 
 function ProtectedRoute({ allowedRoles, children }) {
   const { appUser, loading } = useAuth()
@@ -53,6 +54,7 @@ function AnimatedRoutes() {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<RootRedirect />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/help" element={<HelpPage />} />
 
         <Route
           path="/goals"

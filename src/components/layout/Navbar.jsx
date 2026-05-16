@@ -5,11 +5,13 @@ import { motion } from 'framer-motion'
 import useAuth from '../../hooks/useAuth'
 import NotificationDrawer from './NotificationDrawer'
 import Badge from '../shared/Badge'
+import ConfirmModal from '../shared/ConfirmModal'
 import { NAV_LINKS } from '../../utils/navigation'
 
 export default function Navbar() {
   const { appUser, signOutUser } = useAuth()
   const [scrolled, setScrolled] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const role = appUser?.role || 'EMPLOYEE'
   const links = NAV_LINKS[role] || NAV_LINKS.EMPLOYEE
 
@@ -58,7 +60,7 @@ export default function Navbar() {
               <Badge tone="indigo">{appUser?.role || 'EMPLOYEE'}</Badge>
             </div>
             <button
-              onClick={signOutUser}
+              onClick={() => setShowLogoutConfirm(true)}
               className="flex items-center gap-1 rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-1.5 font-label-bold text-label-bold text-ink-700 dark:text-inverse-on-surface hover:scale-[1.02] transition-all duration-200 hover:shadow-sm"
             >
               Sign out
@@ -67,6 +69,16 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        open={showLogoutConfirm}
+        title="Sign out"
+        message="Are you sure you want to sign out?"
+        confirmLabel="Sign out"
+        tone="danger"
+        onConfirm={() => { setShowLogoutConfirm(false); signOutUser() }}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
 
       <div className="flex gap-2 overflow-x-auto border-t border-sand-200/50 dark:border-outline/10 px-4 py-2 md:hidden">
         {links.map((link) => (

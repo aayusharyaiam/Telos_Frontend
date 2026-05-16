@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { motion } from 'framer-motion'
-import { UserIcon, UsersIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
+import { QuestionMarkCircleIcon, UserIcon, UsersIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
 import useAuth from '../../hooks/useAuth'
 
 const stagger = {
@@ -231,10 +231,17 @@ export default function LoginPage() {
               </motion.button>
             </form>
 
-            <div className="mt-8 text-center">
+            <div className="mt-8 text-center space-y-2">
               <p className="font-caption text-caption text-ink-500 dark:text-outline">
                 Secure connection via Telos Identity
               </p>
+              <Link
+                to="/help"
+                className="inline-flex items-center gap-1 font-caption text-caption text-primary dark:text-primary-fixed-dim hover:underline"
+              >
+                <QuestionMarkCircleIcon className="h-3.5 w-3.5" />
+                Judge's Guide — feature overview & demo accounts
+              </Link>
             </div>
           </motion.div>
         </motion.div>
