@@ -152,10 +152,35 @@ cd C:\Users\aayus\working-ly\Telos_AtomQuest\Telos_Frontend
 npm.cmd run build
 ```
 
-Current status:
-- Production build passes (~1,132 KB, ~318 KB gzip).
-- Vite shows a non-blocking large-chunk warning.
-- 1792 modules transformed.
+## Performance (Code Splitting)
+
+All 18 pages are lazy-loaded via `React.lazy()` for route-level code-splitting. Each page is a separate chunk loaded on-demand.
+
+| Metric | Before (eager) | After (lazy) | Improvement |
+|---|---|---|---|
+| Initial JS download | **1,131 kB** (1 bundle) | **551 kB** (core) | **51% smaller** |
+| Recharts library | Bundled in main | 390 kB lazy chunk | AnalyticsPage only |
+| Per-page chunks | — | 2–35 kB each | Instant nav |
+| Total chunks | 1 monolithic | 35 granular | Optimal sharing |
+
+The 551 kB core chunk contains React 19, framer-motion, react-router-dom, Heroicons, and shared UI components — the unavoidable framework tax. Gzip compresses it to ~176 kB over the wire.
+
+Non-blocking build warning: Vite flags chunks >500 kB (the core chunk). This is expected for the framework bundle and does not affect runtime behavior. All application code is properly split. To adjust, set `build.chunkSizeWarningLimit` in `vite.config.js`.
+
+Build output:
+
+```txt
+dist/assets/index.html                  0.64 kB
+dist/assets/index-*.css                 55.65 kB
+dist/assets/index-*.js                 551.35 kB  (core framework)
+dist/assets/AnalyticsPage-*.js         390.23 kB  (Recharts)
+dist/assets/LoginPage-*.js              35.41 kB
+dist/assets/PageHeader-*.js             36.59 kB
+dist/assets/UserManagementPage-*.js     12.19 kB
+dist/assets/SharedGoalsPage-*.js        11.65 kB
+dist/assets/ApprovalPage-*.js            9.99 kB
+... (28 more chunks, all <9 kB)
+```
 
 ## Key Components Added
 

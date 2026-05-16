@@ -107,6 +107,7 @@ export default function SharedGoalsPage() {
         }))
       } catch (err) {
         if (!mounted) return
+        toast.error('Could not load thrust areas. Using defaults.')
         setThrustAreas(THRUST_AREAS)
         setDraft((prev) => ({
           ...prev,
@@ -356,7 +357,7 @@ export default function SharedGoalsPage() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="grid gap-4 px-6 py-5 lg:grid-cols-[1.4fr_0.8fr_1fr_1fr_auto] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                    className="grid grid-cols-1 gap-4 px-6 py-5 lg:grid-cols-[1.4fr_0.8fr_1fr_1fr_auto] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
                   >
                     <div>
                       <div className="flex items-center gap-2">

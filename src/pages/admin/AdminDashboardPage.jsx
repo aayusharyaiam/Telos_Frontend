@@ -79,7 +79,8 @@ export default function AdminDashboardPage() {
 
       <motion.div
         initial="initial"
-        animate="animate"
+        whileInView="animate"
+        viewport={{ once: true, margin: '-50px' }}
         variants={stagger}
         className="grid gap-4 md:grid-cols-2"
       >

@@ -4,6 +4,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth'
+import toast from 'react-hot-toast'
 import { auth } from '../firebase/config'
 import { getMe, syncUser } from '../api/auth.api'
 
@@ -29,8 +30,10 @@ export function AuthProvider({ children }) {
         const me = await getMe()
         setAppUser(me)
       } catch (err) {
-        console.error('Failed to sync user', err)
         setAppUser(null)
+        if (!loading) {
+          toast.error('Failed to load your profile. Please refresh the page.')
+        }
       } finally {
         setLoading(false)
       }
@@ -44,7 +47,11 @@ export function AuthProvider({ children }) {
   }
 
   const signOutUser = async () => {
-    await signOut(auth)
+    try {
+      await signOut(auth)
+    } catch {
+      toast.error('Failed to sign out. Please try again.')
+    }
     setAppUser(null)
   }
 
@@ -52,7 +59,9 @@ export function AuthProvider({ children }) {
     try {
       const me = await getMe()
       setAppUser(me)
-    } catch { }
+    } catch {
+      toast.error('Failed to refresh profile.')
+    }
   }
 
   const value = useMemo(

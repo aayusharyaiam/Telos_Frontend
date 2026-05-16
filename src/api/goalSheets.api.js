@@ -49,3 +49,8 @@ export async function unlockGoal(goalId, reason) {
   const res = await api.patch(`/goals/${goalId}/unlock`, { reason })
   return res.data.data
 }
+
+export async function getGoalSheetDiff(id) {
+  const res = await api.get(`/goal-sheets/${id}/diff`)
+  return res.data.data
+}

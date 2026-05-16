@@ -1,25 +1,27 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import useAuth from '../hooks/useAuth'
-import LoginPage from '../pages/auth/LoginPage'
-import MyGoalsPage from '../pages/employee/MyGoalsPage'
-import GoalSheetPage from '../pages/employee/GoalSheetPage'
-import CheckinEntryPage from '../pages/employee/CheckinEntryPage'
-import TeamDashboardPage from '../pages/manager/TeamDashboardPage'
-import ApprovalPage from '../pages/manager/ApprovalPage'
-import ManagerCheckinPage from '../pages/manager/ManagerCheckinPage'
-import SharedGoalsPage from '../pages/manager/SharedGoalsPage'
-import AdminDashboardPage from '../pages/admin/AdminDashboardPage'
-import UserManagementPage from '../pages/admin/UserManagementPage'
-import CycleConfigPage from '../pages/admin/CycleConfigPage'
-import AuditLogPage from '../pages/admin/AuditLogPage'
-import CompletionDashboardPage from '../pages/admin/CompletionDashboardPage'
-import AnalyticsPage from '../pages/admin/AnalyticsPage'
-import ThrustAreasPage from '../pages/admin/ThrustAreasPage'
-import EscalationsPage from '../pages/admin/EscalationsPage'
-import UnlockGoalsPage from '../pages/admin/UnlockGoalsPage'
-import SettingsPage from '../pages/shared/SettingsPage'
 import FullScreenLoader from '../components/shared/FullScreenLoader'
+
+const LoginPage = lazy(() => import('../pages/auth/LoginPage'))
+const MyGoalsPage = lazy(() => import('../pages/employee/MyGoalsPage'))
+const GoalSheetPage = lazy(() => import('../pages/employee/GoalSheetPage'))
+const CheckinEntryPage = lazy(() => import('../pages/employee/CheckinEntryPage'))
+const TeamDashboardPage = lazy(() => import('../pages/manager/TeamDashboardPage'))
+const ApprovalPage = lazy(() => import('../pages/manager/ApprovalPage'))
+const ManagerCheckinPage = lazy(() => import('../pages/manager/ManagerCheckinPage'))
+const SharedGoalsPage = lazy(() => import('../pages/manager/SharedGoalsPage'))
+const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage'))
+const UserManagementPage = lazy(() => import('../pages/admin/UserManagementPage'))
+const CycleConfigPage = lazy(() => import('../pages/admin/CycleConfigPage'))
+const AuditLogPage = lazy(() => import('../pages/admin/AuditLogPage'))
+const CompletionDashboardPage = lazy(() => import('../pages/admin/CompletionDashboardPage'))
+const AnalyticsPage = lazy(() => import('../pages/admin/AnalyticsPage'))
+const ThrustAreasPage = lazy(() => import('../pages/admin/ThrustAreasPage'))
+const EscalationsPage = lazy(() => import('../pages/admin/EscalationsPage'))
+const UnlockGoalsPage = lazy(() => import('../pages/admin/UnlockGoalsPage'))
+const SettingsPage = lazy(() => import('../pages/shared/SettingsPage'))
 
 function ProtectedRoute({ allowedRoles, children }) {
   const { appUser, loading } = useAuth()
@@ -46,9 +48,10 @@ function AnimatedRoutes() {
   const location = useLocation()
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<RootRedirect />} />
-        <Route path="/login" element={<LoginPage />} />
+      <Suspense fallback={<FullScreenLoader />}>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<RootRedirect />} />
+          <Route path="/login" element={<LoginPage />} />
 
         <Route
           path="/goals"
@@ -192,6 +195,7 @@ function AnimatedRoutes() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
     </AnimatePresence>
   )
 }

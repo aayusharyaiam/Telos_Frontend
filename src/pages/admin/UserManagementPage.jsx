@@ -126,6 +126,7 @@ export default function UserManagementPage() {
     if (!file) return
     const reader = new FileReader()
     reader.onload = (event) => setCsvText(event.target.result)
+    reader.onerror = () => toast.error('Could not read the selected file.')
     reader.readAsText(file)
   }
 

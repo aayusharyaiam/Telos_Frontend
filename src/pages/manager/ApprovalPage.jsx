@@ -267,7 +267,7 @@ export default function ApprovalPage() {
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className={`grid gap-4 px-6 py-5 md:grid-cols-[2fr_1fr_1fr] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors ${
+                      className={`grid grid-cols-1 gap-4 px-6 py-5 md:grid-cols-[2fr_1fr_1fr] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors ${
                         isEdited ? 'bg-tertiary-fixed-dim/20 dark:bg-tertiary-fixed-dim/30' : ''
                       }`}
                     >

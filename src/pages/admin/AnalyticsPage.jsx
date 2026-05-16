@@ -226,7 +226,8 @@ export default function AnalyticsPage() {
         <div className="grid gap-6 md:grid-cols-2">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-50px' }}
             className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20 p-6"
           >
             <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Quarter-on-Quarter Trend</p>
@@ -250,7 +251,8 @@ export default function AnalyticsPage() {
 
           <motion.div
             initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-50px' }}
             className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20 p-6"
           >
             <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Goal Distribution by Thrust Area</p>
@@ -272,7 +274,8 @@ export default function AnalyticsPage() {
         {managerEffectiveness.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-50px' }}
             className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20 p-6"
           >
             <p className="mb-1 font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Manager Effectiveness</p>
@@ -298,7 +301,8 @@ export default function AnalyticsPage() {
               className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
               variants={containerVariants}
               initial="hidden"
-              animate="visible"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-50px' }}
             >
               {managerEffectiveness.map((m) => (
                 <motion.div

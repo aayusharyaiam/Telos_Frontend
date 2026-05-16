@@ -41,6 +41,7 @@ export default function GoalSheetPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [confirmSubmit, setConfirmSubmit] = useState(false)
+  const [shakeForm, setShakeForm] = useState(false)
 
   async function loadSheet() {
     setLoading(true)
@@ -110,6 +111,7 @@ export default function GoalSheetPage() {
         }))
       } catch (err) {
         if (!mounted) return
+        toast.error('Could not load thrust areas. Using defaults.')
         setThrustAreas(THRUST_AREAS)
         setDraft((prev) => ({
           ...prev,
@@ -148,6 +150,8 @@ export default function GoalSheetPage() {
       toast.success('Goal added')
     } catch (err) {
       toast.error(err.response?.data?.error?.message || 'Could not add goal')
+      setShakeForm(true)
+      setTimeout(() => setShakeForm(false), 400)
     } finally {
       setSaving(false)
     }
@@ -247,7 +251,11 @@ export default function GoalSheetPage() {
 
         {canEdit ? (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg p-6 shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
+            <motion.div
+              animate={shakeForm ? { x: [0, -4, 4, -4, 0] } : { x: 0 }}
+              transition={{ duration: 0.3 }}
+              className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg p-6 shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20"
+            >
               <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Add Goal</p>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <label className="grid gap-2 font-label-bold text-label-bold text-ink-700 dark:text-inverse-on-surface">
@@ -316,11 +324,11 @@ export default function GoalSheetPage() {
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         ) : null}
 
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-50px' }}>
           <div className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
             <div className="border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
               <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Goals ({goals.length})</p>

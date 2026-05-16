@@ -79,14 +79,16 @@ export default function CompletionDashboardPage() {
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
           className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20 p-6"
         >
           <motion.div
             className="grid gap-4"
             variants={containerVariants}
             initial="hidden"
-            animate="visible"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
           >
             {report.rows.length === 0 ? (
               <p className="font-body-md text-body-md text-ink-600 dark:text-outline">No completion records yet.</p>
@@ -95,7 +97,7 @@ export default function CompletionDashboardPage() {
                 <motion.div
                   key={row.userId}
                   variants={itemVariants}
-                  className="grid items-center gap-4 md:grid-cols-[1.5fr_repeat(4,_1fr)] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors rounded-xl px-3 py-2"
+                  className="grid grid-cols-1 gap-4 md:grid-cols-[1.5fr_repeat(4,_1fr)] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors rounded-xl px-3 py-2"
                 >
                   <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface">{row.name}</p>
                   {QUARTERS.map((rowQuarter) => (

@@ -30,6 +30,7 @@ const credentials = [
 export default function LoginPage() {
   const { appUser, signInUser } = useAuth()
   const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const [shake, setShake] = useState(false)
   const {
     register,
     handleSubmit,
@@ -44,6 +45,8 @@ export default function LoginPage() {
       await signInUser(values.email, values.password)
     } catch {
       toast.error('Login failed. Check your credentials or contact Admin.')
+      setShake(true)
+      setTimeout(() => setShake(false), 400)
       setIsLoggingIn(false)
     }
   }
@@ -133,7 +136,11 @@ export default function LoginPage() {
             </span>
           </div>
 
-          <div className="bg-white/80 dark:bg-dark-surface/70 backdrop-blur-xl rounded-3xl p-8 md:p-10 shadow-lg ring-1 ring-glass-border dark:ring-outline/20">
+          <motion.div
+            animate={shake ? { x: [0, -4, 4, -4, 0] } : { x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white/80 dark:bg-dark-surface/70 backdrop-blur-xl rounded-3xl p-8 md:p-10 shadow-lg ring-1 ring-glass-border dark:ring-outline/20"
+          >
             <div className="mb-8 text-center">
               <div className="w-14 h-14 bg-surface-container dark:bg-dark-bg mx-auto rounded-full flex items-center justify-center mb-4 ring-4 ring-white/50 dark:ring-dark-surface">
                 <span className="text-primary dark:text-primary-fixed-dim">
@@ -233,7 +240,7 @@ export default function LoginPage() {
                 Secure connection via Telos Identity
               </p>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>

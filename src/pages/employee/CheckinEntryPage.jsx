@@ -184,7 +184,7 @@ export default function CheckinEntryPage() {
                       custom={index}
                       className="hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
                     >
-                      <div className="grid gap-4 px-6 py-5 lg:grid-cols-[2fr_1fr_1fr_1fr_auto]">
+                      <div className="grid grid-cols-1 gap-4 px-6 py-5 lg:grid-cols-[2fr_1fr_1fr_1fr_auto]">
                         <div>
                           <div className="flex items-center gap-2">
                             <p className="font-label-bold text-label-bold text-ink-900 dark:text-inverse-on-surface">{goal.title}</p>
