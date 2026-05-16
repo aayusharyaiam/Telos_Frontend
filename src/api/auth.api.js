@@ -9,3 +9,8 @@ export async function getMe() {
   const res = await api.get('/auth/me')
   return res.data.data
 }
+
+export async function updateMe(payload) {
+  const res = await api.patch('/auth/me', payload)
+  return res.data.data
+}

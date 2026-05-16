@@ -48,8 +48,15 @@ export function AuthProvider({ children }) {
     setAppUser(null)
   }
 
+  const refreshUser = async () => {
+    try {
+      const me = await getMe()
+      setAppUser(me)
+    } catch { }
+  }
+
   const value = useMemo(
-    () => ({ firebaseUser, appUser, loading, signInUser, signOutUser }),
+    () => ({ firebaseUser, appUser, loading, signInUser, signOutUser, refreshUser }),
     [firebaseUser, appUser, loading]
   )
 
