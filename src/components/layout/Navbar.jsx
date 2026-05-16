@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
 import { NavLink } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import useAuth from '../../hooks/useAuth'
 import NotificationDrawer from './NotificationDrawer'
 import Badge from '../shared/Badge'
@@ -19,7 +20,10 @@ export default function Navbar() {
   }, [])
 
   return (
-    <header
+    <motion.header
+      initial={{ opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
       className={`sticky top-0 z-40 w-full transition-all duration-300 ${
         scrolled
           ? 'shadow-md bg-white/80 dark:bg-dark-surface/80 backdrop-blur-md'
@@ -79,6 +83,6 @@ export default function Navbar() {
           </NavLink>
         ))}
       </div>
-    </header>
+    </motion.header>
   )
 }

@@ -37,7 +37,6 @@ export default function WeightageBar({ totalWeightage }) {
           animate={{ width: `${fillWidth}%` }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className={`h-full rounded-full ${barColor}`}
-          style={{ width: `${fillWidth}%` }}
         />
       </div>
       <div className="mt-2 text-right">

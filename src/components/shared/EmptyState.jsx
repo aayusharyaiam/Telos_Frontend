@@ -6,7 +6,7 @@ export default function EmptyState({ title, description, action, icon }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="rounded-2xl border border-dashed border-ink-200 dark:border-outline/30 bg-white/70 dark:bg-dark-surface/50 px-6 py-12 text-center"
+      className="rounded-2xl border border-dashed border-ink-200 dark:border-outline/30 bg-white/70 dark:bg-dark-surface/50 backdrop-blur-lg px-6 py-12 text-center"
     >
       {icon ? (
         <motion.div

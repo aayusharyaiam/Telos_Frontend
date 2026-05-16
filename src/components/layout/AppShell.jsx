@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import Navbar from './Navbar'
 import Sidebar from './Sidebar'
+import Notifier from './Notifier'
 
 const pageVariants = {
   initial: { opacity: 0, y: 24 },
@@ -11,6 +12,7 @@ const pageVariants = {
 export default function AppShell({ children }) {
   return (
     <div className="min-h-screen text-on-surface dark:text-inverse-on-surface">
+      <Notifier />
       <div className="flex">
         <Sidebar />
         <div className="flex min-w-0 flex-1 flex-col md:ml-[256px]">

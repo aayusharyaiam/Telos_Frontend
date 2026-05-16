@@ -352,16 +352,16 @@ John,john@example.com,pass123,EMPLOYEE"
                 <motion.div
                   key={user.id}
                   variants={itemVariants}
-                  className="grid gap-4 px-6 py-4 md:grid-cols-[2fr_1fr_1fr_1fr] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                  className="grid items-center gap-4 px-6 py-4 xl:grid-cols-[2fr_1fr_1fr_1fr] md:grid-cols-[1fr_auto_auto] sm:grid-cols-1 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
                 >
-                  <div>
-                    <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface">{user.name}</p>
-                    <p className="font-body-sm text-body-sm text-ink-500 dark:text-outline">
-                      {user.email} | Reports to {user.reportingManager?.name || '-'}
+                  <div className="min-w-0">
+                    <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface truncate">{user.name}</p>
+                    <p className="font-body-sm text-body-sm text-ink-500 dark:text-outline truncate">
+                      {user.email}{user.reportingManager?.name ? ` | ${user.reportingManager.name}` : ''}
                     </p>
                   </div>
                   <select
-                    className="rounded-lg border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-2 font-body-md text-body-md"
+                    className="rounded-lg border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-2 font-body-md text-body-md w-full md:w-auto"
                     value={user.role}
                     disabled={updatingUserId === user.id}
                     onChange={(event) => handleRoleChange(user, event.target.value)}
@@ -370,7 +370,7 @@ John,john@example.com,pass123,EMPLOYEE"
                     <option value="MANAGER">MANAGER</option>
                     <option value="ADMIN">ADMIN</option>
                   </select>
-                  <div>
+                  <div className="flex justify-start md:justify-center">
                     <Badge tone={user.isActive ? 'emerald' : 'red'}>
                       {user.isActive ? 'Active' : 'Inactive'}
                     </Badge>
@@ -378,7 +378,7 @@ John,john@example.com,pass123,EMPLOYEE"
                   <button
                     onClick={() => setPendingActiveToggle(user)}
                     disabled={updatingUserId === user.id}
-                    className="text-left font-body-md text-body-md font-semibold text-primary dark:text-primary-fixed-dim disabled:opacity-50"
+                    className="text-left md:text-center font-body-md text-body-md font-semibold text-primary dark:text-primary-fixed-dim disabled:opacity-50 hover:text-primary-700 dark:hover:text-primary-fixed transition-colors"
                   >
                     {user.isActive ? 'Deactivate' : 'Activate'}
                   </button>

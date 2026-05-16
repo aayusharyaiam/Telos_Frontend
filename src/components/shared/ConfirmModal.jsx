@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function ConfirmModal({
@@ -10,6 +11,14 @@ export default function ConfirmModal({
   loading = false,
   tone = 'primary',
 }) {
+  useEffect(() => {
+    if (!open) return
+    function handleKey(e) {
+      if (e.key === 'Escape') onCancel()
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [open, onCancel])
   const toneClasses = {
     primary: 'bg-primary-container text-white hover:bg-primary',
     danger: 'bg-error text-white hover:bg-red-700',

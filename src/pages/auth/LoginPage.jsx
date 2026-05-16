@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { motion } from 'framer-motion'
+import { UserIcon, UsersIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
 import useAuth from '../../hooks/useAuth'
 
 const stagger = {
@@ -13,30 +14,38 @@ const fadeSlide = {
   animate: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 25 } },
 }
 
+const iconMap = {
+  Employee: UserIcon,
+  Manager: UsersIcon,
+  Admin: ShieldCheckIcon,
+}
+
 const credentials = [
-  { role: 'Employee', email: 'employee@telos.demo', icon: 'person', desc: 'View goals & tasks', tone: 'text-primary' },
-  { role: 'Manager', email: 'manager@telos.demo', icon: 'manage_accounts', desc: 'Team oversight', tone: 'text-secondary' },
-  { role: 'Admin', email: 'admin@telos.demo', icon: 'admin_panel_settings', desc: 'Full strategic view', tone: 'text-primary' },
+  { role: 'Employee', email: 'employee@telos.demo', desc: 'View goals & tasks' },
+  { role: 'Manager', email: 'manager@telos.demo', desc: 'Team oversight' },
+  { role: 'Admin', email: 'admin@telos.demo', desc: 'Full strategic view' },
 ]
 
 export default function LoginPage() {
   const { appUser, signInUser } = useAuth()
   const [error, setError] = useState('')
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
   const {
     register,
     handleSubmit,
     setValue,
-    formState: { isSubmitting },
   } = useForm({ defaultValues: { email: '', password: '' } })
 
   if (appUser) return <Navigate to="/" replace />
 
   const onSubmit = async (values) => {
     setError('')
+    setIsLoggingIn(true)
     try {
       await signInUser(values.email, values.password)
     } catch {
       setError('Login failed. Check your credentials or contact Admin.')
+      setIsLoggingIn(false)
     }
   }
 
@@ -81,26 +90,29 @@ export default function LoginPage() {
               Quick Access Demos
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {credentials.map((c) => (
-                <motion.button
-                  key={c.role}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  type="button"
-                  onClick={() => fillDemo(c.email)}
-                  className="text-left bg-white/60 dark:bg-dark-surface/60 backdrop-blur-md rounded-2xl p-5 ring-1 ring-glass-border dark:ring-outline/20 hover:bg-white/80 dark:hover:bg-dark-surface/80 transition-all duration-200 shadow-sm flex flex-col items-start gap-3"
-                >
-                  <div className="w-8 h-8 rounded-full bg-surface-container-high dark:bg-dark-bg flex items-center justify-center text-primary dark:text-primary-fixed-dim">
-                    <span className="material-symbols-outlined text-[18px]">{c.icon}</span>
-                  </div>
-                  <div>
-                    <div className="font-display text-[16px] leading-tight text-ink-900 dark:text-inverse-on-surface">
-                      {c.role}
+              {credentials.map((c) => {
+                const Icon = iconMap[c.role]
+                return (
+                  <motion.button
+                    key={c.role}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="button"
+                    onClick={() => fillDemo(c.email)}
+                    className="h-full text-left bg-white/60 dark:bg-dark-surface/60 backdrop-blur-md rounded-2xl p-5 ring-1 ring-glass-border dark:ring-outline/20 hover:bg-white/80 dark:hover:bg-dark-surface/80 transition-all duration-200 shadow-sm flex flex-col items-start gap-3"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-surface-container-high dark:bg-dark-bg flex items-center justify-center text-primary dark:text-primary-fixed-dim shrink-0">
+                      <Icon className="h-[18px] w-[18px]" />
                     </div>
-                    <div className="font-caption text-caption text-ink-500 dark:text-outline">{c.desc}</div>
-                  </div>
-                </motion.button>
-              ))}
+                    <div className="flex-1">
+                      <div className="font-display text-[16px] leading-tight text-ink-900 dark:text-inverse-on-surface">
+                        {c.role}
+                      </div>
+                      <div className="font-caption text-caption text-ink-500 dark:text-outline mt-0.5">{c.desc}</div>
+                    </div>
+                  </motion.button>
+                )
+              })}
             </div>
           </motion.div>
         </motion.div>
@@ -212,10 +224,18 @@ export default function LoginPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isLoggingIn}
                 className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm font-display text-[16px] font-semibold text-on-primary bg-primary-container hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-container transition-all duration-200 disabled:opacity-60 mt-6"
               >
-                {isSubmitting ? 'Signing in...' : 'Sign in to Dashboard'}
+                {isLoggingIn ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Logging in...
+                  </span>
+                ) : 'Sign in to Dashboard'}
               </motion.button>
             </form>
 
