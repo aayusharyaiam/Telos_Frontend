@@ -31,8 +31,8 @@ export default function Sidebar() {
 
   const sidebarContent = (
     <div className="flex h-full flex-col">
-      <div className="mb-6 flex flex-col items-start gap-1 px-2">
-        <img src="/logo-mark.svg" alt="Telos" className="h-10 w-10 object-contain" />
+      <div className="mb-6 flex items-center gap-3 px-2">
+        <img src="/logo-mark.svg" alt="Telos" className="h-10 w-10 shrink-0 object-contain" />
         <p className="font-caption text-caption text-ink-500 dark:text-outline">
           Executive-Tech Management
         </p>
