@@ -63,8 +63,11 @@ export default function LoginPage() {
 
       <div className="hidden lg:flex flex-col justify-center flex-1 px-12 xl:px-24 z-10 relative">
         <motion.div initial="initial" animate="animate" variants={stagger} className="max-w-2xl">
-          <motion.div variants={fadeSlide} className="mb-12">
-            <img src="/logo-with-name.svg" alt="Telos AtomQuest" className="h-10 w-auto object-contain" />
+          <motion.div variants={fadeSlide} className="flex items-center gap-3 mb-12">
+            <img src="/logo-mark.svg" alt="Telos" className="h-10 w-10 object-contain" />
+            <span className="font-display text-headline-md text-ink-900 dark:text-inverse-on-surface tracking-tight">
+              Telos AtomQuest
+            </span>
           </motion.div>
 
           <motion.h1
@@ -122,8 +125,11 @@ export default function LoginPage() {
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="w-full max-w-md"
         >
-          <div className="flex lg:hidden items-center justify-center mb-8">
-            <img src="/logo-with-name.svg" alt="Telos AtomQuest" className="h-8 w-auto object-contain" />
+          <div className="flex lg:hidden items-center gap-2 justify-center mb-8">
+            <img src="/logo-mark.svg" alt="Telos" className="h-8 w-8 object-contain" />
+            <span className="font-display text-headline-md text-ink-900 dark:text-inverse-on-surface tracking-tight">
+              Telos AtomQuest
+            </span>
           </div>
 
           <motion.div

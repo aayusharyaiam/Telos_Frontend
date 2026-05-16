@@ -40,7 +40,8 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center">
-          <img src="/logo-with-name.svg" alt="Telos AtomQuest" className="h-7 w-auto object-contain" />
+          <img src="/logo-mark.svg" alt="Telos" className="h-7 w-7 object-contain" />
+          <span className="font-display text-headline-md font-bold text-ink-900 dark:text-surface-bright">Telos</span>
           <span className="text-ink-400 dark:text-outline select-none">|</span>
           <span className="font-body-sm text-body-sm text-ink-500 dark:text-outline">
             Purposeful Performance
