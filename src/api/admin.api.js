@@ -52,3 +52,8 @@ export async function runEscalationCheck() {
   const res = await api.post('/admin/escalations/run')
   return res.data.data
 }
+
+export async function getEmailLogs(page = 1, limit = 50) {
+  const res = await api.get(`/admin/email-logs?page=${page}&limit=${limit}`)
+  return res.data.data
+}

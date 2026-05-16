@@ -40,8 +40,9 @@ src/
 │   ├── employee/           # MyGoalsPage, GoalSheetPage, CheckinEntryPage
 │   ├── manager/            # TeamDashboardPage, ApprovalPage, ManagerCheckinPage, SharedGoalsPage
 │   ├── admin/              # AdminDashboardPage, UserManagementPage, CycleConfigPage,
-│   │                       # ThrustAreasPage, UnlockGoalsPage, EscalationsPage,
-│   │                       # CompletionDashboardPage, AuditLogPage, AnalyticsPage
+    │   │                       # ThrustAreasPage, UnlockGoalsPage, EscalationsPage,
+    │   │                       # CompletionDashboardPage, AuditLogPage, AnalyticsPage,
+    │   │                       # EmailLogPage
 │   └── shared/             # SettingsPage
 ├── routes/                 # AppRouter (18 routes with ProtectedRoute + AnimatePresence)
 └── utils/                  # constants, dateHelpers, navigation, scoreComputer
@@ -68,6 +69,7 @@ src/
 | `/admin/completion` | CompletionDashboardPage | Admin |
 | `/admin/audit` | AuditLogPage | Admin |
 | `/admin/analytics` | AnalyticsPage | Admin |
+| `/admin/email-logs` | EmailLogPage | Admin |
 | `/settings` | SettingsPage | All |
 
 ## Design System
@@ -214,7 +216,7 @@ dist/assets/ApprovalPage-*.js            9.99 kB
 
 - **Employee**: Goal sheet creation, weightage health bar with remaining percent, >90% warning, auto-save (30s + on-blur), quarterly check-in entry, shared goal "Awaiting owner update" indicator.
 - **Manager**: Team overview, approval with inline target/weightage edits and diff view (yellow highlight on edits, strikethrough originals), check-in completion, shared goals push.
-- **Admin**: Full CRUD users, CSV bulk user import (upload or paste), force open/close windows, archive past cycles, unlock goals, escalation rules, audit trail with filters, dynamic check-in completion KPI, analytics with Recharts charts, CSV/XLSX export.
+- **Admin**: Full CRUD users, CSV bulk user import (upload or paste), force open/close windows, archive past cycles, unlock goals, escalation rules, audit trail with filters, dynamic check-in completion KPI, analytics with Recharts charts, CSV/XLSX export, per-user `notificationEmail` override (delivers emails to a real inbox without changing login identity), paginated email log viewer with HTML preview.
 - **All**: Dark/light theme toggle, Editable Settings page (name, email, phone, department), notification drawer with popup toasts, role-based navigation, glassmorphism design, Framer Motion animations.
 
 ## Problem Statement Alignment

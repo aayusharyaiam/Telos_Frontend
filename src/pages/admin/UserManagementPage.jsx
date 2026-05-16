@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
+import { CheckIcon, PencilIcon } from '@heroicons/react/24/outline'
 import { getUsers, createUser, updateUser, importUsersCSV } from '../../api/users.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
@@ -29,6 +30,7 @@ export default function UserManagementPage() {
   const [creating, setCreating] = useState(false)
   const [pendingActiveToggle, setPendingActiveToggle] = useState(null)
   const [updatingUserId, setUpdatingUserId] = useState('')
+  const [editNotifEmail, setEditNotifEmail] = useState({ userId: null, value: '' })
   const [form, setForm] = useState({
     name: '', email: '', password: '', role: 'EMPLOYEE',
     reportingManagerId: '', department: '',
@@ -69,6 +71,21 @@ export default function UserManagementPage() {
       toast.success('User updated')
     } catch (err) {
       toast.error(err.response?.data?.error?.message || 'Could not update user')
+    } finally {
+      setUpdatingUserId('')
+    }
+  }
+
+  const handleSaveNotifEmail = async (userId) => {
+    const val = editNotifEmail.value.trim() || null
+    try {
+      setUpdatingUserId(userId)
+      await updateUser(userId, { notificationEmail: val })
+      setEditNotifEmail({ userId: null, value: '' })
+      await loadUsers()
+      toast.success('Notification email updated')
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Could not update notification email')
     } finally {
       setUpdatingUserId('')
     }
@@ -354,7 +371,7 @@ John,john@example.com,pass123,EMPLOYEE"
                 <motion.div
                   key={user.id}
                   variants={itemVariants}
-                  className="grid items-center gap-4 px-6 py-4 xl:grid-cols-[2fr_1fr_1fr_1fr] md:grid-cols-[1fr_auto_auto] sm:grid-cols-1 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                  className="grid items-center gap-4 px-6 py-4 xl:grid-cols-[2fr_1fr_1fr_1fr_1fr] md:grid-cols-[1fr_auto_auto_auto] sm:grid-cols-1 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
                 >
                   <div className="min-w-0">
                     <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface truncate">{user.name}</p>
@@ -376,6 +393,43 @@ John,john@example.com,pass123,EMPLOYEE"
                     <Badge tone={user.isActive ? 'emerald' : 'red'}>
                       {user.isActive ? 'Active' : 'Inactive'}
                     </Badge>
+                  </div>
+                  {/* notificationEmail: separate field that does NOT affect login credentials */}
+                  <div className="min-w-0">
+                    {editNotifEmail.userId === user.id ? (
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="email"
+                          value={editNotifEmail.value}
+                          onChange={(e) => setEditNotifEmail({ ...editNotifEmail, value: e.target.value })}
+                          onBlur={() => handleSaveNotifEmail(user.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSaveNotifEmail(user.id)
+                            if (e.key === 'Escape') setEditNotifEmail({ userId: null, value: '' })
+                          }}
+                          placeholder="user@example.com"
+                          autoFocus
+                          className="w-full rounded-lg border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-2 py-1 text-xs shadow-sm"
+                        />
+                        <button
+                          onClick={() => handleSaveNotifEmail(user.id)}
+                          disabled={updatingUserId === user.id}
+                          className="shrink-0 rounded-lg p-1 text-emerald-600 hover:bg-emerald-50 transition-colors"
+                        >
+                          <CheckIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setEditNotifEmail({ userId: user.id, value: user.notificationEmail || '' })}
+                        className="group flex items-center gap-1 font-body-sm text-body-sm text-ink-500 dark:text-outline hover:text-primary transition-colors"
+                      >
+                        <span className="truncate max-w-[120px]">
+                          {user.notificationEmail || <span className="italic">Not set</span>}
+                        </span>
+                        <PencilIcon className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                      </button>
+                    )}
                   </div>
                   <button
                     onClick={() => setPendingActiveToggle(user)}

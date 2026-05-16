@@ -156,6 +156,12 @@ export default function SettingsPage() {
                   <span className="font-body-md text-body-md text-ink-500 dark:text-outline">Email</span>
                   <span className="font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface">{appUser.email}</span>
                 </div>
+                {appUser.notificationEmail && (
+                  <div className="flex items-center justify-between py-3">
+                    <span className="font-body-md text-body-md text-ink-500 dark:text-outline">Notification Email</span>
+                    <span className="font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface">{appUser.notificationEmail}</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between py-3">
                   <span className="font-body-md text-body-md text-ink-500 dark:text-outline">Phone</span>
                   <span className="font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface">{appUser.phone || '—'}</span>
@@ -183,7 +189,7 @@ export default function SettingsPage() {
           <div className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg p-6 shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
             <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Preferences</p>
             <p className="mt-2 font-body-md text-body-md text-ink-500 dark:text-outline">
-              Keep your email up to date to receive email notifications for check-in reminders and goal updates.
+              Emails are sent to your login email unless an admin sets a separate notification email. Ask your admin to update it if needed.
             </p>
           </div>
         </motion.div>
