@@ -12,7 +12,7 @@ export default function WeightageBar({ totalWeightage }) {
           <p className="text-xs text-ink-500">Total must equal 100% to submit.</p>
         </div>
         <Badge tone={isExact ? 'emerald' : 'amber'}>
-          {totalWeightage}% allocated
+          {totalWeightage}% allocated — {100 - totalWeightage}% remaining
         </Badge>
       </div>
       <div className="mt-4 h-2 w-full rounded-full bg-sand-200">

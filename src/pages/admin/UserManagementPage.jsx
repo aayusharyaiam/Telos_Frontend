@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getUsers, createUser, updateUser } from '../../api/users.api'
+import { getUsers, createUser, updateUser, importUsersCSV } from '../../api/users.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
@@ -82,6 +82,36 @@ export default function UserManagementPage() {
     }
   }
 
+  const [showCsvImport, setShowCsvImport] = useState(false)
+  const [csvText, setCsvText] = useState('')
+  const [importingCsv, setImportingCsv] = useState(false)
+  const [importResult, setImportResult] = useState(null)
+
+  const handleCsvImport = async (e) => {
+    e.preventDefault()
+    if (!csvText.trim()) return
+    setImportingCsv(true)
+    setImportResult(null)
+    try {
+      const result = await importUsersCSV(csvText)
+      setImportResult(result)
+      setCsvText('')
+      await loadUsers()
+    } catch (err) {
+      setImportResult({ created: 0, errors: [{ error: err.response?.data?.error?.message || 'Import failed' }] })
+    } finally {
+      setImportingCsv(false)
+    }
+  }
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (event) => setCsvText(event.target.result)
+    reader.readAsText(file)
+  }
+
   const managers = users.filter((u) => u.role === 'MANAGER' || u.role === 'ADMIN')
 
   return (
@@ -92,12 +122,20 @@ export default function UserManagementPage() {
             title="User Management"
             subtitle="Manage roles, reporting lines, and user activation states."
           />
-          <button
-            onClick={() => setShowCreate(!showCreate)}
-            className="mt-1 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
-          >
-            {showCreate ? 'Cancel' : '+ New User'}
-          </button>
+          <div className="mt-1 flex gap-3">
+            <button
+              onClick={() => { setShowCsvImport(!showCsvImport); setShowCreate(false) }}
+              className="rounded-xl border border-ink-200 bg-white px-5 py-2.5 text-sm font-semibold text-ink-700 shadow-sm transition hover:bg-ink-50"
+            >
+              {showCsvImport ? 'Cancel' : 'Import CSV'}
+            </button>
+            <button
+              onClick={() => { setShowCreate(!showCreate); setShowCsvImport(false) }}
+              className="rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
+            >
+              {showCreate ? 'Cancel' : '+ New User'}
+            </button>
+          </div>
         </div>
 
         {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
@@ -116,6 +154,58 @@ export default function UserManagementPage() {
           onCancel={() => setPendingActiveToggle(null)}
           loading={Boolean(updatingUserId)}
         />
+
+        {/* CSV Import */}
+        {showCsvImport && (
+          <form
+            onSubmit={handleCsvImport}
+            className="rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-ink-100"
+          >
+            <p className="mb-1 text-sm font-semibold text-ink-900">Bulk Import Users</p>
+            <p className="mb-4 text-xs text-ink-500">
+              Upload a .csv file or paste CSV text. Columns: name, email, password, role, department (role and department optional).
+            </p>
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleFileUpload}
+              className="mb-4 block w-full text-sm text-ink-600 file:mr-3 file:rounded-xl file:border-0 file:bg-primary-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-700 hover:file:bg-primary-100"
+            />
+            <textarea
+              value={csvText}
+              onChange={(e) => setCsvText(e.target.value)}
+              rows={5}
+              placeholder="Or paste CSV here...
+name,email,password,role
+John,john@example.com,pass123,EMPLOYEE"
+              className="mb-4 w-full rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm text-ink-900 shadow-sm"
+            />
+            <div className="flex items-center justify-between">
+              <button
+                type="submit"
+                disabled={importingCsv || !csvText.trim()}
+                className="rounded-xl bg-accent-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-accent-700 disabled:opacity-50"
+              >
+                {importingCsv ? 'Importing...' : 'Import Users'}
+              </button>
+              {importResult && (
+                <p className="text-sm text-ink-600">
+                  {importResult.created} created
+                  {importResult.errors?.length > 0 ? `, ${importResult.errors.length} errors` : ''}
+                </p>
+              )}
+            </div>
+            {importResult?.errors?.length > 0 && (
+              <div className="mt-4 max-h-40 overflow-y-auto rounded-xl bg-red-50 px-4 py-3">
+                {importResult.errors.map((e, i) => (
+                  <p key={i} className="text-xs text-red-700">
+                    Row {e.row || '?'}: {e.error}
+                  </p>
+                ))}
+              </div>
+            )}
+          </form>
+        )}
 
         {/* Create User Form */}
         {showCreate && (

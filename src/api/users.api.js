@@ -14,3 +14,8 @@ export async function updateUser(id, payload) {
   const res = await api.patch(`/users/${id}`, payload)
   return res.data.data
 }
+
+export async function importUsersCSV(csv) {
+  const res = await api.post('/users/import', { csv })
+  return res.data.data
+}
