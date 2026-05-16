@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { getCycles, getActiveCycle, updateCycleWindow, archiveCycle } from '../../api/cycles.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
@@ -30,7 +31,6 @@ const itemVariants = {
 export default function CycleConfigPage() {
   const [cycles, setCycles] = useState([])
   const [activeCycle, setActiveCycle] = useState(null)
-  const [error, setError] = useState('')
   const [pendingWindowChange, setPendingWindowChange] = useState(null)
   const [pendingArchive, setPendingArchive] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -44,9 +44,8 @@ export default function CycleConfigPage() {
       ])
       setCycles(allCycles)
       setActiveCycle(active)
-      setError('')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not load cycles')
+      toast.error(err.response?.data?.error?.message || 'Could not load cycles')
     }
   }
 
@@ -61,8 +60,9 @@ export default function CycleConfigPage() {
       await updateCycleWindow(pendingWindowChange.cycleId, pendingWindowChange.window.phase, pendingWindowChange.status)
       setPendingWindowChange(null)
       await loadData()
+      toast.success('Window updated')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not update cycle window')
+      toast.error(err.response?.data?.error?.message || 'Could not update cycle window')
     } finally {
       setSaving(false)
     }
@@ -75,8 +75,9 @@ export default function CycleConfigPage() {
       await archiveCycle(pendingArchive.id)
       setPendingArchive(null)
       await loadData()
+      toast.success('Cycle archived')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not archive cycle')
+      toast.error(err.response?.data?.error?.message || 'Could not archive cycle')
     } finally {
       setSaving(false)
     }
@@ -93,8 +94,6 @@ export default function CycleConfigPage() {
           title="Cycle Configuration"
           subtitle="Force-open or close windows, archive past cycles."
         />
-
-        {error ? <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p> : null}
 
         <ConfirmModal
           open={Boolean(pendingWindowChange)}

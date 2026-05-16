@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { getThrustAreas, createThrustArea, updateThrustArea } from '../../api/admin.api'
+import { SkeletonPage } from '../../components/shared/Skeleton'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
@@ -23,16 +25,14 @@ export default function ThrustAreasPage() {
   const [areas, setAreas] = useState([])
   const [newName, setNewName] = useState('')
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
   const [creating, setCreating] = useState(false)
 
   async function load() {
     try {
       setLoading(true)
       setAreas(await getThrustAreas())
-      setError('')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not load thrust areas')
+      toast.error(err.response?.data?.error?.message || 'Could not load thrust areas')
     } finally {
       setLoading(false)
     }
@@ -48,8 +48,9 @@ export default function ThrustAreasPage() {
       await createThrustArea(newName.trim())
       setNewName('')
       await load()
+      toast.success('Thrust area created')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not create thrust area')
+      toast.error(err.response?.data?.error?.message || 'Could not create thrust area')
     } finally {
       setCreating(false)
     }
@@ -60,7 +61,7 @@ export default function ThrustAreasPage() {
       await updateThrustArea(area.id, { isActive: !area.isActive })
       await load()
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not update thrust area')
+      toast.error(err.response?.data?.error?.message || 'Could not update thrust area')
     }
   }
 
@@ -71,10 +72,6 @@ export default function ThrustAreasPage() {
           title="Thrust Area Management"
           subtitle="Manage the thrust areas available for goal categorization."
         />
-
-        {error && (
-          <div className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</div>
-        )}
 
         {/* Create new */}
         <motion.div
@@ -106,7 +103,7 @@ export default function ThrustAreasPage() {
 
         {/* List */}
         {loading ? (
-          <div className="py-12 text-center font-body-md text-body-md text-ink-500 dark:text-outline">Loading...</div>
+          <SkeletonTableRow rows={3} />
         ) : !areas.length ? (
           <EmptyState
             title="No thrust areas found"

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { getAuditReport } from '../../api/reports.api'
+import { SkeletonPage } from '../../components/shared/Skeleton'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import EmptyState from '../../components/shared/EmptyState'
@@ -57,7 +59,6 @@ function formatDateInput(d) {
 export default function AuditLogPage() {
   const [logs, setLogs] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
 
   // Filters
   const [filterAction, setFilterAction] = useState('')
@@ -72,9 +73,8 @@ export default function AuditLogPage() {
       if (filterStartDate) params.startDate = filterStartDate
       if (filterEndDate) params.endDate = filterEndDate
       setLogs(await getAuditReport(params))
-      setError('')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not load audit logs')
+      toast.error(err.response?.data?.error?.message || 'Could not load audit logs')
     } finally {
       setLoading(false)
     }
@@ -99,10 +99,6 @@ export default function AuditLogPage() {
           title="Audit Trail"
           subtitle="Track every post-lock edit, role change, and system-level override."
         />
-
-        {error && (
-          <div className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</div>
-        )}
 
         {/* Filter Controls */}
         <motion.div
@@ -153,7 +149,7 @@ export default function AuditLogPage() {
         </motion.div>
 
         {loading ? (
-          <div className="py-12 text-center font-body-md text-body-md text-ink-500 dark:text-outline">Loading audit logs...</div>
+          <SkeletonPage rows={5} statCards={0} />
         ) : !logs.length ? (
           <EmptyState
             title="No audit logs found"

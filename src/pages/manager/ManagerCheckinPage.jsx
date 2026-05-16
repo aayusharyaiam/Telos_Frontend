@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { useParams } from 'react-router-dom'
 import { getTeamCheckinSummary, submitManagerCheckin } from '../../api/checkins.api'
+import { SkeletonPage } from '../../components/shared/Skeleton'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
@@ -18,11 +20,9 @@ export default function ManagerCheckinPage() {
   const [comments, setComments] = useState({})
   const [loading, setLoading] = useState(true)
   const [savingId, setSavingId] = useState('')
-  const [error, setError] = useState('')
 
   async function load() {
     setLoading(true)
-    setError('')
     try {
       const next = await getTeamCheckinSummary({ employeeId, quarter })
       setData(next)
@@ -35,7 +35,7 @@ export default function ManagerCheckinPage() {
       }
       setComments(nextComments)
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not load manager check-in')
+      toast.error(err.response?.data?.error?.message || 'Could not load manager check-in')
     } finally {
       setLoading(false)
     }
@@ -55,12 +55,12 @@ export default function ManagerCheckinPage() {
 
   const saveComment = async (checkinId) => {
     setSavingId(checkinId)
-    setError('')
     try {
       await submitManagerCheckin(checkinId, comments[checkinId] || '')
       await load()
+      toast.success('Comment submitted')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not submit manager comment')
+      toast.error(err.response?.data?.error?.message || 'Could not submit manager comment')
     } finally {
       setSavingId('')
     }
@@ -69,7 +69,7 @@ export default function ManagerCheckinPage() {
   if (loading) {
     return (
       <AppShell>
-        <p className="font-body-md text-body-md text-ink-600 dark:text-outline">Loading manager check-in...</p>
+        <SkeletonPage rows={3} statCards={0} />
       </AppShell>
     )
   }
@@ -93,8 +93,6 @@ export default function ManagerCheckinPage() {
             </select>
           }
         />
-
-        {error ? <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p> : null}
 
         {!sheet ? (
           <p className="font-body-md text-body-md text-ink-600 dark:text-outline">No approved goal sheet is available for this employee yet.</p>

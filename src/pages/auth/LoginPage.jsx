@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { Navigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { motion } from 'framer-motion'
@@ -28,7 +29,6 @@ const credentials = [
 
 export default function LoginPage() {
   const { appUser, signInUser } = useAuth()
-  const [error, setError] = useState('')
   const [isLoggingIn, setIsLoggingIn] = useState(false)
   const {
     register,
@@ -39,12 +39,11 @@ export default function LoginPage() {
   if (appUser) return <Navigate to="/" replace />
 
   const onSubmit = async (values) => {
-    setError('')
     setIsLoggingIn(true)
     try {
       await signInUser(values.email, values.password)
     } catch {
-      setError('Login failed. Check your credentials or contact Admin.')
+      toast.error('Login failed. Check your credentials or contact Admin.')
       setIsLoggingIn(false)
     }
   }
@@ -191,16 +190,6 @@ export default function LoginPage() {
                   />
                 </div>
               </div>
-
-              {error ? (
-                <motion.p
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="font-body-md text-body-md text-error"
-                >
-                  {error}
-                </motion.p>
-              ) : null}
 
               <div className="flex items-center justify-between pt-2">
                 <div className="flex items-center">

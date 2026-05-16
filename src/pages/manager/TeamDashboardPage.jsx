@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getTeamOverview } from '../../api/goalSheets.api'
@@ -35,18 +36,16 @@ export default function TeamDashboardPage() {
   const [reports, setReports] = useState([])
   const [cycleName, setCycleName] = useState('')
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
 
   useEffect(() => {
     async function load() {
       setLoading(true)
-      setError('')
       try {
         const payload = await getTeamOverview()
         setReports(payload.reports || [])
         setCycleName(payload.cycleName || '')
       } catch (err) {
-        setError(err.response?.data?.error?.message || 'Could not load team')
+        toast.error(err.response?.data?.error?.message || 'Could not load team')
       } finally {
         setLoading(false)
       }
@@ -76,16 +75,6 @@ export default function TeamDashboardPage() {
           ) : null
         }
       />
-
-      {error ? (
-        <motion.p
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error"
-        >
-          {error}
-        </motion.p>
-      ) : null}
 
       <div className="grid gap-4 md:grid-cols-3">
         <StatCard title="Direct Reports" value={loading ? '...' : String(reports.length)} caption="In your team" />

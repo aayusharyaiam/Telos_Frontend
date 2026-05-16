@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { getAdminSummary } from '../../api/reports.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
@@ -21,28 +22,17 @@ const cardSlideRight = {
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState(null)
-  const [error, setError] = useState('')
 
   useEffect(() => {
     async function load() {
       try {
         setStats(await getAdminSummary())
       } catch (err) {
-        setError(err.response?.data?.error?.message || 'Could not load dashboard data')
+        toast.error(err.response?.data?.error?.message || 'Could not load dashboard data')
       }
     }
     load()
   }, [])
-
-  if (error) {
-    return (
-      <AppShell>
-        <div className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">
-          {error}
-        </div>
-      </AppShell>
-    )
-  }
 
   const s = stats || {}
 

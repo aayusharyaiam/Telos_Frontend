@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { createGoalSheet, getMyGoalSheet } from '../../api/goalSheets.api'
@@ -6,8 +7,9 @@ import { getActiveCycle } from '../../api/cycles.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import StatCard from '../../components/shared/StatCard'
-import Badge from '../../components/shared/Badge'
 import EmptyState from '../../components/shared/EmptyState'
+import GoalCard from '../../components/goals/GoalCard'
+import WeightageBar from '../../components/goals/WeightageBar'
 
 const CHECKIN_PHASE_TO_QUARTER = {
   Q1_CHECKIN: 'Q1',
@@ -35,30 +37,19 @@ function getOpenCheckinWindow(cycle) {
   })
 }
 
-const rowVariants = {
-  initial: { opacity: 0, y: 12 },
-  animate: (i) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.05, type: 'spring', stiffness: 300, damping: 25 },
-  }),
-}
-
 export default function MyGoalsPage() {
   const [sheet, setSheet] = useState(null)
   const [activeCycle, setActiveCycle] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
 
   async function loadSheet() {
     setLoading(true)
-    setError('')
     try {
       const [nextSheet, nextCycle] = await Promise.all([getMyGoalSheet(), getActiveCycle()])
       setSheet(nextSheet)
       setActiveCycle(nextCycle)
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not load goal sheet')
+      toast.error(err.response?.data?.error?.message || 'Could not load goal sheet')
     } finally {
       setLoading(false)
     }
@@ -67,12 +58,12 @@ export default function MyGoalsPage() {
   useEffect(() => { loadSheet() }, [])
 
   const handleCreate = async () => {
-    setError('')
     try {
       const nextSheet = await createGoalSheet()
       setSheet(nextSheet)
+      toast.success('Goal sheet created')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not create goal sheet')
+      toast.error(err.response?.data?.error?.message || 'Could not create goal sheet')
     }
   }
 
@@ -107,16 +98,6 @@ export default function MyGoalsPage() {
           </>
         }
       />
-
-      {error ? (
-        <motion.p
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error"
-        >
-          {error}
-        </motion.p>
-      ) : null}
 
       {openWindow ? (
         <motion.div
@@ -190,46 +171,28 @@ export default function MyGoalsPage() {
           }
         />
       ) : (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20"
-        >
-          <div className="flex items-center justify-between border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
-            <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Active Goals</p>
-            <Badge tone={totalWeightage === 100 ? 'emerald' : 'amber'}>
-              Total {totalWeightage}%
-            </Badge>
-          </div>
-          <div className="divide-y divide-sand-200/30 dark:divide-outline/10">
-            {goals.map((goal, i) => (
-              <motion.div
-                key={goal.id}
-                custom={i}
-                variants={rowVariants}
-                initial="initial"
-                animate="animate"
-                className="grid gap-4 px-6 py-4 md:grid-cols-[2fr_1fr_1fr_1fr] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
-              >
-                <div>
-                  <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface">{goal.title}</p>
-                  <p className="font-body-sm text-body-sm text-ink-500 dark:text-outline">{goal.thrustArea}</p>
-                </div>
-                <div className="flex items-center font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
-                  Target: {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}
-                </div>
-                <div className="flex items-center font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
-                  Weightage: {goal.weightage}%
-                </div>
-                <div className="flex items-center">
-                  <Badge tone={goal.isLocked ? 'emerald' : 'slate'}>
-                    {goal.isLocked ? 'Locked' : sheet.status}
-                  </Badge>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+        <div className="space-y-6">
+          <WeightageBar totalWeightage={totalWeightage} />
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20"
+          >
+            <div className="border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
+              <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Active Goals ({goals.length})</p>
+            </div>
+            <div className="space-y-3 p-4">
+              {goals.map((goal, i) => (
+                <GoalCard
+                  key={goal.id}
+                  goal={goal}
+                  canEdit={false}
+                  index={i}
+                />
+              ))}
+            </div>
+          </motion.div>
+        </div>
       )}
     </AppShell>
   )

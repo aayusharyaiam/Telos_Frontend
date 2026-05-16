@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import {
   getEscalationRules, createEscalationRule, updateEscalationRule,
   getEscalations, resolveEscalation, runEscalationCheck,
 } from '../../api/admin.api'
+import { SkeletonPage } from '../../components/shared/Skeleton'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
@@ -48,7 +50,6 @@ export default function EscalationsPage() {
   const [rules, setRules] = useState([])
   const [escalations, setEscalations] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
   const [tab, setTab] = useState('rules')
   const [running, setRunning] = useState(false)
 
@@ -62,9 +63,8 @@ export default function EscalationsPage() {
       const [r, e] = await Promise.all([getEscalationRules(), getEscalations()])
       setRules(r)
       setEscalations(e)
-      setError('')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not load data')
+      toast.error(err.response?.data?.error?.message || 'Could not load data')
     } finally {
       setLoading(false)
     }
@@ -80,8 +80,9 @@ export default function EscalationsPage() {
       await createEscalationRule(newRule)
       setNewRule({ name: '', phase: 'GOAL_SETTING', triggerAfterDays: 7 })
       await load()
+      toast.success('Escalation rule created')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Failed to create rule')
+      toast.error(err.response?.data?.error?.message || 'Failed to create rule')
     } finally {
       setCreating(false)
     }
@@ -92,7 +93,7 @@ export default function EscalationsPage() {
       await updateEscalationRule(rule.id, { isActive: !rule.isActive })
       await load()
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Failed to update rule')
+      toast.error(err.response?.data?.error?.message || 'Failed to update rule')
     }
   }
 
@@ -100,8 +101,9 @@ export default function EscalationsPage() {
     try {
       await resolveEscalation(esc.id)
       await load()
+      toast.success('Escalation resolved')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Failed to resolve')
+      toast.error(err.response?.data?.error?.message || 'Failed to resolve')
     }
   }
 
@@ -111,7 +113,7 @@ export default function EscalationsPage() {
       await runEscalationCheck()
       await load()
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Failed to run escalation check')
+      toast.error(err.response?.data?.error?.message || 'Failed to run escalation check')
     } finally {
       setRunning(false)
     }
@@ -134,10 +136,6 @@ export default function EscalationsPage() {
           }
         />
 
-        {error && (
-          <div className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</div>
-        )}
-
         {/* Tabs */}
         <div className="flex gap-1 rounded-xl bg-sand-100 dark:bg-dark-bg p-1">
           {['rules', 'log'].map((t) => (
@@ -156,7 +154,7 @@ export default function EscalationsPage() {
         </div>
 
         {loading && (
-          <div className="py-12 text-center font-body-md text-body-md text-ink-500 dark:text-outline">Loading...</div>
+          <SkeletonPage rows={3} statCards={0} />
         )}
 
         {/* Rules Tab */}

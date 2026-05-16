@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState, useRef } from 'react'
+import toast from 'react-hot-toast'
 import { useNavigate, useParams } from 'react-router-dom'
 import { approveGoalSheet, getGoalSheet, getTeamGoalSheets, returnGoalSheet } from '../../api/goalSheets.api'
 import { updateGoal } from '../../api/goals.api'
+import { SkeletonPage } from '../../components/shared/Skeleton'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
@@ -16,7 +18,6 @@ export default function ApprovalPage() {
   const [reason, setReason] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
   const [confirmApprove, setConfirmApprove] = useState(false)
   const [confirmReturn, setConfirmReturn] = useState(false)
   const [showDiff, setShowDiff] = useState(false)
@@ -24,7 +25,6 @@ export default function ApprovalPage() {
 
   async function loadSheet() {
     setLoading(true)
-    setError('')
     try {
       if (sheetId === 'active') {
         const team = await getTeamGoalSheets()
@@ -33,7 +33,7 @@ export default function ApprovalPage() {
         setSheet(await getGoalSheet(sheetId))
       }
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not load approval sheet')
+      toast.error(err.response?.data?.error?.message || 'Could not load approval sheet')
     } finally {
       setLoading(false)
     }
@@ -80,7 +80,7 @@ export default function ApprovalPage() {
       await updateGoal(goal.id, { weightage: value })
       await loadSheet()
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not update weightage')
+      toast.error(err.response?.data?.error?.message || 'Could not update weightage')
       await loadSheet()
     }
   }
@@ -97,7 +97,7 @@ export default function ApprovalPage() {
       await updateGoal(goal.id, { [field]: nextValue })
       await loadSheet()
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not update target')
+      toast.error(err.response?.data?.error?.message || 'Could not update target')
       await loadSheet()
     }
   }
@@ -106,11 +106,11 @@ export default function ApprovalPage() {
     if (!sheet) return
     setConfirmApprove(false)
     setSaving(true)
-    setError('')
     try {
       setSheet(await approveGoalSheet(sheet.id))
+      toast.success('Goal sheet approved')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not approve goal sheet')
+      toast.error(err.response?.data?.error?.message || 'Could not approve goal sheet')
     } finally {
       setSaving(false)
     }
@@ -120,12 +120,12 @@ export default function ApprovalPage() {
     if (!sheet) return
     setConfirmReturn(false)
     setSaving(true)
-    setError('')
     try {
       await returnGoalSheet(sheet.id, reason)
+      toast.success('Goal sheet returned')
       navigate('/manager/team')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not return goal sheet')
+      toast.error(err.response?.data?.error?.message || 'Could not return goal sheet')
     } finally {
       setSaving(false)
     }
@@ -134,7 +134,7 @@ export default function ApprovalPage() {
   if (loading) {
     return (
       <AppShell>
-        <p className="font-body-md text-body-md text-ink-600 dark:text-outline">Loading approval sheet...</p>
+        <SkeletonPage rows={4} statCards={0} />
       </AppShell>
     )
   }
@@ -184,8 +184,6 @@ export default function ApprovalPage() {
           onCancel={() => setConfirmReturn(false)}
           loading={saving}
         />
-
-        {error ? <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p> : null}
 
         {!sheet ? (
           <p className="font-body-md text-body-md text-ink-600 dark:text-outline">There are no team goal sheets to review yet.</p>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import {
   getAnalyticsOverview,
   getAnalyticsTrends,
@@ -68,7 +69,6 @@ export default function AnalyticsPage() {
   const [distribution, setDistribution] = useState([])
   const [managerEffectiveness, setManagerEffectiveness] = useState([])
   const [downloading, setDownloading] = useState('')
-  const [error, setError] = useState('')
 
   // Filter state
   const [filterQuarter, setFilterQuarter] = useState('')
@@ -90,7 +90,7 @@ export default function AnalyticsPage() {
         setDistribution(dist?.byThrustArea || [])
         setManagerEffectiveness(mgr || [])
       } catch (err) {
-        setError(err.response?.data?.error?.message || 'Could not load analytics')
+        toast.error(err.response?.data?.error?.message || 'Could not load analytics')
       }
     }
     load()
@@ -111,7 +111,7 @@ export default function AnalyticsPage() {
       const blob = await getAchievementReport('csv', buildFilters())
       triggerDownload(blob, 'achievement-report.csv')
     } catch (err) {
-      setError('Failed to download CSV')
+      toast.error('Failed to download CSV')
     } finally {
       setDownloading('')
     }
@@ -123,7 +123,7 @@ export default function AnalyticsPage() {
       const blob = await getAchievementReport('xlsx', buildFilters())
       triggerDownload(blob, 'achievement-report.xlsx')
     } catch (err) {
-      setError('Failed to download XLSX')
+      toast.error('Failed to download XLSX')
     } finally {
       setDownloading('')
     }
@@ -136,10 +136,6 @@ export default function AnalyticsPage() {
           title="Analytics"
           subtitle="Track quarterly score trends, goal distribution, and export reports."
         />
-
-        {error && (
-          <div className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</div>
-        )}
 
         {overview && (
           <div className="grid gap-4 md:grid-cols-4">

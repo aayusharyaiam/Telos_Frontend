@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { getCheckins, upsertCheckin } from '../../api/checkins.api'
 import { getActiveCycle } from '../../api/cycles.api'
+import { SkeletonPage } from '../../components/shared/Skeleton'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
@@ -54,11 +56,9 @@ export default function CheckinEntryPage() {
   const [drafts, setDrafts] = useState({})
   const [loading, setLoading] = useState(true)
   const [savingId, setSavingId] = useState('')
-  const [error, setError] = useState('')
 
   async function load() {
     setLoading(true)
-    setError('')
     try {
       const [next, nextCycle] = await Promise.all([getCheckins({ sheetId, quarter }), getActiveCycle()])
       setData(next)
@@ -75,7 +75,7 @@ export default function CheckinEntryPage() {
       }
       setDrafts(nextDrafts)
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not load check-ins')
+      toast.error(err.response?.data?.error?.message || 'Could not load check-ins')
     } finally {
       setLoading(false)
     }
@@ -94,7 +94,6 @@ export default function CheckinEntryPage() {
 
   const saveGoal = async (goal) => {
     setSavingId(goal.id)
-    setError('')
     const draft = drafts[goal.id] || {}
     try {
       await upsertCheckin({
@@ -106,8 +105,9 @@ export default function CheckinEntryPage() {
         actualDate: goal.isShared || goal.uomType !== 'TIMELINE' ? undefined : draft.actualDate,
       })
       await load()
+      toast.success('Check-in saved')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not save check-in')
+      toast.error(err.response?.data?.error?.message || 'Could not save check-in')
     } finally {
       setSavingId('')
     }
@@ -116,7 +116,7 @@ export default function CheckinEntryPage() {
   if (loading) {
     return (
       <AppShell>
-        <p className="font-body-md text-body-md text-ink-600 dark:text-outline">Loading check-ins...</p>
+        <SkeletonPage rows={3} statCards={0} />
       </AppShell>
     )
   }
@@ -146,7 +146,6 @@ export default function CheckinEntryPage() {
           }
         />
 
-        {error ? <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p> : null}
         {openWindow ? (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
             <div className="rounded-2xl border border-accent-200 bg-secondary/10 dark:bg-secondary/10 px-5 py-4 shadow-sm">

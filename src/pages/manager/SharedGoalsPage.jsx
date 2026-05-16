@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { getActiveThrustAreas } from '../../api/admin.api'
 import {
   createSharedGoal,
@@ -7,6 +8,7 @@ import {
   getSharedGoals,
   updateSharedGoalAchievement,
 } from '../../api/sharedGoals.api'
+import { SkeletonPage } from '../../components/shared/Skeleton'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
@@ -49,11 +51,9 @@ export default function SharedGoalsPage() {
   const [achievementQuarter, setAchievementQuarter] = useState('Q2')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
 
   async function load() {
     setLoading(true)
-    setError('')
     try {
       const [goals, nextRecipients] = await Promise.all([getSharedGoals(), getSharedGoalRecipients()])
       setSharedGoals(goals)
@@ -65,7 +65,7 @@ export default function SharedGoalsPage() {
       }
       setAchievementDrafts(nextAchievementDrafts)
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not load shared goals')
+      toast.error(err.response?.data?.error?.message || 'Could not load shared goals')
     } finally {
       setLoading(false)
     }
@@ -142,7 +142,6 @@ export default function SharedGoalsPage() {
 
   const handleCreate = async () => {
     setSaving(true)
-    setError('')
     try {
       await createSharedGoal({
         ...draft,
@@ -152,8 +151,9 @@ export default function SharedGoalsPage() {
       })
       setDraft(buildEmptyDraft(thrustAreas))
       await load()
+      toast.success('Shared goal created')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not create shared goal')
+      toast.error(err.response?.data?.error?.message || 'Could not create shared goal')
     } finally {
       setSaving(false)
     }
@@ -168,7 +168,6 @@ export default function SharedGoalsPage() {
 
   const handleAchievementSave = async (goal) => {
     setSaving(true)
-    setError('')
     const next = achievementDrafts[goal.id] || {}
     try {
       await updateSharedGoalAchievement(goal.id, {
@@ -177,8 +176,9 @@ export default function SharedGoalsPage() {
         actualDate: goal.uomType === 'TIMELINE' ? next.actualDate : undefined,
       })
       await load()
+      toast.success('Achievement saved')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not update shared achievement')
+      toast.error(err.response?.data?.error?.message || 'Could not update shared achievement')
     } finally {
       setSaving(false)
     }
@@ -189,7 +189,7 @@ export default function SharedGoalsPage() {
   if (loading) {
     return (
       <AppShell>
-        <p className="font-body-md text-body-md text-ink-600 dark:text-outline">Loading shared goals...</p>
+        <SkeletonPage rows={4} statCards={3} />
       </AppShell>
     )
   }
@@ -201,8 +201,6 @@ export default function SharedGoalsPage() {
           title="Shared Goals"
           subtitle="Push common KPIs into employee goal sheets and maintain one shared achievement value."
         />
-
-        {error ? <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p> : null}
 
         <div className="grid gap-4 md:grid-cols-3">
           <StatCard title="Shared Goals" value={String(sharedGoals.length)} caption="Created by you" />

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { getTeamGoalSheets, unlockGoalSheet, unlockGoal } from '../../api/goalSheets.api'
+import { SkeletonPage, SkeletonTableRow } from '../../components/shared/Skeleton'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
@@ -29,7 +31,6 @@ const itemVariants = {
 export default function UnlockGoalsPage() {
   const [sheets, setSheets] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
 
   // Sheet-level unlock
@@ -49,9 +50,8 @@ export default function UnlockGoalsPage() {
     try {
       setLoading(true)
       setSheets(await getTeamGoalSheets())
-      setError('')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not load goal sheets')
+      toast.error(err.response?.data?.error?.message || 'Could not load goal sheets')
     } finally {
       setLoading(false)
     }
@@ -75,8 +75,9 @@ export default function UnlockGoalsPage() {
       setUnlockTarget(null)
       setReason('')
       await load()
+      toast.success('Goal sheet unlocked')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Failed to unlock')
+      toast.error(err.response?.data?.error?.message || 'Failed to unlock')
     } finally {
       setUnlocking(false)
     }
@@ -90,8 +91,9 @@ export default function UnlockGoalsPage() {
       setGoalUnlockTarget(null)
       setGoalReason('')
       await load()
+      toast.success('Goal unlocked')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Failed to unlock goal')
+      toast.error(err.response?.data?.error?.message || 'Failed to unlock goal')
     } finally {
       setGoalUnlocking(false)
     }
@@ -108,10 +110,6 @@ export default function UnlockGoalsPage() {
           title="Goal Sheet Unlock"
           subtitle="Unlock approved/locked goal sheets or individual goals for employees to edit and resubmit."
         />
-
-        {error && (
-          <div className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</div>
-        )}
 
         {/* Search */}
         <input
@@ -197,7 +195,7 @@ export default function UnlockGoalsPage() {
 
         {/* Sheets List */}
         {loading ? (
-          <div className="py-12 text-center font-body-md text-body-md text-ink-500 dark:text-outline">Loading goal sheets...</div>
+          <SkeletonTableRow rows={3} />
         ) : !filtered.length ? (
           <EmptyState
             title={search ? 'No matching sheets' : 'No goal sheets found'}

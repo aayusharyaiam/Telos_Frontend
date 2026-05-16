@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { useParams } from 'react-router-dom'
 import {
   createGoalSheet,
@@ -12,7 +13,7 @@ import { createGoal, deleteGoal, updateGoal } from '../../api/goals.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
-import ConfirmModal from '../../components/shared/ConfirmModal'
+import { SkeletonPage } from '../../components/shared/Skeleton'
 import WeightageBar from '../../components/goals/WeightageBar'
 import GoalCard from '../../components/goals/GoalCard'
 import { THRUST_AREAS, UOM_TYPES } from '../../utils/constants'
@@ -39,12 +40,10 @@ export default function GoalSheetPage() {
   const [draft, setDraft] = useState(() => buildEmptyGoal(THRUST_AREAS))
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
   const [confirmSubmit, setConfirmSubmit] = useState(false)
 
   async function loadSheet() {
     setLoading(true)
-    setError('')
     try {
       if (sheetId === 'active') {
         const mine = (await getMyGoalSheet()) || (await createGoalSheet())
@@ -53,7 +52,7 @@ export default function GoalSheetPage() {
         setSheet(await getGoalSheet(sheetId))
       }
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not load goal sheet')
+      toast.error(err.response?.data?.error?.message || 'Could not load goal sheet')
     } finally {
       setLoading(false)
     }
@@ -137,7 +136,6 @@ export default function GoalSheetPage() {
   const handleAddGoal = async () => {
     if (!sheet) return
     setSaving(true)
-    setError('')
     try {
       await createGoal({
         ...draft,
@@ -147,15 +145,15 @@ export default function GoalSheetPage() {
       })
       setDraft(buildEmptyGoal(thrustAreas))
       await loadSheet()
+      toast.success('Goal added')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not add goal')
+      toast.error(err.response?.data?.error?.message || 'Could not add goal')
     } finally {
       setSaving(false)
     }
   }
 
   const handleUpdateGoal = async (goal, field, value) => {
-    setError('')
     setSheet((prev) => ({
       ...prev,
       goals: prev.goals.map((item) => (item.id === goal.id ? { ...item, [field]: value } : item)),
@@ -165,18 +163,18 @@ export default function GoalSheetPage() {
       await updateGoal(goal.id, { [field]: value })
       await loadSheet()
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not update goal')
+      toast.error(err.response?.data?.error?.message || 'Could not update goal')
       await loadSheet()
     }
   }
 
   const handleDeleteGoal = async (goalId) => {
-    setError('')
     try {
       await deleteGoal(goalId)
       await loadSheet()
+      toast.success('Goal deleted')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not delete goal')
+      toast.error(err.response?.data?.error?.message || 'Could not delete goal')
     }
   }
 
@@ -184,11 +182,11 @@ export default function GoalSheetPage() {
     if (!sheet) return
     setConfirmSubmit(false)
     setSaving(true)
-    setError('')
     try {
       setSheet(await submitGoalSheet(sheet.id))
+      toast.success('Goal sheet submitted')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not submit goal sheet')
+      toast.error(err.response?.data?.error?.message || 'Could not submit goal sheet')
     } finally {
       setSaving(false)
     }
@@ -197,7 +195,7 @@ export default function GoalSheetPage() {
   if (loading) {
     return (
       <AppShell>
-        <p className="font-body-md text-body-md text-ink-600 dark:text-outline">Loading goal sheet...</p>
+        <SkeletonPage rows={3} statCards={0} />
       </AppShell>
     )
   }
@@ -219,8 +217,6 @@ export default function GoalSheetPage() {
             </button>
           }
         />
-
-        {error ? <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p> : null}
 
         <ConfirmModal
           open={confirmSubmit}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { getCompletionReport } from '../../api/reports.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
@@ -33,14 +34,13 @@ export default function CompletionDashboardPage() {
     rows: [],
     summary: { total: 0, selectedQuarter: 'Q2', selectedComplete: 0, selectedPercent: 0, quarters: {} },
   })
-  const [error, setError] = useState('')
 
   useEffect(() => {
     async function load() {
       try {
         setReport(await getCompletionReport({ quarter }))
       } catch (err) {
-        setError(err.response?.data?.error?.message || 'Could not load completion report')
+        toast.error(err.response?.data?.error?.message || 'Could not load completion report')
       }
     }
     load()
@@ -70,8 +70,6 @@ export default function CompletionDashboardPage() {
             </select>
           }
         />
-
-        {error ? <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p> : null}
 
         <div className="grid gap-4 md:grid-cols-3">
           <StatCard title="Employees" value={String(report.summary.total)} caption="With goal sheets" />

@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import useAuth from '../../hooks/useAuth'
 import { updateMe } from '../../api/auth.api'
+import { SkeletonPage } from '../../components/shared/Skeleton'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
@@ -10,8 +12,6 @@ export default function SettingsPage() {
   const { appUser, refreshUser } = useAuth()
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
   const [form, setForm] = useState({ name: '', email: '', phone: '', department: '' })
 
   const startEditing = () => {
@@ -21,25 +21,19 @@ export default function SettingsPage() {
       phone: appUser?.phone || '',
       department: appUser?.department || '',
     })
-    setError('')
-    setSuccess('')
     setEditing(true)
   }
 
   const cancelEditing = () => {
     setEditing(false)
-    setError('')
-    setSuccess('')
   }
 
   const handleSave = async (e) => {
     e.preventDefault()
-    if (!form.name.trim()) { setError('Name is required'); return }
-    if (!form.email.trim() || !form.email.includes('@')) { setError('Valid email is required'); return }
+    if (!form.name.trim()) { toast.error('Name is required'); return }
+    if (!form.email.trim() || !form.email.includes('@')) { toast.error('Valid email is required'); return }
 
     setSaving(true)
-    setError('')
-    setSuccess('')
     try {
       await updateMe({
         name: form.name.trim(),
@@ -48,10 +42,10 @@ export default function SettingsPage() {
         department: form.department.trim() || null,
       })
       await refreshUser()
-      setSuccess('Profile updated successfully')
+      toast.success('Profile updated successfully')
       setEditing(false)
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not update profile')
+      toast.error(err.response?.data?.error?.message || 'Could not update profile')
     } finally {
       setSaving(false)
     }
@@ -60,7 +54,7 @@ export default function SettingsPage() {
   if (!appUser) {
     return (
       <AppShell>
-        <p className="font-body-md text-body-md text-ink-600 dark:text-outline">Loading profile...</p>
+        <SkeletonPage rows={3} statCards={0} />
       </AppShell>
     )
   }
@@ -82,17 +76,6 @@ export default function SettingsPage() {
             )
           }
         />
-
-        {error && (
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-            <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p>
-          </motion.div>
-        )}
-        {success && (
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-            <p className="rounded-xl bg-secondary/10 px-4 py-3 font-body-md text-body-md text-secondary dark:text-secondary-fixed">{success}</p>
-          </motion.div>
-        )}
 
         {editing ? (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>

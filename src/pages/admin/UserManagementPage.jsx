@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { getUsers, createUser, updateUser, importUsersCSV } from '../../api/users.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
@@ -24,7 +25,6 @@ const itemVariants = {
 
 export default function UserManagementPage() {
   const [users, setUsers] = useState([])
-  const [error, setError] = useState('')
   const [showCreate, setShowCreate] = useState(false)
   const [creating, setCreating] = useState(false)
   const [pendingActiveToggle, setPendingActiveToggle] = useState(null)
@@ -37,9 +37,8 @@ export default function UserManagementPage() {
   async function loadUsers() {
     try {
       setUsers(await getUsers())
-      setError('')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not load users')
+      toast.error(err.response?.data?.error?.message || 'Could not load users')
     }
   }
 
@@ -52,8 +51,9 @@ export default function UserManagementPage() {
       setUpdatingUserId(user.id)
       await updateUser(user.id, { role })
       await loadUsers()
+      toast.success('Role updated')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not update role')
+      toast.error(err.response?.data?.error?.message || 'Could not update role')
     } finally {
       setUpdatingUserId('')
     }
@@ -66,8 +66,9 @@ export default function UserManagementPage() {
       await updateUser(pendingActiveToggle.id, { isActive: !pendingActiveToggle.isActive })
       setPendingActiveToggle(null)
       await loadUsers()
+      toast.success('User updated')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not update user')
+      toast.error(err.response?.data?.error?.message || 'Could not update user')
     } finally {
       setUpdatingUserId('')
     }
@@ -89,8 +90,9 @@ export default function UserManagementPage() {
       setForm({ name: '', email: '', password: '', role: 'EMPLOYEE', reportingManagerId: '', department: '' })
       setShowCreate(false)
       await loadUsers()
+      toast.success('User created')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'Could not create user')
+      toast.error(err.response?.data?.error?.message || 'Could not create user')
     } finally {
       setCreating(false)
     }
@@ -111,6 +113,7 @@ export default function UserManagementPage() {
       setImportResult(result)
       setCsvText('')
       await loadUsers()
+      toast.success(`Imported ${result.created} users`)
     } catch (err) {
       setImportResult({ created: 0, errors: [{ error: err.response?.data?.error?.message || 'Import failed' }] })
     } finally {
@@ -151,8 +154,6 @@ export default function UserManagementPage() {
             </button>
           </div>
         </div>
-
-        {error && <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p>}
 
         <ConfirmModal
           open={Boolean(pendingActiveToggle)}
