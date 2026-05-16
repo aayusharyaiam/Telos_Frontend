@@ -1,6 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap');
 
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-ink-500: #6b7280;
@@ -13,6 +15,27 @@
   --color-sand-100: #f4f1ea;
   --color-sand-200: #ebe6dc;
   --color-sand-300: #e2dbc9;
+
+  --color-primary: #3525cd;
+  --color-primary-container: #4f46e5;
+  --color-primary-fixed: #e2dfff;
+  --color-primary-fixed-dim: #c3c0ff;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #dad7ff;
+
+  --color-secondary: #006c49;
+  --color-secondary-container: #6cf8bb;
+  --color-secondary-fixed: #6ffbbe;
+  --color-secondary-fixed-dim: #4edea3;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #00714d;
+
+  --color-tertiary: #5e4400;
+  --color-tertiary-container: #7b5b00;
+  --color-tertiary-fixed: #ffdf9f;
+  --color-tertiary-fixed-dim: #f1bf4f;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #ffd681;
 
   --color-primary-50: #eef2ff;
   --color-primary-100: #e0e7ff;
@@ -39,23 +62,102 @@
   --color-sun-400: #f6c453;
   --color-sun-500: #f2b545;
 
+  --color-surface: #f9f9ff;
+  --color-surface-dim: #d3daef;
+  --color-surface-bright: #f9f9ff;
+  --color-surface-variant: #dce2f7;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f1f3ff;
+  --color-surface-container: #e9edff;
+  --color-surface-container-high: #e1e8fd;
+  --color-surface-container-highest: #dce2f7;
+  --color-on-surface: #141b2b;
+  --color-on-surface-variant: #464555;
+  --color-inverse-surface: #293040;
+  --color-inverse-on-surface: #edf0ff;
+  --color-inverse-primary: #c3c0ff;
+
+  --color-outline: #777587;
+  --color-outline-variant: #c7c4d8;
+  --color-glass-border: rgba(17, 24, 39, 0.08);
+  --color-glass-bg: rgba(255, 255, 255, 0.7);
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+  --color-danger: #dc2626;
+
+  --color-dark-bg: #0f172a;
+  --color-dark-surface: #1e293b;
+
   --font-sans: 'Manrope', sans-serif;
   --font-display: 'Sora', sans-serif;
+
+  --font-size-display: 36px;
+  --font-size-display--line-height: 1.2;
+  --font-size-display--letter-spacing: -0.02em;
+  --font-size-display--font-weight: 600;
+
+  --font-size-headline-lg: 30px;
+  --font-size-headline-lg--line-height: 1.3;
+  --font-size-headline-lg--font-weight: 600;
+
+  --font-size-headline-lg-mobile: 24px;
+  --font-size-headline-lg-mobile--line-height: 1.3;
+  --font-size-headline-lg-mobile--font-weight: 600;
+
+  --font-size-headline-md: 20px;
+  --font-size-headline-md--line-height: 1.4;
+  --font-size-headline-md--font-weight: 600;
+
+  --font-size-headline-sm: 18px;
+  --font-size-headline-sm--line-height: 1.4;
+  --font-size-headline-sm--font-weight: 600;
+
+  --font-size-body-md: 14px;
+  --font-size-body-md--line-height: 1.6;
+  --font-size-body-md--font-weight: 400;
+
+  --font-size-body-sm: 12px;
+  --font-size-body-sm--line-height: 1.5;
+  --font-size-body-sm--font-weight: 400;
+
+  --font-size-label-bold: 12px;
+  --font-size-label-bold--line-height: 1;
+  --font-size-label-bold--letter-spacing: 0.05em;
+  --font-size-label-bold--font-weight: 700;
+
+  --font-size-label-medium: 12px;
+  --font-size-label-medium--line-height: 1;
+  --font-size-label-medium--font-weight: 500;
+
+  --font-size-stat-value: 30px;
+  --font-size-stat-value--line-height: 1;
+  --font-size-stat-value--font-weight: 600;
+
+  --font-size-caption: 12px;
+  --font-size-caption--line-height: 16px;
+  --font-size-caption--font-weight: 400;
 }
 
 :root {
   font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light;
-  color: #111827;
+  color: #141b2b;
   background-color: #fbfaf7;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.dark {
+  color-scheme: dark;
+  color: #edf0ff;
+  background-color: #0f172a;
 }
 
 body {
@@ -68,11 +170,27 @@ body {
     linear-gradient(180deg, #fbfaf7 0%, #f4f1ea 100%);
 }
 
+.dark body,
+body.dark {
+  background: #0f172a;
+}
+
+.dark body::before,
+body.dark::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(79, 70, 229, 0.08), transparent 60%),
+    radial-gradient(1000px 500px at 110% 10%, rgba(16, 185, 129, 0.06), transparent 60%);
+  pointer-events: none;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Sora', sans-serif;
 }
 
-/* Glassmorphism utility */
 .glass {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(16px);
@@ -80,8 +198,70 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid rgba(17, 24, 39, 0.08);
 }
 
+.dark .glass {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(199, 196, 216, 0.2);
+}
+
+.glass-card {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(107, 114, 128, 0.5);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+}
+
+.dark .glass-card {
+  background-color: rgba(30, 41, 59, 0.7);
+  border-color: rgba(199, 196, 216, 0.2);
+}
+
 .text-gradient {
   background: linear-gradient(to right, #4f46e5, #10b981, #f2b545);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #ebe6dc;
+  border-radius: 9999px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #6b7280;
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import { getAuditReport } from '../../api/reports.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
@@ -26,6 +27,19 @@ const ACTION_OPTIONS = [
     label: action.replace(/_/g, ' '),
   })),
 ]
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0 },
+}
 
 function formatDate(d) {
   if (!d) return '-'
@@ -87,88 +101,105 @@ export default function AuditLogPage() {
         />
 
         {error && (
-          <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+          <div className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</div>
         )}
 
         {/* Filter Controls */}
-        <div className="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-ink-100">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20 p-5"
+        >
           <div className="flex flex-wrap items-end gap-4">
-            <label className="grid gap-1 text-sm font-semibold text-ink-700">
+            <label className="grid gap-1 font-body-md text-body-md font-semibold text-ink-700 dark:text-inverse-on-surface">
               Action
               <select
                 value={filterAction}
                 onChange={(e) => setFilterAction(e.target.value)}
-                className="rounded-xl border border-ink-200 bg-white px-3 py-2.5 text-sm text-ink-900 shadow-sm"
+                className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-2.5 font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface shadow-sm"
               >
                 {ACTION_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
               </select>
             </label>
-            <label className="grid gap-1 text-sm font-semibold text-ink-700">
+            <label className="grid gap-1 font-body-md text-body-md font-semibold text-ink-700 dark:text-inverse-on-surface">
               From
               <input
                 type="date"
                 value={filterStartDate}
                 onChange={(e) => setFilterStartDate(e.target.value)}
-                className="rounded-xl border border-ink-200 bg-white px-3 py-2.5 text-sm text-ink-900 shadow-sm"
+                className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-2.5 font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface shadow-sm"
               />
             </label>
-            <label className="grid gap-1 text-sm font-semibold text-ink-700">
+            <label className="grid gap-1 font-body-md text-body-md font-semibold text-ink-700 dark:text-inverse-on-surface">
               To
               <input
                 type="date"
                 value={filterEndDate}
                 onChange={(e) => setFilterEndDate(e.target.value)}
-                className="rounded-xl border border-ink-200 bg-white px-3 py-2.5 text-sm text-ink-900 shadow-sm"
+                className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-2.5 font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface shadow-sm"
               />
             </label>
             {hasFilters && (
               <button
                 onClick={clearFilters}
-                className="rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm font-semibold text-ink-700 shadow-sm transition hover:bg-sand-100"
+                className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-2.5 text-sm font-semibold text-ink-700 dark:text-inverse-on-surface shadow-sm transition hover:bg-sand-100 dark:hover:bg-dark-bg/30"
               >
                 Clear Filters
               </button>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {loading ? (
-          <div className="py-12 text-center text-sm text-ink-500">Loading audit logs...</div>
+          <div className="py-12 text-center font-body-md text-body-md text-ink-500 dark:text-outline">Loading audit logs...</div>
         ) : !logs.length ? (
           <EmptyState
             title="No audit logs found"
             description={hasFilters ? 'Try adjusting your filters.' : 'Audit entries will appear as admin actions are performed.'}
           />
         ) : (
-          <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-ink-100">
-            <div className="border-b border-ink-100 px-6 py-4">
-              <p className="text-sm font-semibold text-ink-900">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20"
+          >
+            <div className="border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
+              <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">
                 Activity Log ({logs.length})
               </p>
             </div>
-            <div className="divide-y divide-ink-100">
+            <motion.div
+              className="divide-y divide-sand-200/30 dark:divide-outline/10"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {logs.map((log) => (
-                <div key={log.id} className="px-6 py-4">
+                <motion.div
+                  key={log.id}
+                  variants={itemVariants}
+                  className="px-6 py-4 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                >
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge tone={ACTION_TONES[log.action] || 'slate'}>
                       {log.action.replace(/_/g, ' ')}
                     </Badge>
                     {log.goal && (
-                      <span className="text-xs text-ink-500">
+                      <span className="font-body-sm text-body-sm text-ink-500 dark:text-outline">
                         Goal: {log.goal.title}
                       </span>
                     )}
                   </div>
 
                   {log.fieldChanged && (
-                    <p className="mt-1 text-sm text-ink-700">
+                    <p className="mt-1 font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
                       <span className="font-medium">{log.fieldChanged}</span>
                       {log.oldValue && (
                         <>
                           {' '}
-                          <span className="rounded bg-red-50 px-1.5 py-0.5 text-xs text-red-700 line-through">
+                          <span className="rounded bg-error-container/40 dark:bg-error-container/20 px-1.5 py-0.5 font-body-sm text-body-sm text-error line-through">
                             {log.oldValue}
                           </span>
                         </>
@@ -176,7 +207,7 @@ export default function AuditLogPage() {
                       {log.newValue && (
                         <>
                           {' → '}
-                          <span className="rounded bg-accent-50 px-1.5 py-0.5 text-xs text-accent-700">
+                          <span className="rounded bg-secondary/10 dark:bg-secondary/10 px-1.5 py-0.5 font-body-sm text-body-sm text-secondary dark:text-secondary-fixed">
                             {log.newValue}
                           </span>
                         </>
@@ -185,18 +216,18 @@ export default function AuditLogPage() {
                   )}
 
                   {log.reason && (
-                    <p className="mt-1 text-xs text-ink-600">
+                    <p className="mt-1 font-body-sm text-body-sm text-ink-600 dark:text-outline">
                       Reason: <span className="italic">{log.reason}</span>
                     </p>
                   )}
 
-                  <p className="mt-2 text-xs text-ink-500">
+                  <p className="mt-2 font-body-sm text-body-sm text-ink-500 dark:text-outline">
                     {log.user?.name || 'Unknown'} ({log.user?.email || '-'}) — {formatDate(log.createdAt)}
                   </p>
-                </div>
+                </motion.div>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
       </div>
     </AppShell>

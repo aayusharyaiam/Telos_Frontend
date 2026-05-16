@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast'
 import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
+import { ThemeProvider } from './context/ThemeContext.jsx'
 
 const queryClient = new QueryClient()
 
@@ -12,8 +13,10 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <App />
-        <Toaster position="top-right" />
+        <ThemeProvider>
+          <App />
+          <Toaster position="top-right" />
+        </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>

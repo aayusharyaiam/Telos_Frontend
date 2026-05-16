@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import useAuth from '../../hooks/useAuth'
 import { updateMe } from '../../api/auth.api'
 import AppShell from '../../components/layout/AppShell'
@@ -59,7 +60,7 @@ export default function SettingsPage() {
   if (!appUser) {
     return (
       <AppShell>
-        <p className="text-sm text-ink-600">Loading profile...</p>
+        <p className="font-body-md text-body-md text-ink-600 dark:text-outline">Loading profile...</p>
       </AppShell>
     )
   }
@@ -74,7 +75,7 @@ export default function SettingsPage() {
             !editing && (
               <button
                 onClick={startEditing}
-                className="rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+                className="rounded-xl bg-primary-container px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary hover:scale-[1.02]"
               >
                 Edit Profile
               </button>
@@ -82,113 +83,127 @@ export default function SettingsPage() {
           }
         />
 
-        {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
-        {success && <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{success}</p>}
-
-        {editing ? (
-          <form onSubmit={handleSave} className="rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-ink-100">
-            <p className="mb-4 text-sm font-semibold text-ink-900">Edit Profile</p>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-600">Name *</label>
-                <input
-                  type="text"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm text-ink-900 shadow-sm"
-                  required
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-600">Email *</label>
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm text-ink-900 shadow-sm"
-                  required
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-600">Phone</label>
-                <input
-                  type="tel"
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="Optional"
-                  className="w-full rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm text-ink-900 shadow-sm"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-600">Department</label>
-                <input
-                  type="text"
-                  value={form.department}
-                  onChange={(e) => setForm({ ...form, department: e.target.value })}
-                  placeholder="Optional"
-                  className="w-full rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm text-ink-900 shadow-sm"
-                />
-              </div>
-            </div>
-            <div className="mt-6 flex gap-3">
-              <button
-                type="submit"
-                disabled={saving}
-                className="rounded-xl bg-accent-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-accent-700 disabled:opacity-50"
-              >
-                {saving ? 'Saving...' : 'Save Changes'}
-              </button>
-              <button
-                type="button"
-                onClick={cancelEditing}
-                className="rounded-xl border border-ink-200 bg-white px-6 py-2.5 text-sm font-semibold text-ink-700 shadow-sm hover:bg-ink-50"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        ) : (
-          <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-ink-100">
-            <div className="border-b border-ink-100 px-6 py-4">
-              <p className="text-sm font-semibold text-ink-900">Account Information</p>
-            </div>
-            <div className="divide-y divide-ink-100 px-6 py-4">
-              <div className="flex items-center justify-between py-3">
-                <span className="text-sm text-ink-500">Name</span>
-                <span className="text-sm font-semibold text-ink-900">{appUser.name}</span>
-              </div>
-              <div className="flex items-center justify-between py-3">
-                <span className="text-sm text-ink-500">Email</span>
-                <span className="text-sm text-ink-900">{appUser.email}</span>
-              </div>
-              <div className="flex items-center justify-between py-3">
-                <span className="text-sm text-ink-500">Phone</span>
-                <span className="text-sm text-ink-900">{appUser.phone || '—'}</span>
-              </div>
-              <div className="flex items-center justify-between py-3">
-                <span className="text-sm text-ink-500">Role</span>
-                <Badge tone="indigo">{appUser.role}</Badge>
-              </div>
-              <div className="flex items-center justify-between py-3">
-                <span className="text-sm text-ink-500">Department</span>
-                <span className="text-sm text-ink-900">{appUser.department || '—'}</span>
-              </div>
-              <div className="flex items-center justify-between py-3">
-                <span className="text-sm text-ink-500">Account Status</span>
-                <Badge tone={appUser.isActive !== false ? 'emerald' : 'red'}>
-                  {appUser.isActive !== false ? 'Active' : 'Inactive'}
-                </Badge>
-              </div>
-            </div>
-          </div>
+        {error && (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p>
+          </motion.div>
+        )}
+        {success && (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="rounded-xl bg-secondary/10 px-4 py-3 font-body-md text-body-md text-secondary dark:text-secondary-fixed">{success}</p>
+          </motion.div>
         )}
 
-        <div className="rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-ink-100">
-          <p className="text-sm font-semibold text-ink-900">Preferences</p>
-          <p className="mt-2 text-sm text-ink-500">
-            Keep your email up to date to receive email notifications for check-in reminders and goal updates.
-          </p>
-        </div>
+        {editing ? (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+            <form onSubmit={handleSave} className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg p-6 shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
+              <p className="mb-4 font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Edit Profile</p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-1 block font-label-bold text-label-bold uppercase tracking-wider text-ink-600 dark:text-outline">Name *</label>
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className="w-full rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-2.5 font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface shadow-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block font-label-bold text-label-bold uppercase tracking-wider text-ink-600 dark:text-outline">Email *</label>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className="w-full rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-2.5 font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface shadow-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block font-label-bold text-label-bold uppercase tracking-wider text-ink-600 dark:text-outline">Phone</label>
+                  <input
+                    type="tel"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    placeholder="Optional"
+                    className="w-full rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-2.5 font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface shadow-sm"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block font-label-bold text-label-bold uppercase tracking-wider text-ink-600 dark:text-outline">Department</label>
+                  <input
+                    type="text"
+                    value={form.department}
+                    onChange={(e) => setForm({ ...form, department: e.target.value })}
+                    placeholder="Optional"
+                    className="w-full rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-2.5 font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface shadow-sm"
+                  />
+                </div>
+              </div>
+              <div className="mt-6 flex gap-3">
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="rounded-xl bg-secondary px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-secondary disabled:opacity-50"
+                >
+                  {saving ? 'Saving...' : 'Save Changes'}
+                </button>
+                <button
+                  type="button"
+                  onClick={cancelEditing}
+                  className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-6 py-2.5 text-sm font-semibold text-ink-700 dark:text-inverse-on-surface shadow-sm hover:bg-ink-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        ) : (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
+              <div className="border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
+                <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Account Information</p>
+              </div>
+              <div className="divide-y divide-sand-200/30 dark:divide-outline/10 px-6 py-4">
+                <div className="flex items-center justify-between py-3">
+                  <span className="font-body-md text-body-md text-ink-500 dark:text-outline">Name</span>
+                  <span className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface">{appUser.name}</span>
+                </div>
+                <div className="flex items-center justify-between py-3">
+                  <span className="font-body-md text-body-md text-ink-500 dark:text-outline">Email</span>
+                  <span className="font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface">{appUser.email}</span>
+                </div>
+                <div className="flex items-center justify-between py-3">
+                  <span className="font-body-md text-body-md text-ink-500 dark:text-outline">Phone</span>
+                  <span className="font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface">{appUser.phone || '—'}</span>
+                </div>
+                <div className="flex items-center justify-between py-3">
+                  <span className="font-body-md text-body-md text-ink-500 dark:text-outline">Role</span>
+                  <Badge tone="indigo">{appUser.role}</Badge>
+                </div>
+                <div className="flex items-center justify-between py-3">
+                  <span className="font-body-md text-body-md text-ink-500 dark:text-outline">Department</span>
+                  <span className="font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface">{appUser.department || '—'}</span>
+                </div>
+                <div className="flex items-center justify-between py-3">
+                  <span className="font-body-md text-body-md text-ink-500 dark:text-outline">Account Status</span>
+                  <Badge tone={appUser.isActive !== false ? 'emerald' : 'red'}>
+                    {appUser.isActive !== false ? 'Active' : 'Inactive'}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg p-6 shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
+            <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Preferences</p>
+            <p className="mt-2 font-body-md text-body-md text-ink-500 dark:text-outline">
+              Keep your email up to date to receive email notifications for check-in reminders and goal updates.
+            </p>
+          </div>
+        </motion.div>
       </div>
     </AppShell>
   )

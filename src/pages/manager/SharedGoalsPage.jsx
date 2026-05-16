@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { getActiveThrustAreas } from '../../api/admin.api'
 import {
@@ -188,7 +189,7 @@ export default function SharedGoalsPage() {
   if (loading) {
     return (
       <AppShell>
-        <p className="text-sm text-ink-600">Loading shared goals...</p>
+        <p className="font-body-md text-body-md text-ink-600 dark:text-outline">Loading shared goals...</p>
       </AppShell>
     )
   }
@@ -201,7 +202,7 @@ export default function SharedGoalsPage() {
           subtitle="Push common KPIs into employee goal sheets and maintain one shared achievement value."
         />
 
-        {error ? <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+        {error ? <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p> : null}
 
         <div className="grid gap-4 md:grid-cols-3">
           <StatCard title="Shared Goals" value={String(sharedGoals.length)} caption="Created by you" />
@@ -209,21 +210,21 @@ export default function SharedGoalsPage() {
           <StatCard title="Recipients" value={String(recipients.length)} caption="Available employees" />
         </div>
 
-        <div className="rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-ink-100">
-          <p className="text-sm font-semibold text-ink-900">Create Shared Goal</p>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 p-6 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
+          <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Create Shared Goal</p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
+            <label className="grid gap-2 font-headline-md text-headline-md text-ink-700 dark:text-inverse-on-surface">
               Title
               <input
-                className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
+                className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-3 font-body-md text-body-md"
                 value={draft.title}
                 onChange={(event) => updateDraft('title', event.target.value)}
               />
             </label>
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
+            <label className="grid gap-2 font-headline-md text-headline-md text-ink-700 dark:text-inverse-on-surface">
               Thrust Area
               <select
-                className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
+                className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-3 font-body-md text-body-md"
                 value={draft.thrustArea}
                 onChange={(event) => updateDraft('thrustArea', event.target.value)}
               >
@@ -232,10 +233,10 @@ export default function SharedGoalsPage() {
                 ))}
               </select>
             </label>
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
+            <label className="grid gap-2 font-headline-md text-headline-md text-ink-700 dark:text-inverse-on-surface">
               UoM
               <select
-                className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
+                className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-3 font-body-md text-body-md"
                 value={draft.uomType}
                 onChange={(event) => updateDraft('uomType', event.target.value)}
               >
@@ -244,31 +245,31 @@ export default function SharedGoalsPage() {
                 ))}
               </select>
             </label>
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
+            <label className="grid gap-2 font-headline-md text-headline-md text-ink-700 dark:text-inverse-on-surface">
               Target
               <input
                 type={draft.uomType === 'TIMELINE' ? 'date' : 'number'}
-                className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
+                className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-3 font-body-md text-body-md"
                 value={draft.uomType === 'TIMELINE' ? draft.targetDate : draft.target}
                 onChange={(event) =>
                   updateDraft(draft.uomType === 'TIMELINE' ? 'targetDate' : 'target', event.target.value)
                 }
               />
             </label>
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
+            <label className="grid gap-2 font-headline-md text-headline-md text-ink-700 dark:text-inverse-on-surface">
               Default Weightage
               <input
                 type="number"
                 min="10"
-                className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
+                className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-3 font-body-md text-body-md"
                 value={draft.defaultWeightage}
                 onChange={(event) => updateDraft('defaultWeightage', event.target.value)}
               />
             </label>
-            <label className="grid gap-2 text-sm font-semibold text-ink-700">
+            <label className="grid gap-2 font-headline-md text-headline-md text-ink-700 dark:text-inverse-on-surface">
               Description
               <input
-                className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
+                className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-3 font-body-md text-body-md"
                 value={draft.description}
                 onChange={(event) => updateDraft('description', event.target.value)}
               />
@@ -277,16 +278,16 @@ export default function SharedGoalsPage() {
 
           <div className="mt-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm font-semibold text-ink-700">Recipients</p>
+              <p className="font-headline-md text-headline-md text-ink-700 dark:text-inverse-on-surface">Recipients</p>
               {primaryRecipient ? (
-                <p className="text-xs text-ink-500">Primary owner: {primaryRecipient.name}</p>
+                <p className="font-body-sm text-body-sm text-ink-500 dark:text-outline">Primary owner: {primaryRecipient.name}</p>
               ) : null}
             </div>
             <div className="mt-3 grid gap-2 md:grid-cols-3">
               {recipients.map((recipient) => (
                 <label
                   key={recipient.id}
-                  className="flex items-center gap-3 rounded-xl border border-ink-100 bg-sand-100 px-3 py-2 text-sm text-ink-700"
+                  className="flex items-center gap-3 rounded-xl border border-sand-200/50 dark:border-outline/20 bg-sand-100 px-3 py-2 font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface"
                 >
                   <input
                     type="checkbox"
@@ -294,17 +295,17 @@ export default function SharedGoalsPage() {
                     onChange={() => toggleRecipient(recipient.id)}
                   />
                   <span>
-                    <span className="block font-semibold text-ink-900">{recipient.name}</span>
-                    <span className="block text-xs text-ink-500">{recipient.email}</span>
+                    <span className="block font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">{recipient.name}</span>
+                    <span className="block font-body-sm text-body-sm text-ink-500 dark:text-outline">{recipient.email}</span>
                   </span>
                 </label>
               ))}
             </div>
             {draft.recipientIds.length ? (
-              <label className="mt-4 grid gap-2 text-sm font-semibold text-ink-700 md:max-w-sm">
+              <label className="mt-4 grid gap-2 font-headline-md text-headline-md text-ink-700 dark:text-inverse-on-surface md:max-w-sm">
                 Primary Owner
                 <select
-                  className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
+                  className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-3 font-body-md text-body-md"
                   value={draft.primaryOwnerId || draft.recipientIds[0]}
                   onChange={(event) => updateDraft('primaryOwnerId', event.target.value)}
                 >
@@ -320,22 +321,22 @@ export default function SharedGoalsPage() {
 
           <div className="mt-5 flex justify-end">
             <button
-              className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+              className="rounded-xl bg-primary-container px-4 py-2 font-headline-md text-headline-md text-white hover:scale-[1.02] disabled:opacity-60"
               disabled={saving || !draft.title || !draft.recipientIds.length}
               onClick={handleCreate}
             >
               Push Shared Goal
             </button>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-ink-100">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink-100 px-6 py-4">
-            <p className="text-sm font-semibold text-ink-900">Shared Goal Library</p>
-            <label className="flex items-center gap-2 text-sm font-semibold text-ink-700">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
+            <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Shared Goal Library</p>
+            <label className="flex items-center gap-2 font-headline-md text-headline-md text-ink-700 dark:text-inverse-on-surface">
               Actual Quarter
               <select
-                className="rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm"
+                className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-2 font-body-md text-body-md"
                 value={achievementQuarter}
                 onChange={(event) => setAchievementQuarter(event.target.value)}
               >
@@ -345,28 +346,34 @@ export default function SharedGoalsPage() {
               </select>
             </label>
           </div>
-          <div className="divide-y divide-ink-100">
+          <div className="divide-y divide-sand-200/30 dark:divide-outline/10">
             {sharedGoals.length === 0 ? (
-              <div className="px-6 py-6 text-sm text-ink-600">No shared goals have been pushed yet.</div>
+              <div className="px-6 py-6 font-body-md text-body-md text-ink-600 dark:text-outline">No shared goals have been pushed yet.</div>
             ) : (
-              sharedGoals.map((goal) => {
+              sharedGoals.map((goal, index) => {
                 const achievement = achievementDrafts[goal.id] || {}
                 return (
-                  <div key={goal.id} className="grid gap-4 px-6 py-5 lg:grid-cols-[1.4fr_0.8fr_1fr_1fr_auto]">
+                  <motion.div
+                    key={goal.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="grid gap-4 px-6 py-5 lg:grid-cols-[1.4fr_0.8fr_1fr_1fr_auto] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                  >
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-ink-900">{goal.title}</p>
+                        <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">{goal.title}</p>
                         <Badge tone="indigo">Shared</Badge>
                       </div>
-                      <p className="text-xs text-ink-500">
+                      <p className="font-body-sm text-body-sm text-ink-500 dark:text-outline">
                         {goal.thrustArea} | Target: {targetLabel(goal)} | {goal.linkedGoals.length} recipients
                         {goal.primaryOwner?.name ? ` | Owner: ${goal.primaryOwner.name}` : ''}
                       </p>
                     </div>
-                    <div className="text-sm text-ink-700">
+                    <div className="font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
                       Weightage: {goal.defaultWeightage}%
                     </div>
-                    <label className="grid gap-2 text-sm text-ink-700">
+                    <label className="grid gap-2 font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
                       Actual
                       <input
                         type={goal.uomType === 'TIMELINE' ? 'date' : 'number'}
@@ -378,27 +385,27 @@ export default function SharedGoalsPage() {
                             event.target.value
                           )
                         }
-                        className="rounded-lg border border-ink-200 bg-white px-3 py-2"
+                        className="rounded-lg border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-2"
                       />
                     </label>
-                    <div className="text-sm text-ink-700">
+                    <div className="font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
                       {goal.linkedGoals.map((linkedGoal) => linkedGoal.goalSheet.user.name).join(', ')}
                     </div>
                     <div className="flex items-end">
                       <button
-                        className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                        className="rounded-xl bg-primary-container px-4 py-2 font-headline-md text-headline-md text-white hover:scale-[1.02] disabled:opacity-60"
                         disabled={saving}
                         onClick={() => handleAchievementSave(goal)}
                       >
                         Save Actual
                       </button>
                     </div>
-                  </div>
+                  </motion.div>
                 )
               })
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </AppShell>
   )

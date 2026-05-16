@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { createGoalSheet, getMyGoalSheet } from '../../api/goalSheets.api'
 import { getActiveCycle } from '../../api/cycles.api'
 import AppShell from '../../components/layout/AppShell'
@@ -34,6 +35,15 @@ function getOpenCheckinWindow(cycle) {
   })
 }
 
+const rowVariants = {
+  initial: { opacity: 0, y: 12 },
+  animate: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.05, type: 'spring', stiffness: 300, damping: 25 },
+  }),
+}
+
 export default function MyGoalsPage() {
   const [sheet, setSheet] = useState(null)
   const [activeCycle, setActiveCycle] = useState(null)
@@ -54,9 +64,7 @@ export default function MyGoalsPage() {
     }
   }
 
-  useEffect(() => {
-    loadSheet()
-  }, [])
+  useEffect(() => { loadSheet() }, [])
 
   const handleCreate = async () => {
     setError('')
@@ -76,121 +84,153 @@ export default function MyGoalsPage() {
 
   return (
     <AppShell>
-      <div className="space-y-8">
-        <PageHeader
-          title="My Goals"
-          subtitle="Track goal sheet status, weightage health, and check-in windows in one view."
-          actions={
-            <>
-              {sheet ? (
-                <Link
-                  className="rounded-xl border border-ink-200 bg-white px-4 py-2 text-sm font-semibold text-ink-700 transition hover:border-ink-300"
-                  to={nextSheetLink}
-                >
-                  View Goal Sheet
-                </Link>
-              ) : null}
-              <button
-                className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:opacity-60"
-                disabled={Boolean(sheet) || loading}
-                onClick={handleCreate}
+      <PageHeader
+        title="My Goals"
+        subtitle="Track goal sheet status, weightage health, and check-in windows in one view."
+        actions={
+          <>
+            {sheet ? (
+              <Link
+                className="inline-flex items-center rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-2 font-label-bold text-label-bold text-ink-700 dark:text-inverse-on-surface transition hover:scale-[1.02]"
+                to={nextSheetLink}
               >
-                Create Goal Sheet
-              </button>
-            </>
+                View Goal Sheet
+              </Link>
+            ) : null}
+            <button
+              className="inline-flex items-center rounded-xl bg-primary-container px-4 py-2 font-label-bold text-label-bold text-white transition hover:bg-primary hover:scale-[1.02] disabled:opacity-60"
+              disabled={Boolean(sheet) || loading}
+              onClick={handleCreate}
+            >
+              Create Goal Sheet
+            </button>
+          </>
+        }
+      />
+
+      {error ? (
+        <motion.p
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error"
+        >
+          {error}
+        </motion.p>
+      ) : null}
+
+      {openWindow ? (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-secondary/30 dark:border-secondary-fixed-dim/30 bg-secondary/10 dark:bg-secondary/10 px-5 py-4 shadow-sm"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="font-body-md text-body-md font-semibold text-secondary dark:text-secondary-fixed">
+                {openQuarter} Check-in is open
+              </p>
+              <p className="font-body-sm text-body-sm text-on-secondary-container dark:text-secondary-fixed/80">
+                Update your achievements by {formatDeadline(openWindow.closesAt)}.
+              </p>
+            </div>
+            <Link
+              to={`${nextSheetLink}/checkin?quarter=${openQuarter}`}
+              className="rounded-xl bg-secondary px-4 py-2 font-label-bold text-label-bold text-white transition hover:bg-secondary/80 hover:scale-[1.02]"
+            >
+              Open Check-in
+            </Link>
+          </div>
+        </motion.div>
+      ) : null}
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatCard
+          title="Goal Sheet Status"
+          value={loading ? 'Loading' : sheet?.status || 'Not Created'}
+          caption={sheet?.cycle?.name || 'Active cycle'}
+        />
+        <StatCard
+          title="Total Weightage"
+          value={`${totalWeightage}%`}
+          caption="Target: 100%"
+          tone={totalWeightage === 100 ? 'emerald' : 'indigo'}
+        />
+        <StatCard
+          title="Goals"
+          value={String(goals.length)}
+          caption="Maximum 8 goals"
+          tone="emerald"
+        />
+      </div>
+
+      {!sheet ? (
+        <EmptyState
+          title="No goal sheet yet"
+          description="Create your goal sheet to start adding goals for the active cycle."
+          action={
+            <button
+              onClick={handleCreate}
+              className="rounded-xl bg-primary-container px-4 py-2 font-label-bold text-label-bold text-white hover:bg-primary hover:scale-[1.02] transition-all"
+            >
+              Create Goal Sheet
+            </button>
           }
         />
-
-        {error ? <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
-        {openWindow ? (
-          <div className="rounded-2xl border border-accent-200 bg-accent-50 px-5 py-4 shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold text-accent-900">{openQuarter} Check-in is open</p>
-                <p className="text-sm text-accent-800">Update your achievements by {formatDeadline(openWindow.closesAt)}.</p>
-              </div>
-              <Link
-                to={`${nextSheetLink}/checkin?quarter=${openQuarter}`}
-                className="rounded-xl bg-accent-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-700"
-              >
-                Open Check-in
-              </Link>
-            </div>
+      ) : goals.length === 0 ? (
+        <EmptyState
+          title="No goals yet"
+          description="Open the goal sheet and add at least one goal before submitting."
+          action={
+            <Link
+              to={nextSheetLink}
+              className="inline-flex rounded-xl bg-primary-container px-4 py-2 font-label-bold text-label-bold text-white hover:bg-primary hover:scale-[1.02] transition-all"
+            >
+              Add Goals
+            </Link>
+          }
+        />
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20"
+        >
+          <div className="flex items-center justify-between border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
+            <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Active Goals</p>
+            <Badge tone={totalWeightage === 100 ? 'emerald' : 'amber'}>
+              Total {totalWeightage}%
+            </Badge>
           </div>
-        ) : null}
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <StatCard title="Goal Sheet Status" value={loading ? 'Loading' : sheet?.status || 'Not Created'} caption={sheet?.cycle?.name || 'Active cycle'} />
-          <StatCard
-            title="Total Weightage"
-            value={`${totalWeightage}%`}
-            caption="Target: 100%"
-            tone={totalWeightage === 100 ? 'emerald' : 'indigo'}
-          />
-          <StatCard
-            title="Goals"
-            value={String(goals.length)}
-            caption="Maximum 8 goals"
-            tone="emerald"
-          />
-        </div>
-
-        {!sheet ? (
-          <EmptyState
-            title="No goal sheet yet"
-            description="Create your goal sheet to start adding goals for the active cycle."
-            action={
-              <button
-                onClick={handleCreate}
-                className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white"
+          <div className="divide-y divide-sand-200/30 dark:divide-outline/10">
+            {goals.map((goal, i) => (
+              <motion.div
+                key={goal.id}
+                custom={i}
+                variants={rowVariants}
+                initial="initial"
+                animate="animate"
+                className="grid gap-4 px-6 py-4 md:grid-cols-[2fr_1fr_1fr_1fr] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
               >
-                Create Goal Sheet
-              </button>
-            }
-          />
-        ) : goals.length === 0 ? (
-          <EmptyState
-            title="No goals yet"
-            description="Open the goal sheet and add at least one goal before submitting."
-            action={
-              <Link
-                to={nextSheetLink}
-                className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white"
-              >
-                Add Goals
-              </Link>
-            }
-          />
-        ) : (
-          <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-ink-100">
-            <div className="flex items-center justify-between border-b border-ink-100 px-6 py-4">
-              <p className="text-sm font-semibold text-ink-900">Active Goals</p>
-              <Badge tone={totalWeightage === 100 ? 'emerald' : 'amber'}>
-                Total {totalWeightage}%
-              </Badge>
-            </div>
-            <div className="divide-y divide-ink-100">
-              {goals.map((goal) => (
-                <div key={goal.id} className="grid gap-4 px-6 py-4 md:grid-cols-[2fr_1fr_1fr_1fr]">
-                  <div>
-                    <p className="text-sm font-semibold text-ink-900">{goal.title}</p>
-                    <p className="text-xs text-ink-500">{goal.thrustArea}</p>
-                  </div>
-                  <div className="text-sm text-ink-700">
-                    Target: {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}
-                  </div>
-                  <div className="text-sm text-ink-700">Weightage: {goal.weightage}%</div>
-                  <div>
-                    <Badge tone={goal.isLocked ? 'emerald' : 'slate'}>
-                      {goal.isLocked ? 'Locked' : sheet.status}
-                    </Badge>
-                  </div>
+                <div>
+                  <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface">{goal.title}</p>
+                  <p className="font-body-sm text-body-sm text-ink-500 dark:text-outline">{goal.thrustArea}</p>
                 </div>
-              ))}
-            </div>
+                <div className="flex items-center font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
+                  Target: {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}
+                </div>
+                <div className="flex items-center font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
+                  Weightage: {goal.weightage}%
+                </div>
+                <div className="flex items-center">
+                  <Badge tone={goal.isLocked ? 'emerald' : 'slate'}>
+                    {goal.isLocked ? 'Locked' : sheet.status}
+                  </Badge>
+                </div>
+              </motion.div>
+            ))}
           </div>
-        )}
-      </div>
+        </motion.div>
+      )}
     </AppShell>
   )
 }

@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
@@ -15,6 +16,11 @@ import ConfirmModal from '../../components/shared/ConfirmModal'
 import WeightageBar from '../../components/goals/WeightageBar'
 import GoalCard from '../../components/goals/GoalCard'
 import { THRUST_AREAS, UOM_TYPES } from '../../utils/constants'
+
+const rowVariants = {
+  initial: { opacity: 0, y: 12 },
+  animate: (i) => ({ opacity: 1, y: 0, transition: { delay: i * 0.05, type: 'spring', stiffness: 300, damping: 25 } }),
+}
 
 const buildEmptyGoal = (thrustAreas) => ({
   thrustArea: thrustAreas[0] || THRUST_AREAS[0],
@@ -191,7 +197,7 @@ export default function GoalSheetPage() {
   if (loading) {
     return (
       <AppShell>
-        <p className="text-sm text-ink-600">Loading goal sheet...</p>
+        <p className="font-body-md text-body-md text-ink-600 dark:text-outline">Loading goal sheet...</p>
       </AppShell>
     )
   }
@@ -205,7 +211,7 @@ export default function GoalSheetPage() {
           chips={<Badge tone={sheet?.status === 'APPROVED' ? 'emerald' : 'indigo'}>{sheet?.status || 'Draft'}</Badge>}
           actions={
             <button
-              className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-xl bg-primary-container px-4 py-2 text-sm font-semibold text-white hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
               disabled={!sheet || saving || totalWeightage !== 100 || !goals.length || !canEdit}
               onClick={() => setConfirmSubmit(true)}
             >
@@ -214,7 +220,7 @@ export default function GoalSheetPage() {
           }
         />
 
-        {error ? <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+        {error ? <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p> : null}
 
         <ConfirmModal
           open={confirmSubmit}
@@ -227,107 +233,123 @@ export default function GoalSheetPage() {
         />
 
         {sheet?.returnReason ? (
-          <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Return reason: {sheet.returnReason}
-          </p>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="rounded-xl bg-tertiary-fixed-dim/20 dark:bg-tertiary-fixed-dim/30 px-4 py-3 font-body-md text-body-md text-amber-800">
+              Return reason: {sheet.returnReason}
+            </p>
+          </motion.div>
         ) : null}
 
         <WeightageBar totalWeightage={totalWeightage} />
         {heavyGoals.length > 0 ? (
-          <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Warning: {heavyGoals.map(g => g.title).join(', ')} {'>'}90% weightage — this leaves very little room for other goals.
-          </p>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="rounded-xl bg-tertiary-fixed-dim/20 dark:bg-tertiary-fixed-dim/30 px-4 py-3 font-body-md text-body-md text-amber-800">
+              Warning: {heavyGoals.map(g => g.title).join(', ')} {'>'}90% weightage — this leaves very little room for other goals.
+            </p>
+          </motion.div>
         ) : null}
 
         {canEdit ? (
-          <div className="rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-ink-100">
-            <p className="text-sm font-semibold text-ink-900">Add Goal</p>
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <label className="grid gap-2 text-sm font-semibold text-ink-700">
-                Title
-                <input
-                  className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
-                  value={draft.title}
-                  onChange={(event) => handleDraftChange('title', event.target.value)}
-                  onBlur={handleBlurAutoSave}
-                />
-              </label>
-              <label className="grid gap-2 text-sm font-semibold text-ink-700">
-                Thrust Area
-                <select
-                  className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
-                  value={draft.thrustArea}
-                  onChange={(event) => handleDraftChange('thrustArea', event.target.value)}
-                >
-                  {thrustAreas.map((area) => (
-                    <option key={area} value={area}>{area}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-2 text-sm font-semibold text-ink-700">
-                UoM
-                <select
-                  className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
-                  value={draft.uomType}
-                  onChange={(event) => handleDraftChange('uomType', event.target.value)}
-                >
-                  {UOM_TYPES.map((uom) => (
-                    <option key={uom.value} value={uom.value}>{uom.label}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-2 text-sm font-semibold text-ink-700">
-                Target
-                <input
-                  type={draft.uomType === 'TIMELINE' ? 'date' : 'number'}
-                  className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
-                  value={draft.uomType === 'TIMELINE' ? draft.targetDate : draft.target}
-                  onChange={(event) =>
-                    handleDraftChange(draft.uomType === 'TIMELINE' ? 'targetDate' : 'target', event.target.value)
-                  }
-                />
-              </label>
-              <label className="grid gap-2 text-sm font-semibold text-ink-700">
-                Weightage
-                <input
-                  type="number"
-                  min="10"
-                  max="100"
-                  className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
-                  value={draft.weightage}
-                  onChange={(event) => handleDraftChange('weightage', event.target.value)}
-                  onBlur={handleBlurAutoSave}
-                />
-              </label>
-              <div className="flex items-end">
-                <button
-                  className="w-full rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
-                  disabled={saving || !draft.title}
-                  onClick={handleAddGoal}
-                >
-                  Add Goal
-                </button>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg p-6 shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
+              <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Add Goal</p>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <label className="grid gap-2 font-label-bold text-label-bold text-ink-700 dark:text-inverse-on-surface">
+                  Title
+                  <input
+                    className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-3 font-body-md text-body-md"
+                    value={draft.title}
+                    onChange={(event) => handleDraftChange('title', event.target.value)}
+                    onBlur={handleBlurAutoSave}
+                  />
+                </label>
+                <label className="grid gap-2 font-label-bold text-label-bold text-ink-700 dark:text-inverse-on-surface">
+                  Thrust Area
+                  <select
+                    className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-3 font-body-md text-body-md"
+                    value={draft.thrustArea}
+                    onChange={(event) => handleDraftChange('thrustArea', event.target.value)}
+                  >
+                    {thrustAreas.map((area) => (
+                      <option key={area} value={area}>{area}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="grid gap-2 font-label-bold text-label-bold text-ink-700 dark:text-inverse-on-surface">
+                  UoM
+                  <select
+                    className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-3 font-body-md text-body-md"
+                    value={draft.uomType}
+                    onChange={(event) => handleDraftChange('uomType', event.target.value)}
+                  >
+                    {UOM_TYPES.map((uom) => (
+                      <option key={uom.value} value={uom.value}>{uom.label}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="grid gap-2 font-label-bold text-label-bold text-ink-700 dark:text-inverse-on-surface">
+                  Target
+                  <input
+                    type={draft.uomType === 'TIMELINE' ? 'date' : 'number'}
+                    className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-3 font-body-md text-body-md"
+                    value={draft.uomType === 'TIMELINE' ? draft.targetDate : draft.target}
+                    onChange={(event) =>
+                      handleDraftChange(draft.uomType === 'TIMELINE' ? 'targetDate' : 'target', event.target.value)
+                    }
+                  />
+                </label>
+                <label className="grid gap-2 font-label-bold text-label-bold text-ink-700 dark:text-inverse-on-surface">
+                  Weightage
+                  <input
+                    type="number"
+                    min="10"
+                    max="100"
+                    className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-3 font-body-md text-body-md"
+                    value={draft.weightage}
+                    onChange={(event) => handleDraftChange('weightage', event.target.value)}
+                    onBlur={handleBlurAutoSave}
+                  />
+                </label>
+                <div className="flex items-end">
+                  <button
+                    className="w-full rounded-xl bg-primary-container px-4 py-3 text-sm font-semibold text-white hover:scale-[1.02] disabled:opacity-60"
+                    disabled={saving || !draft.title}
+                    onClick={handleAddGoal}
+                  >
+                    Add Goal
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         ) : null}
 
-        <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-ink-100">
-          <div className="border-b border-ink-100 px-6 py-4">
-            <p className="text-sm font-semibold text-ink-900">Goals ({goals.length})</p>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
+            <div className="border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
+              <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Goals ({goals.length})</p>
+            </div>
+            <div className="divide-y divide-sand-200/30 dark:divide-outline/10">
+              {goals.map((goal, index) => (
+                <motion.div
+                  key={goal.id}
+                  variants={rowVariants}
+                  initial="initial"
+                  animate="animate"
+                  custom={index}
+                  className="hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                >
+                  <GoalCard
+                    goal={goal}
+                    canEdit={canEdit}
+                    onUpdateWeightage={(g, value) => handleUpdateGoal(g, 'weightage', value)}
+                    onDelete={handleDeleteGoal}
+                  />
+                </motion.div>
+              ))}
+            </div>
           </div>
-          <div className="divide-y divide-ink-100">
-            {goals.map((goal) => (
-              <GoalCard
-                key={goal.id}
-                goal={goal}
-                canEdit={canEdit}
-                onUpdateWeightage={(g, value) => handleUpdateGoal(g, 'weightage', value)}
-                onDelete={handleDeleteGoal}
-              />
-            ))}
-          </div>
-        </div>
+        </motion.div>
       </div>
     </AppShell>
   )

@@ -1,10 +1,18 @@
+import { motion } from 'framer-motion'
+
 export default function FullScreenLoader() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center">
-      <div className="flex items-center gap-3 rounded-full bg-white/80 px-5 py-3 shadow-sm">
-        <span className="h-4 w-4 animate-spin rounded-full border-2 border-ink-900 border-t-transparent" />
-        <span className="text-sm font-semibold text-ink-800">Loading Telos...</span>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex items-center gap-3 rounded-full bg-white/80 dark:bg-dark-surface/80 px-6 py-3 shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20"
+      >
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-container border-t-transparent" />
+        <span className="font-body-md text-body-md font-semibold text-ink-800 dark:text-inverse-on-surface">
+          Loading Telos...
+        </span>
+      </motion.div>
     </div>
   )
 }

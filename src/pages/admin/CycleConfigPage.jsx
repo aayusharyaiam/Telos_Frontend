@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import { getCycles, getActiveCycle, updateCycleWindow, archiveCycle } from '../../api/cycles.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
@@ -11,6 +12,19 @@ const phaseLabels = {
   Q2_CHECKIN: 'Q2 Check-in',
   Q3_CHECKIN: 'Q3 Check-in',
   Q4_CHECKIN: 'Q4 Check-in',
+}
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0 },
 }
 
 export default function CycleConfigPage() {
@@ -80,7 +94,7 @@ export default function CycleConfigPage() {
           subtitle="Force-open or close windows, archive past cycles."
         />
 
-        {error ? <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+        {error ? <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p> : null}
 
         <ConfirmModal
           open={Boolean(pendingWindowChange)}
@@ -110,17 +124,30 @@ export default function CycleConfigPage() {
 
         {/* Active Cycle Windows */}
         {active && (
-          <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-ink-100">
-            <div className="flex items-center justify-between border-b border-ink-100 px-6 py-4">
-              <p className="text-sm font-semibold text-ink-900">{active.name} Windows</p>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20"
+          >
+            <div className="flex items-center justify-between border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
+              <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">{active.name} Windows</p>
               <Badge tone="emerald">Active</Badge>
             </div>
-            <div className="divide-y divide-ink-100">
+            <motion.div
+              className="divide-y divide-sand-200/30 dark:divide-outline/10"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {(active.windows || []).map((window) => (
-                <div key={window.phase} className="grid gap-4 px-6 py-4 md:grid-cols-[2fr_1fr_1fr_1fr]">
+                <motion.div
+                  key={window.phase}
+                  variants={itemVariants}
+                  className="grid gap-4 px-6 py-4 md:grid-cols-[2fr_1fr_1fr_1fr] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                >
                   <div>
-                    <p className="text-sm font-semibold text-ink-900">{phaseLabels[window.phase] || window.phase}</p>
-                    <p className="text-xs text-ink-500">
+                    <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">{phaseLabels[window.phase] || window.phase}</p>
+                    <p className="font-body-sm text-body-sm text-ink-500 dark:text-outline">
                       {window.opensAt.slice(0, 10)} - {window.closesAt.slice(0, 10)}
                     </p>
                   </div>
@@ -131,42 +158,55 @@ export default function CycleConfigPage() {
                   </div>
                   <button
                     onClick={() => setPendingWindowChange({ cycleId: active.id, window, status: 'FORCE_OPEN' })}
-                    className="text-left text-sm font-semibold text-primary-700"
+                    className="text-left font-body-md text-body-md font-semibold text-primary dark:text-primary-fixed-dim"
                   >
                     Force Open
                   </button>
                   <button
                     onClick={() => setPendingWindowChange({ cycleId: active.id, window, status: 'FORCE_CLOSED' })}
-                    className="text-left text-sm font-semibold text-ink-600"
+                    className="text-left font-body-md text-body-md font-semibold text-ink-600 dark:text-outline"
                   >
                     Force Close
                   </button>
-                </div>
+                </motion.div>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
 
         {/* Inactive Cycles */}
         {inactiveCycles.length > 0 && (
-          <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-ink-100">
-            <div className="border-b border-ink-100 px-6 py-4">
-              <p className="text-sm font-semibold text-ink-900">Past Cycles ({inactiveCycles.length})</p>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20"
+          >
+            <div className="border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
+              <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Past Cycles ({inactiveCycles.length})</p>
             </div>
-            <div className="divide-y divide-ink-100">
+            <motion.div
+              className="divide-y divide-sand-200/30 dark:divide-outline/10"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {inactiveCycles.map((c) => (
-                <div key={c.id} className="flex items-center justify-between px-6 py-4">
-                  <p className="text-sm font-semibold text-ink-900">{c.name}</p>
+                <motion.div
+                  key={c.id}
+                  variants={itemVariants}
+                  className="flex items-center justify-between px-6 py-4 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                >
+                  <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">{c.name}</p>
                   <button
                     onClick={() => setPendingArchive(c)}
-                    className="text-sm font-semibold text-ink-500 hover:text-red-600"
+                    className="font-body-md text-body-md font-semibold text-ink-500 dark:text-outline hover:text-red-600"
                   >
                     Archive
                   </button>
-                </div>
+                </motion.div>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
 
         {/* Archived Cycles */}
@@ -174,23 +214,36 @@ export default function CycleConfigPage() {
           <div>
             <button
               onClick={() => setShowArchived(!showArchived)}
-              className="text-sm font-semibold text-ink-500"
+              className="font-body-md text-body-md font-semibold text-ink-500 dark:text-outline"
             >
               {showArchived ? 'Hide' : 'Show'} archived cycles ({archivedCycles.length})
             </button>
             {showArchived && (
-              <div className="mt-4 rounded-2xl bg-white/60 shadow-sm ring-1 ring-ink-100">
-                <div className="border-b border-ink-100 px-6 py-4">
-                  <p className="text-sm font-semibold text-ink-700">Archived Cycles</p>
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 rounded-2xl bg-white/60 dark:bg-dark-surface/50 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20"
+              >
+                <div className="border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
+                  <p className="font-headline-md text-headline-md text-ink-700 dark:text-inverse-on-surface">Archived Cycles</p>
                 </div>
-                <div className="divide-y divide-ink-100">
+                <motion.div
+                  className="divide-y divide-sand-200/30 dark:divide-outline/10"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
                   {archivedCycles.map((c) => (
-                    <div key={c.id} className="px-6 py-4">
-                      <p className="text-sm text-ink-600">{c.name}</p>
-                    </div>
+                    <motion.div
+                      key={c.id}
+                      variants={itemVariants}
+                      className="px-6 py-4 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                    >
+                      <p className="font-body-md text-body-md text-ink-600 dark:text-outline">{c.name}</p>
+                    </motion.div>
                   ))}
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             )}
           </div>
         )}

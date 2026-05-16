@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getTeamCheckinSummary, submitManagerCheckin } from '../../api/checkins.api'
@@ -68,7 +69,7 @@ export default function ManagerCheckinPage() {
   if (loading) {
     return (
       <AppShell>
-        <p className="text-sm text-ink-600">Loading manager check-in...</p>
+        <p className="font-body-md text-body-md text-ink-600 dark:text-outline">Loading manager check-in...</p>
       </AppShell>
     )
   }
@@ -82,7 +83,7 @@ export default function ManagerCheckinPage() {
           chips={<Badge tone={canEdit ? 'emerald' : 'slate'}>{canEdit ? 'Window Open' : 'Read Only'}</Badge>}
           actions={
             <select
-              className="rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm"
+              className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-2 font-body-md text-body-md"
               value={quarter}
               onChange={(event) => setQuarter(event.target.value)}
             >
@@ -93,30 +94,36 @@ export default function ManagerCheckinPage() {
           }
         />
 
-        {error ? <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+        {error ? <p className="rounded-xl bg-error-container/40 dark:bg-error-container/20 px-4 py-3 font-body-md text-body-md text-error">{error}</p> : null}
 
         {!sheet ? (
-          <p className="text-sm text-ink-600">No approved goal sheet is available for this employee yet.</p>
+          <p className="font-body-md text-body-md text-ink-600 dark:text-outline">No approved goal sheet is available for this employee yet.</p>
         ) : (
-          <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-ink-100">
-            <div className="border-b border-ink-100 px-6 py-4">
-              <p className="text-sm font-semibold text-ink-900">Employee Goals</p>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
+            <div className="border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
+              <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Employee Goals</p>
             </div>
-            <div className="divide-y divide-ink-100">
-              {goals.map((goal) => {
+            <div className="divide-y divide-sand-200/30 dark:divide-outline/10">
+              {goals.map((goal, index) => {
                 const checkin = currentCheckin(goal)
                 return (
-                  <div key={goal.id} className="grid gap-4 px-6 py-5 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1.4fr_auto]">
+                  <motion.div
+                    key={goal.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="grid gap-4 px-6 py-5 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1.4fr_auto] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                  >
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-ink-900">{goal.title}</p>
+                        <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">{goal.title}</p>
                         {goal.isShared ? <Badge tone="indigo">Shared</Badge> : null}
                       </div>
-                      <p className="text-xs text-ink-500">
+                      <p className="font-body-sm text-body-sm text-ink-500 dark:text-outline">
                         Planned: {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}
                       </p>
                     </div>
-                    <div className="text-sm text-ink-700">
+                    <div className="font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
                       Actual: {checkin?.actualAchievement ?? checkin?.actualDate?.slice(0, 10) ?? '--'}
                     </div>
                     <div>
@@ -124,18 +131,18 @@ export default function ManagerCheckinPage() {
                         {checkin?.checkinCompleted ? 'Complete' : checkin?.goalStatus || 'Pending'}
                       </Badge>
                     </div>
-                    <label className="grid gap-2 text-sm text-ink-700">
+                    <label className="grid gap-2 font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
                       Manager Comment
                       <input
                         disabled={!checkin?.id || !canEdit}
                         value={checkin?.id ? comments[checkin.id] || '' : ''}
                         onChange={(event) => updateComment(checkin.id, event.target.value)}
-                        className="rounded-lg border border-ink-200 bg-white px-3 py-2 disabled:bg-sand-100"
+                        className="rounded-lg border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-2 disabled:bg-sand-100"
                         placeholder={checkin?.id ? 'Add comment' : 'Employee has not saved this check-in'}
                       />
                     </label>
                     <div className="flex items-end gap-3">
-                      <div className="text-sm font-semibold text-ink-800">
+                      <div className="font-headline-md text-headline-md text-ink-800">
                         {checkin?.progressScore === null || checkin?.progressScore === undefined
                           ? 'N/A'
                           : `${Number(checkin.progressScore).toFixed(1)}%`}
@@ -143,16 +150,16 @@ export default function ManagerCheckinPage() {
                       <button
                         disabled={!checkin?.id || !canEdit || savingId === checkin.id}
                         onClick={() => saveComment(checkin.id)}
-                        className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                        className="rounded-xl bg-primary-container px-4 py-2 font-headline-md text-headline-md text-white hover:scale-[1.02] disabled:opacity-60"
                       >
                         Submit
                       </button>
                     </div>
-                  </div>
+                  </motion.div>
                 )
               })}
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </AppShell>

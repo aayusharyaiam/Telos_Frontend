@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
 import { NavLink } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
@@ -7,26 +8,52 @@ import { NAV_LINKS } from '../../utils/navigation'
 
 export default function Navbar() {
   const { appUser, signOutUser } = useAuth()
+  const [scrolled, setScrolled] = useState(false)
   const role = appUser?.role || 'EMPLOYEE'
   const links = NAV_LINKS[role] || NAV_LINKS.EMPLOYEE
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
-    <header className="sticky top-0 z-20 border-b border-ink-100 bg-white/80 backdrop-blur">
-      <div className="flex items-center justify-between px-6 py-4">
-        <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-ink-500">Telos</p>
-          <p className="text-lg font-semibold text-ink-900">Purposeful Performance</p>
+    <header
+      className={`sticky top-0 z-40 w-full transition-all duration-300 ${
+        scrolled
+          ? 'shadow-md bg-white/80 dark:bg-dark-surface/80 backdrop-blur-md'
+          : 'bg-white/70 dark:bg-dark-surface/50 backdrop-blur-sm'
+      } border-b border-sand-200 dark:border-ink-600/20`}
+    >
+      <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 max-w-[1440px] mx-auto">
+        <div className="md:hidden flex items-center gap-3 ml-10">
+          <p className="font-display text-headline-md font-semibold text-ink-900 dark:text-surface-bright">
+            Telos
+          </p>
         </div>
+
+        <div className="hidden md:flex items-center gap-2">
+          <span className="font-display text-headline-md text-primary dark:text-primary-fixed-dim font-bold">
+            Telos AtomQuest
+          </span>
+          <span className="font-body-sm text-body-sm text-ink-500 dark:text-outline ml-2">
+            Purposeful Performance
+          </span>
+        </div>
+
         <div className="flex items-center gap-4">
           <NotificationDrawer />
-          <div className="flex items-center gap-2">
-            <div className="text-right">
-              <p className="text-sm font-semibold text-ink-900">{appUser?.name || 'Guest'}</p>
+          <div className="flex items-center gap-3">
+            <div className="text-right hidden sm:block">
+              <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface">
+                {appUser?.name || 'Guest'}
+              </p>
               <Badge tone="indigo">{appUser?.role || 'EMPLOYEE'}</Badge>
             </div>
             <button
               onClick={signOutUser}
-              className="flex items-center gap-1 rounded-full border border-ink-200 bg-white px-3 py-1.5 text-xs font-semibold text-ink-700 transition hover:border-ink-300"
+              className="flex items-center gap-1 rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-1.5 font-label-bold text-label-bold text-ink-700 dark:text-inverse-on-surface hover:scale-[1.02] transition-all duration-200 hover:shadow-sm"
             >
               Sign out
               <ChevronDownIcon className="h-4 w-4" />
@@ -34,16 +61,17 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-      <div className="flex gap-2 overflow-x-auto border-t border-ink-100 px-4 py-3 md:hidden">
+
+      <div className="flex gap-2 overflow-x-auto border-t border-sand-200/50 dark:border-outline/10 px-4 py-2 md:hidden">
         {links.map((link) => (
           <NavLink
             key={link.label}
             to={link.to}
             className={({ isActive }) =>
-              `whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${
+              `whitespace-nowrap rounded-full px-3 py-1.5 font-label-bold text-label-bold transition-all duration-200 ${
                 isActive
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-sand-100 text-ink-700'
+                  ? 'bg-primary-container text-white'
+                  : 'bg-sand-100 dark:bg-dark-surface text-ink-700 dark:text-inverse-on-surface'
               }`
             }
           >

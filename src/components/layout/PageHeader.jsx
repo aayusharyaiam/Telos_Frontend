@@ -1,14 +1,40 @@
+import { motion } from 'framer-motion'
+
+const staggerContainer = {
+  animate: { transition: { staggerChildren: 0.08 } },
+}
+
+const staggerItem = {
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 25 } },
+}
+
 export default function PageHeader({ title, subtitle, actions, chips }) {
   return (
-    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <motion.div
+      variants={staggerContainer}
+      initial="initial"
+      animate="animate"
+      className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+    >
       <div>
-        <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-3xl font-semibold text-ink-900">{title}</h1>
+        <motion.div variants={staggerItem} className="flex flex-wrap items-center gap-2">
+          <h1 className="font-display text-headline-lg-mobile md:text-headline-lg text-ink-900 dark:text-inverse-on-surface">
+            {title}
+          </h1>
           {chips}
-        </div>
-        {subtitle ? <p className="mt-2 text-sm text-ink-600">{subtitle}</p> : null}
+        </motion.div>
+        {subtitle ? (
+          <motion.p variants={staggerItem} className="mt-2 font-body-md text-body-md text-ink-600 dark:text-outline">
+            {subtitle}
+          </motion.p>
+        ) : null}
       </div>
-      {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
-    </div>
+      {actions ? (
+        <motion.div variants={staggerItem} className="flex flex-wrap gap-2">
+          {actions}
+        </motion.div>
+      ) : null}
+    </motion.div>
   )
 }
