@@ -93,7 +93,7 @@ export default function TeamDashboardPage() {
                 const tone = STATUS_TONES[statusKey] || 'slate'
 
                 return (
-                  <div key={report.userId} className="flex items-center justify-between px-6 py-4">
+                  <div key={report.userId} className="flex flex-wrap items-center justify-between gap-2 px-6 py-4">
                     <div>
                       <p className="text-sm font-semibold text-ink-900">{report.name}</p>
                       <p className="text-xs text-ink-500">{report.goalsCount || 0} goals</p>

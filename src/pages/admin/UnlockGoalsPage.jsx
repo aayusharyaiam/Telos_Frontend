@@ -199,7 +199,7 @@ export default function UnlockGoalsPage() {
             <div className="divide-y divide-ink-100">
               {filtered.map((sheet) => (
                 <div key={sheet.id}>
-                  <div className="flex items-center justify-between gap-4 px-6 py-4">
+                  <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4">
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-semibold text-ink-900">
@@ -240,7 +240,7 @@ export default function UnlockGoalsPage() {
                       <p className="text-xs font-semibold text-ink-600 mb-2">Individual Goals</p>
                       <div className="space-y-2">
                         {sheet.goals.map((goal) => (
-                          <div key={goal.id} className="flex items-center justify-between rounded-xl bg-white px-4 py-2.5 ring-1 ring-ink-100">
+                          <div key={goal.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white px-4 py-2.5 ring-1 ring-ink-100">
                             <div>
                               <div className="flex items-center gap-2">
                                 <p className="text-sm font-semibold text-ink-900">{goal.title}</p>

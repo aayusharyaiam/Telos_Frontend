@@ -190,7 +190,7 @@ export default function EscalationsPage() {
               <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-ink-100">
                 <div className="divide-y divide-ink-100">
                   {rules.map((rule) => (
-                    <div key={rule.id} className="flex items-center justify-between gap-4 px-6 py-4">
+                    <div key={rule.id} className="flex flex-wrap items-center justify-between gap-4 px-6 py-4">
                       <div>
                         <p className="text-sm font-semibold text-ink-900">{rule.name}</p>
                         <p className="text-xs text-ink-500">
@@ -226,7 +226,7 @@ export default function EscalationsPage() {
               <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-ink-100">
                 <div className="divide-y divide-ink-100">
                   {escalations.map((esc) => (
-                    <div key={esc.id} className="flex items-center justify-between gap-4 px-6 py-4">
+                    <div key={esc.id} className="flex flex-wrap items-center justify-between gap-4 px-6 py-4">
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-semibold text-ink-900">
