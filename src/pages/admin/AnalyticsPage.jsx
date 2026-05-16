@@ -138,7 +138,7 @@ export default function AnalyticsPage() {
         />
 
         {overview && (
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
             <StatCard title="Users" value={overview.users} caption="Active employees" />
             <StatCard title="Goal Sheets" value={overview.sheets} caption="This cycle" />
             <StatCard
@@ -163,7 +163,7 @@ export default function AnalyticsPage() {
           className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20 p-6"
         >
           <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Export Achievement Report</p>
-          <div className="mt-4 flex flex-wrap items-end gap-4">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 sm:gap-4">
             <label className="grid gap-1 font-body-md text-body-md font-semibold text-ink-700 dark:text-inverse-on-surface">
               Quarter
               <select
@@ -287,11 +287,11 @@ export default function AnalyticsPage() {
                 <BarChart
                   data={managerEffectiveness}
                   layout="vertical"
-                  margin={{ left: 140, right: 40, top: 8, bottom: 8 }}
+                  margin={{ left: 80, right: 16, top: 8, bottom: 8 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`} stroke="#6b7280" />
-                  <YAxis type="category" dataKey="managerName" stroke="#6b7280" tick={{ fontSize: 12 }} width={130} />
+                  <YAxis type="category" dataKey="managerName" stroke="#6b7280" tick={{ fontSize: 11 }} width={75} />
                   <Tooltip formatter={(v) => `${v}%`} />
                   <Bar dataKey="checkinCompletionRate" fill="#4f46e5" radius={[0, 8, 8, 0]} name="Check-in Rate" />
                 </BarChart>

@@ -91,7 +91,7 @@ export default function EmailLogPage() {
                   <motion.div
                     key={log.id}
                     variants={itemVariants}
-                    className="px-6 py-4 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                    className="px-4 sm:px-6 py-4 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
                   >
                     <div className="flex flex-wrap items-center gap-2 mb-1">
                       <Badge tone={STATUS_MAP[log.success].tone}>

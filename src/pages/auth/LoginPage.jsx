@@ -57,42 +57,44 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex relative overflow-hidden bg-background dark:bg-dark-bg">
+    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-background dark:bg-dark-bg">
       <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-primary/20 dark:bg-primary/10 rounded-full mix-blend-multiply filter blur-[120px] opacity-60 z-0" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-secondary/15 dark:bg-secondary/10 rounded-full mix-blend-multiply filter blur-[120px] opacity-60 z-0" />
 
-      <div className="hidden lg:flex flex-col justify-center flex-1 px-12 xl:px-24 z-10 relative">
-        <motion.div initial="initial" animate="animate" variants={stagger} className="max-w-2xl">
-          <motion.div variants={fadeSlide} className="flex items-center gap-3 mb-12">
-            <img src="/logo-mark.svg" alt="Telos" className="h-10 w-10 object-contain" />
-            <span className="font-display text-headline-md text-ink-900 dark:text-inverse-on-surface tracking-tight">
+      {/* Left Side — Branding & Demo Cards (visible on all screens) */}
+      <div className="flex flex-col justify-center flex-none lg:flex-1 px-6 pt-8 pb-4 lg:px-12 xl:px-24 lg:py-0 z-10 relative">
+        <motion.div initial="initial" animate="animate" variants={stagger} className="max-w-2xl mx-auto lg:mx-0">
+          <motion.div variants={fadeSlide} className="flex items-center gap-3 mb-6 lg:mb-12">
+            <img src="/logo-mark.svg" alt="Telos" className="h-8 w-8 lg:h-10 lg:w-10 object-contain" />
+            <span className="font-display text-headline-sm lg:text-headline-md text-ink-900 dark:text-inverse-on-surface tracking-tight">
               Telos AtomQuest
             </span>
           </motion.div>
 
           <motion.h1
             variants={fadeSlide}
-            className="font-display text-display text-ink-900 dark:text-inverse-on-surface mb-6"
+            className="font-display text-headline-lg-mobile lg:text-display text-ink-900 dark:text-inverse-on-surface mb-3 lg:mb-6"
           >
             Align every goal to purpose.
           </motion.h1>
 
           <motion.p
             variants={fadeSlide}
-            className="font-body-lg text-body-lg text-ink-600 dark:text-outline mb-16 leading-relaxed max-w-xl"
+            className="font-body-md lg:font-body-lg text-body-md lg:text-body-lg text-ink-600 dark:text-outline mb-6 lg:mb-16 leading-relaxed max-w-xl"
           >
             The executive-tech platform designed to synchronize team focus, track critical performance metrics, and drive
             strategic resources toward measurable outcomes.
           </motion.p>
 
           <motion.div variants={fadeSlide}>
-            <h3 className="font-display text-display text-ink-900 dark:text-inverse-on-surface mb-2">
+            <h3 className="font-headline-sm lg:font-display text-headline-sm lg:text-display text-ink-900 dark:text-inverse-on-surface mb-1 lg:mb-2">
               Quick Access Demos
             </h3>
-            <p className="font-caption text-caption text-ink-500 dark:text-outline mb-4">
+            <p className="font-caption text-caption text-ink-500 dark:text-outline mb-3 lg:mb-4">
               Click any account to fill the login form
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Horizontal scroll on mobile, grid on larger screens */}
+            <div className="flex gap-3 overflow-x-auto pb-2 lg:pb-0 lg:grid lg:grid-cols-3 lg:gap-4 -mx-1 px-1 lg:mx-0 lg:px-0 snap-x snap-mandatory lg:snap-none">
               {credentials.map((c) => {
                 const Icon = iconMap[c.role]
                 return (
@@ -102,13 +104,13 @@ export default function LoginPage() {
                     whileTap={{ scale: 0.98 }}
                     type="button"
                     onClick={() => fillDemo(c.email)}
-                    className="h-full text-left bg-white/60 dark:bg-dark-surface/60 backdrop-blur-md rounded-2xl p-5 ring-1 ring-glass-border dark:ring-outline/20 hover:bg-white/80 dark:hover:bg-dark-surface/80 transition-all duration-200 shadow-sm flex flex-col items-start gap-3"
+                    className="h-full min-w-[140px] lg:min-w-0 snap-start text-left bg-white/60 dark:bg-dark-surface/60 backdrop-blur-md rounded-2xl p-4 lg:p-5 ring-1 ring-glass-border dark:ring-outline/20 hover:bg-white/80 dark:hover:bg-dark-surface/80 transition-all duration-200 shadow-sm flex flex-col items-start gap-2 lg:gap-3 shrink-0 lg:shrink"
                   >
-                    <div className="w-9 h-9 rounded-full bg-surface-container-high dark:bg-dark-bg flex items-center justify-center text-primary dark:text-primary-fixed-dim shrink-0">
-                      <Icon className="h-[18px] w-[18px]" />
+                    <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-surface-container-high dark:bg-dark-bg flex items-center justify-center text-primary dark:text-primary-fixed-dim shrink-0">
+                      <Icon className="h-4 w-4 lg:h-[18px] lg:w-[18px]" />
                     </div>
                     <div className="flex-1">
-                      <div className="font-display text-[16px] leading-tight text-ink-900 dark:text-inverse-on-surface">
+                      <div className="font-display text-[14px] lg:text-[16px] leading-tight text-ink-900 dark:text-inverse-on-surface">
                         {c.role}
                       </div>
                       <div className="font-caption text-caption text-ink-500 dark:text-outline mt-0.5">{c.desc}</div>
@@ -121,29 +123,23 @@ export default function LoginPage() {
         </motion.div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center items-center px-6 lg:px-12 z-10 w-full">
+      {/* Right Side — Login Form */}
+      <div className="flex-1 flex flex-col justify-center items-center px-6 py-6 lg:px-12 lg:py-0 z-10 w-full">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="w-full max-w-md"
         >
-          <div className="flex lg:hidden items-center gap-2 justify-center mb-8">
-            <img src="/logo-mark.svg" alt="Telos" className="h-8 w-8 object-contain" />
-            <span className="font-display text-headline-md text-ink-900 dark:text-inverse-on-surface tracking-tight">
-              Telos AtomQuest
-            </span>
-          </div>
-
           <motion.div
             animate={shake ? { x: [0, -4, 4, -4, 0] } : { x: 0 }}
             transition={{ duration: 0.3 }}
-            className="bg-white/80 dark:bg-dark-surface/70 backdrop-blur-xl rounded-3xl p-8 md:p-10 shadow-lg ring-1 ring-glass-border dark:ring-outline/20"
+            className="bg-white/80 dark:bg-dark-surface/70 backdrop-blur-xl rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg ring-1 ring-glass-border dark:ring-outline/20"
           >
-            <div className="mb-8 text-center">
-              <div className="w-14 h-14 bg-surface-container dark:bg-dark-bg mx-auto rounded-full flex items-center justify-center mb-4 ring-4 ring-white/50 dark:ring-dark-surface">
+            <div className="mb-6 sm:mb-8 text-center">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-surface-container dark:bg-dark-bg mx-auto rounded-full flex items-center justify-center mb-3 sm:mb-4 ring-4 ring-white/50 dark:ring-dark-surface">
                 <span className="text-primary dark:text-primary-fixed-dim">
-                  <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-6 w-6 sm:h-7 sm:w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </span>
@@ -156,13 +152,13 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-5">
               <div>
                 <label className="block font-label-bold text-label-bold text-ink-600 dark:text-outline mb-2" htmlFor="email">
                   Work Email
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
                     <svg className="h-5 w-5 text-ink-500 dark:text-outline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
@@ -171,7 +167,7 @@ export default function LoginPage() {
                     id="email"
                     type="email"
                     placeholder="name@company.com"
-                    className="block w-full pl-11 pr-4 py-3 bg-white/50 dark:bg-dark-bg/50 border border-sand-200 dark:border-outline/30 rounded-xl focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface placeholder:text-ink-500 dark:placeholder:text-outline transition-all"
+                    className="block w-full pl-10 sm:pl-11 pr-4 py-3 bg-white/50 dark:bg-dark-bg/50 border border-sand-200 dark:border-outline/30 rounded-xl focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface placeholder:text-ink-500 dark:placeholder:text-outline transition-all"
                     {...register('email', { required: true })}
                   />
                 </div>
@@ -182,7 +178,7 @@ export default function LoginPage() {
                   Password
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
                     <svg className="h-5 w-5 text-ink-500 dark:text-outline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                     </svg>
@@ -191,7 +187,7 @@ export default function LoginPage() {
                     id="password"
                     type="password"
                     placeholder="••••••••"
-                    className="block w-full pl-11 pr-4 py-3 bg-white/50 dark:bg-dark-bg/50 border border-sand-200 dark:border-outline/30 rounded-xl focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface placeholder:text-ink-500 dark:placeholder:text-outline transition-all"
+                    className="block w-full pl-10 sm:pl-11 pr-4 py-3 bg-white/50 dark:bg-dark-bg/50 border border-sand-200 dark:border-outline/30 rounded-xl focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface placeholder:text-ink-500 dark:placeholder:text-outline transition-all"
                     {...register('password', { required: true })}
                   />
                 </div>
@@ -220,7 +216,7 @@ export default function LoginPage() {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={isLoggingIn}
-                className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm font-display text-[16px] font-semibold text-on-primary bg-primary-container hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-container transition-all duration-200 disabled:opacity-60 mt-6"
+                className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm font-display text-[16px] font-semibold text-on-primary bg-primary-container hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-container transition-all duration-200 disabled:opacity-60 mt-4 sm:mt-6"
               >
                 {isLoggingIn ? (
                   <span className="flex items-center justify-center gap-2">
@@ -234,7 +230,7 @@ export default function LoginPage() {
               </motion.button>
             </form>
 
-            <div className="mt-8 text-center space-y-2">
+            <div className="mt-6 sm:mt-8 text-center space-y-2">
               <p className="font-caption text-caption text-ink-500 dark:text-outline">
                 Secure connection via Telos Identity
               </p>

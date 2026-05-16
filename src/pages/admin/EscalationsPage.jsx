@@ -164,7 +164,7 @@ export default function EscalationsPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <form onSubmit={handleCreateRule} className="grid gap-3 md:grid-cols-[2fr_1fr_1fr_auto]">
+              <form onSubmit={handleCreateRule} className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-[2fr_1fr_1fr_auto]">
                 <input
                   type="text"
                   placeholder="Rule name"
@@ -219,7 +219,7 @@ export default function EscalationsPage() {
                     <motion.div
                       key={rule.id}
                       variants={itemVariants}
-                      className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                      className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6 py-4 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
                     >
                       <div>
                         <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface">{rule.name}</p>
@@ -268,7 +268,7 @@ export default function EscalationsPage() {
                     <motion.div
                       key={esc.id}
                       variants={itemVariants}
-                      className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                      className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6 py-4 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
                     >
                       <div>
                         <div className="flex items-center gap-2">

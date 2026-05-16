@@ -106,7 +106,7 @@ export default function AuditLogPage() {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20 p-5"
         >
-          <div className="flex flex-wrap items-end gap-4">
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:flex md:flex-wrap md:items-end md:gap-4">
             <label className="grid gap-1 font-body-md text-body-md font-semibold text-ink-700 dark:text-inverse-on-surface">
               Action
               <select
@@ -176,7 +176,7 @@ export default function AuditLogPage() {
                 <motion.div
                   key={log.id}
                   variants={itemVariants}
-                  className="px-6 py-4 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                  className="px-4 sm:px-6 py-4 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
                 >
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge tone={ACTION_TONES[log.action] || 'slate'}>

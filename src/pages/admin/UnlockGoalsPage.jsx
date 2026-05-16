@@ -123,7 +123,7 @@ export default function UnlockGoalsPage() {
         {/* Sheet Unlock Modal */}
         {unlockTarget && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-            <div className="w-full max-w-md rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg p-6 shadow-xl">
+            <div className="w-full max-w-md mx-4 rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg p-5 sm:p-6 shadow-xl">
               <h3 className="text-lg font-semibold text-ink-900 dark:text-inverse-on-surface">
                 Unlock Goal Sheet
               </h3>
@@ -160,7 +160,7 @@ export default function UnlockGoalsPage() {
         {/* Goal Unlock Modal */}
         {goalUnlockTarget && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-            <div className="w-full max-w-md rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg p-6 shadow-xl">
+            <div className="w-full max-w-md mx-4 rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg p-5 sm:p-6 shadow-xl">
               <h3 className="text-lg font-semibold text-ink-900 dark:text-inverse-on-surface">
                 Unlock Individual Goal
               </h3>
@@ -222,7 +222,7 @@ export default function UnlockGoalsPage() {
                 <div key={sheet.id}>
                   <motion.div
                     variants={itemVariants}
-                    className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                    className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6 py-4 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
                   >
                     <div>
                       <div className="flex items-center gap-2">

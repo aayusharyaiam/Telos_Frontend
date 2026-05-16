@@ -97,7 +97,7 @@ export default function CompletionDashboardPage() {
                 <motion.div
                   key={row.userId}
                   variants={itemVariants}
-                  className="grid grid-cols-1 gap-4 md:grid-cols-[1.5fr_repeat(4,_1fr)] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors rounded-xl px-3 py-2"
+                  className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 md:grid-cols-[1.5fr_repeat(4,_1fr)] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors rounded-xl px-3 py-2"
                 >
                   <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface">{row.name}</p>
                   {QUARTERS.map((rowQuarter) => (

@@ -152,21 +152,21 @@ export default function UserManagementPage() {
   return (
     <AppShell>
       <div className="space-y-8">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <PageHeader
             title="User Management"
             subtitle="Manage roles, reporting lines, and user activation states."
           />
-          <div className="mt-1 flex gap-3">
+          <div className="flex gap-3 shrink-0">
             <button
               onClick={() => { setShowCsvImport(!showCsvImport); setShowCreate(false) }}
-              className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-5 py-2.5 text-sm font-semibold text-ink-700 dark:text-inverse-on-surface shadow-sm transition hover:bg-ink-50"
+              className="rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 sm:px-5 py-2.5 text-sm font-semibold text-ink-700 dark:text-inverse-on-surface shadow-sm transition hover:bg-ink-50"
             >
               {showCsvImport ? 'Cancel' : 'Import CSV'}
             </button>
             <button
               onClick={() => { setShowCreate(!showCreate); setShowCsvImport(false) }}
-              className="rounded-xl bg-primary-container px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary hover:scale-[1.02]"
+              className="rounded-xl bg-primary-container px-4 sm:px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary hover:scale-[1.02]"
             >
               {showCreate ? 'Cancel' : '+ New User'}
             </button>
@@ -371,7 +371,7 @@ John,john@example.com,pass123,EMPLOYEE"
                 <motion.div
                   key={user.id}
                   variants={itemVariants}
-                  className="grid items-center gap-4 px-6 py-4 xl:grid-cols-[2fr_1fr_1fr_1fr_1fr] md:grid-cols-[1fr_auto_auto_auto] sm:grid-cols-1 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                  className="grid items-center gap-3 sm:gap-4 px-4 sm:px-6 py-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-[2fr_auto_auto_auto] xl:grid-cols-[2fr_1fr_1fr_1fr_1fr] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
                 >
                   <div className="min-w-0">
                     <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface truncate">{user.name}</p>

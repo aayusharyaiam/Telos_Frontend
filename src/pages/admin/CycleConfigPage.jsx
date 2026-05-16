@@ -128,7 +128,7 @@ export default function CycleConfigPage() {
             animate={{ opacity: 1, y: 0 }}
             className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20"
           >
-            <div className="flex items-center justify-between border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-sand-200/50 dark:border-outline/20 px-4 sm:px-6 py-4">
               <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">{active.name} Windows</p>
               <Badge tone="emerald">Active</Badge>
             </div>
@@ -142,7 +142,7 @@ export default function CycleConfigPage() {
                 <motion.div
                   key={window.phase}
                   variants={itemVariants}
-                  className="grid gap-4 px-6 py-4 md:grid-cols-[2fr_1fr_1fr_1fr] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                  className="grid gap-3 sm:gap-4 px-4 sm:px-6 py-4 grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
                 >
                   <div>
                     <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">{phaseLabels[window.phase] || window.phase}</p>

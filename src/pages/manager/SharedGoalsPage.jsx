@@ -209,7 +209,7 @@ export default function SharedGoalsPage() {
           <StatCard title="Recipients" value={String(recipients.length)} caption="Available employees" />
         </div>
 
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 p-6 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 p-4 sm:p-6 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
           <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Create Shared Goal</p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <label className="grid gap-2 font-headline-md text-headline-md text-ink-700 dark:text-inverse-on-surface">
@@ -282,7 +282,7 @@ export default function SharedGoalsPage() {
                 <p className="font-body-sm text-body-sm text-ink-500 dark:text-outline">Primary owner: {primaryRecipient.name}</p>
               ) : null}
             </div>
-            <div className="mt-3 grid gap-2 md:grid-cols-3">
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 md:grid-cols-3">
               {recipients.map((recipient) => (
                 <label
                   key={recipient.id}
@@ -330,7 +330,7 @@ export default function SharedGoalsPage() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between border-b border-sand-200/50 dark:border-outline/20 px-4 sm:px-6 py-4">
             <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Shared Goal Library</p>
             <label className="flex items-center gap-2 font-headline-md text-headline-md text-ink-700 dark:text-inverse-on-surface">
               Actual Quarter
@@ -357,7 +357,7 @@ export default function SharedGoalsPage() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="grid grid-cols-1 gap-4 px-6 py-5 lg:grid-cols-[1.4fr_0.8fr_1fr_1fr_auto] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                    className="grid grid-cols-1 gap-3 sm:gap-4 px-4 sm:px-6 py-5 lg:grid-cols-[1.4fr_0.8fr_1fr_1fr_auto] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
                   >
                     <div>
                       <div className="flex items-center gap-2">
