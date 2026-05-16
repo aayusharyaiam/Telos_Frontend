@@ -64,7 +64,7 @@ export default function LoginPage() {
       <div className="hidden lg:flex flex-col justify-center flex-1 px-12 xl:px-24 z-10 relative">
         <motion.div initial="initial" animate="animate" variants={stagger} className="max-w-2xl">
           <motion.div variants={fadeSlide} className="mb-12">
-            <img src="/logo-with-name.png" alt="Telos AtomQuest" className="h-10" />
+            <img src="/logo-with-name.svg" alt="Telos AtomQuest" className="h-10 w-auto object-contain" />
           </motion.div>
 
           <motion.h1
@@ -123,7 +123,7 @@ export default function LoginPage() {
           className="w-full max-w-md"
         >
           <div className="flex lg:hidden items-center justify-center mb-8">
-            <img src="/logo-with-name.png" alt="Telos AtomQuest" className="h-8" />
+            <img src="/logo-with-name.svg" alt="Telos AtomQuest" className="h-8 w-auto object-contain" />
           </div>
 
           <motion.div
