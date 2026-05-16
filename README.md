@@ -54,7 +54,7 @@ src/
 | `/goals/sheet/:sheetId` | GoalSheetPage | Employee |
 | `/goals/sheet/:sheetId/checkin` | CheckinEntryPage | Employee |
 | `/manager/team` | TeamDashboardPage | Manager |
-| `/manager/approve/:sheetId` | ApprovalPage (diff view) | Manager |
+| `/manager/approve/:sheetId` | ApprovalPage (inline target/weightage edits + diff view) | Manager |
 | `/manager/checkin/:employeeId` | ManagerCheckinPage | Manager |
 | `/manager/shared-goals` | SharedGoalsPage | Manager |
 | `/admin` | AdminDashboardPage | Admin |
@@ -135,9 +135,23 @@ Current status:
 ## Key Features
 
 - **Employee**: Goal sheet creation, weightage health bar with remaining percent, >90% warning, auto-save (30s + on-blur), quarterly check-in entry, shared goal "Awaiting owner update" indicator.
-- **Manager**: Team overview, approval with diff view (yellow highlight on edits, strikethrough originals), check-in completion, shared goals push.
-- **Admin**: Full CRUD users, CSV bulk user import (upload or paste), force open/close windows, archive past cycles, unlock goals, escalation rules, audit trail with filters, analytics with Recharts charts, CSV/XLSX export.
+- **Manager**: Team overview, approval with inline target/weightage edits and diff view (yellow highlight on edits, strikethrough originals), check-in completion, shared goals push.
+- **Admin**: Full CRUD users, CSV bulk user import (upload or paste), force open/close windows, archive past cycles, unlock goals, escalation rules, audit trail with filters, dynamic check-in completion KPI, analytics with Recharts charts, CSV/XLSX export.
 - **All**: Editable Settings page (name, email, phone, department), notification drawer with 30s polling, role-based navigation.
+
+## Problem Statement Alignment
+
+Covered in the UI:
+- Employee goal sheet creation with thrust areas, UoM, target, weightage, validation feedback, submission, and locked/read-only states.
+- Manager approval journey with inline target/weightage edits, return reason, approval confirmation, and visible diff review.
+- Quarterly employee achievement entry with actuals, statuses, notes, shared-goal owner indicators, and computed progress score display.
+- Manager check-in page with planned vs actual data and structured comments.
+- Admin pages for user hierarchy management, cycle windows, unlock exceptions, completion dashboard, audit trail, reports/exports, escalations, thrust areas, and analytics.
+
+Known problem statement gaps:
+- Microsoft Entra ID / Azure AD SSO is not implemented; the app currently uses Firebase Email/Password Auth.
+- Microsoft Teams notifications/adaptive cards/deep links are not implemented.
+- Automatic Azure AD org hierarchy sync is not implemented; hierarchy is managed through the admin user module.
 
 ## Notes
 

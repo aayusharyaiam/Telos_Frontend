@@ -44,11 +44,15 @@ export default function ApprovalPage() {
 
   useEffect(() => {
     if (sheet?.goals) {
-      const orig = {}
-      for (const goal of sheet.goals) {
-        orig[goal.id] = { weightage: goal.weightage, target: goal.target, targetDate: goal.targetDate }
-      }
-      setOriginals(orig)
+      setOriginals((prev) => {
+        const next = { ...prev }
+        for (const goal of sheet.goals) {
+          if (!next[goal.id]) {
+            next[goal.id] = { weightage: goal.weightage, target: goal.target, targetDate: goal.targetDate }
+          }
+        }
+        return next
+      })
     }
   }, [sheet?.goals])
 
@@ -59,8 +63,12 @@ export default function ApprovalPage() {
   const editedGoals = goals.filter(goal => {
     const orig = originals[goal.id]
     if (!orig) return false
-    return orig.weightage !== goal.weightage || orig.target !== goal.target
+    return orig.weightage !== goal.weightage || orig.target !== goal.target || orig.targetDate !== goal.targetDate
   })
+
+  const goalTargetValue = (goal) => (
+    goal.uomType === 'TIMELINE' ? goal.targetDate?.slice(0, 10) || '' : goal.target ?? ''
+  )
 
   const handleWeightageChange = async (goal, value) => {
     setSheet((prev) => ({
@@ -72,6 +80,23 @@ export default function ApprovalPage() {
       await loadSheet()
     } catch (err) {
       setError(err.response?.data?.error?.message || 'Could not update weightage')
+      await loadSheet()
+    }
+  }
+
+  const handleTargetChange = async (goal, value) => {
+    const field = goal.uomType === 'TIMELINE' ? 'targetDate' : 'target'
+    const nextValue = goal.uomType === 'TIMELINE' ? value : Number(value)
+
+    setSheet((prev) => ({
+      ...prev,
+      goals: prev.goals.map((item) => (item.id === goal.id ? { ...item, [field]: nextValue } : item)),
+    }))
+    try {
+      await updateGoal(goal.id, { [field]: nextValue })
+      await loadSheet()
+    } catch (err) {
+      setError(err.response?.data?.error?.message || 'Could not update target')
       await loadSheet()
     }
   }
@@ -206,12 +231,16 @@ export default function ApprovalPage() {
                           ) : (
                             <div><span className="text-ink-500">Weightage: </span>{goal.weightage}%</div>
                           )}
-                          {orig.target !== goal.target ? (
+                          {orig.target !== goal.target || orig.targetDate !== goal.targetDate ? (
                             <div>
                               <span className="text-ink-500">Target: </span>
-                              <span className="text-red-500 line-through">{orig.target}</span>
+                              <span className="text-red-500 line-through">
+                                {orig.target ?? orig.targetDate?.slice(0, 10) ?? '--'}
+                              </span>
                               {' → '}
-                              <span className="text-accent-600 font-semibold">{goal.target}</span>
+                              <span className="text-accent-600 font-semibold">
+                                {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}
+                              </span>
                             </div>
                           ) : null}
                         </div>
@@ -230,7 +259,8 @@ export default function ApprovalPage() {
                 {goals.map((goal) => {
                   const isEdited = originals[goal.id] && (
                     originals[goal.id].weightage !== goal.weightage ||
-                    originals[goal.id].target !== goal.target
+                    originals[goal.id].target !== goal.target ||
+                    originals[goal.id].targetDate !== goal.targetDate
                   )
                   return (
                     <div
@@ -246,14 +276,24 @@ export default function ApprovalPage() {
                         </div>
                         <p className="text-xs text-ink-500">{goal.thrustArea}</p>
                       </div>
-                      <div className={`rounded-xl px-3 py-2 text-sm text-ink-700 ${isEdited ? 'bg-amber-100' : 'bg-sand-100'}`}>
-                        Target: {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}
-                        {isEdited && originals[goal.id]?.target !== goal.target ? (
+                      <label className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-ink-700 ${isEdited ? 'bg-amber-100' : 'bg-sand-100'}`}>
+                        Target
+                        <input
+                          type={goal.uomType === 'TIMELINE' ? 'date' : 'number'}
+                          value={goalTargetValue(goal)}
+                          disabled={!canApprove}
+                          onChange={(event) => handleTargetChange(goal, event.target.value)}
+                          className="w-28 rounded-lg border border-ink-200 bg-white px-2 py-1 disabled:bg-sand-100"
+                        />
+                        {isEdited && (
+                          originals[goal.id]?.target !== goal.target ||
+                          originals[goal.id]?.targetDate !== goal.targetDate
+                        ) ? (
                           <span className="ml-2 text-xs text-red-500 line-through">
-                            orig: {originals[goal.id]?.target}
+                            orig: {originals[goal.id]?.target ?? originals[goal.id]?.targetDate?.slice(0, 10) ?? '--'}
                           </span>
                         ) : null}
-                      </div>
+                      </label>
                       <label className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-ink-700 ${isEdited ? 'bg-amber-100' : 'bg-sand-100'}`}>
                         Weightage
                         <input

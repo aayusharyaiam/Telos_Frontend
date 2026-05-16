@@ -54,9 +54,9 @@ export default function AdminDashboardPage() {
             caption={`${s.submittedCount ?? 0} submitted · ${s.approvedCount ?? 0} approved`}
           />
           <StatCard
-            title="Q2 Completion"
-            value={s.q2CompletionRate != null ? `${s.q2CompletionRate}%` : '—'}
-            caption={`${s.q2CompletedCount ?? 0} sheets completed`}
+            title={`${s.dashboardQuarter || 'Check-in'} Completion`}
+            value={s.selectedCompletionRate != null ? `${s.selectedCompletionRate}%` : '—'}
+            caption={`${s.selectedCompletedCount ?? 0} sheets completed`}
             tone="emerald"
           />
         </div>
