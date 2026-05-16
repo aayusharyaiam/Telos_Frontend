@@ -86,9 +86,12 @@ export default function LoginPage() {
           </motion.p>
 
           <motion.div variants={fadeSlide}>
-            <h3 className="font-label-bold text-label-bold text-ink-500 dark:text-outline uppercase tracking-wider mb-4">
+            <h3 className="font-display text-display text-ink-900 dark:text-inverse-on-surface mb-2">
               Quick Access Demos
             </h3>
+            <p className="font-caption text-caption text-ink-500 dark:text-outline mb-4">
+              Click any account to fill the login form
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {credentials.map((c) => {
                 const Icon = iconMap[c.role]
