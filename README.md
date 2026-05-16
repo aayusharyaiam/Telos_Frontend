@@ -107,7 +107,7 @@ npm.cmd run build
 ```
 
 Current status:
-- Production build passes (949 KB gzip: 269 KB).
+- Production build passes (~958 KB, ~270 KB gzip).
 - Vite shows a non-blocking large-chunk warning.
 - 1391 modules transformed.
 
@@ -118,7 +118,7 @@ Current status:
 - **`Navbar`** — Uses NotificationDrawer component; role-based mobile nav links.
 
 ### Goals
-- **`WeightageBar`** — Visual bar showing allocation progress (green=100%, red=over, primary=under).
+- **`WeightageBar`** — Visual bar showing allocation progress with remaining percent (e.g. "72% allocated — 28% remaining", green=100%, red=over, primary=under).
 - **`GoalCard`** — Single goal row with title, shared badge, weightage input, delete/locked actions.
 - **`ProgressScoreBadge`** — Color-coded score display (green≥80%, yellow≥50%, red<50%, "N/A" for no data).
 
@@ -134,10 +134,10 @@ Current status:
 
 ## Key Features
 
-- **Employee**: Goal sheet creation, weightage health bar, >90% warning, auto-save (30s + on-blur), quarterly check-in entry, shared goal "Awaiting owner update" indicator.
+- **Employee**: Goal sheet creation, weightage health bar with remaining percent, >90% warning, auto-save (30s + on-blur), quarterly check-in entry, shared goal "Awaiting owner update" indicator.
 - **Manager**: Team overview, approval with diff view (yellow highlight on edits, strikethrough originals), check-in completion, shared goals push.
-- **Admin**: Full CRUD users, force open/close windows, unlock goals, escalation rules, audit trail with filters, analytics with Recharts charts, CSV/XLSX export.
-- **All**: Settings page, notification drawer with 30s polling, role-based navigation.
+- **Admin**: Full CRUD users, CSV bulk user import (upload or paste), force open/close windows, archive past cycles, unlock goals, escalation rules, audit trail with filters, analytics with Recharts charts, CSV/XLSX export.
+- **All**: Editable Settings page (name, email, phone, department), notification drawer with 30s polling, role-based navigation.
 
 ## Notes
 
