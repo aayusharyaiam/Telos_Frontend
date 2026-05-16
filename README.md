@@ -74,6 +74,8 @@ npm run build                  # production build
 
 | Feature | Implementation |
 |---|---|
+| **Logout Confirmation** | Sign-out button triggers a `ConfirmModal` with "Are you sure you want to sign out?" — prevents accidental logouts. |
+| **Judge's Guide** | `/help` page with role-by-role feature overview, demo accounts table, and key features to verify. Public route — accessible without login. Link shown on LoginPage. |
 | **Notification Drawer** | Bell icon in navbar shows unread count. Drawer polls every 30s. Click to navigate + mark read. Mark all read button. |
 | **Toast Notifications** | `react-hot-toast` for all success/error states across every page. |
 | **Settings** | Editable name, email, phone, department. Email changes sync to Firebase Auth. |
@@ -91,6 +93,7 @@ npm run build                  # production build
 | Route | Page | Access |
 |---|---|---|
 | `/login` | Login | Public |
+| `/help` | Judge's Guide | Public |
 | `/goals` | My Goals Dashboard | Employee+ |
 | `/goals/sheet/:sheetId` | Goal Sheet Editor | Employee+ |
 | `/goals/sheet/:sheetId/checkin` | Quarterly Check-in | Employee+ |
@@ -109,12 +112,13 @@ npm run build                  # production build
 | `/admin/analytics` | Analytics & Export | Admin |
 | `/admin/email-logs` | Email Log Viewer | Admin |
 | `/settings` | Profile & Settings | All |
+| `/notifications` | Notification Drawer | All (via navbar bell icon) |
 
 ---
 
 ## Performance — Code Splitting
 
-All 18 pages are lazy-loaded via `React.lazy()`. Each page is a separate chunk.
+All 19 pages are lazy-loaded via `React.lazy()`. Each page is a separate chunk.
 
 | Metric | Before (eager) | After (lazy) | Improvement |
 |---|---|---|---|
@@ -162,7 +166,7 @@ src/
 │   ├── manager/       # TeamDashboardPage, ApprovalPage, ManagerCheckinPage, SharedGoalsPage
 │   ├── admin/         # 10 pages (dashboard, users, cycles, thrust-areas, unlock,
 │   │                  # escalations, completion, audit, analytics, email-logs)
-│   └── shared/        # SettingsPage
+│   └── shared/        # SettingsPage, HelpPage
 ├── routes/            # AppRouter (lazy routes + ProtectedRoute + AnimatePresence)
 └── utils/             # constants, dateHelpers, navigation, scoreComputer
 ```
