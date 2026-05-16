@@ -4,6 +4,7 @@ import {
   getAnalyticsTrends,
   getAnalyticsDistribution,
   getAchievementReport,
+  getManagerEffectiveness,
 } from '../../api/reports.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
@@ -51,6 +52,7 @@ export default function AnalyticsPage() {
   const [overview, setOverview] = useState(null)
   const [trends, setTrends] = useState([])
   const [distribution, setDistribution] = useState([])
+  const [managerEffectiveness, setManagerEffectiveness] = useState([])
   const [downloading, setDownloading] = useState('')
   const [error, setError] = useState('')
 
@@ -63,14 +65,16 @@ export default function AnalyticsPage() {
   useEffect(() => {
     async function load() {
       try {
-        const [ov, tr, dist] = await Promise.all([
+        const [ov, tr, dist, mgr] = await Promise.all([
           getAnalyticsOverview(),
           getAnalyticsTrends(),
           getAnalyticsDistribution(),
+          getManagerEffectiveness(),
         ])
         setOverview(ov)
         setTrends(tr)
         setDistribution(dist?.byThrustArea || [])
+        setManagerEffectiveness(mgr || [])
       } catch (err) {
         setError(err.response?.data?.error?.message || 'Could not load analytics')
       }
@@ -241,6 +245,41 @@ export default function AnalyticsPage() {
             </div>
           </div>
         </div>
+
+        {/* Manager Effectiveness */}
+        {managerEffectiveness.length > 0 && (
+          <div className="rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-ink-100">
+            <p className="mb-1 text-sm font-semibold text-ink-900">Manager Effectiveness</p>
+            <p className="mb-4 text-xs text-ink-500">
+              Check-in completion rates and average team scores across managers.
+            </p>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={managerEffectiveness}
+                  layout="vertical"
+                  margin={{ left: 140, right: 40, top: 8, bottom: 8 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`} stroke="#6b7280" />
+                  <YAxis type="category" dataKey="managerName" stroke="#6b7280" tick={{ fontSize: 12 }} width={130} />
+                  <Tooltip formatter={(v) => `${v}%`} />
+                  <Bar dataKey="checkinCompletionRate" fill="#4f46e5" radius={[0, 8, 8, 0]} name="Check-in Rate" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {managerEffectiveness.map((m) => (
+                <div key={m.managerId} className="rounded-xl bg-sand-50 px-4 py-3">
+                  <p className="text-sm font-semibold text-ink-900">{m.managerName}</p>
+                  <p className="text-xs text-ink-500">
+                    {m.directReports} reports · {m.checkinCompletionRate}% check-in rate · Avg team score: {m.avgTeamScore}%
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </AppShell>
   )
