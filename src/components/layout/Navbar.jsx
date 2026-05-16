@@ -31,13 +31,18 @@ export default function Navbar() {
       } border-b border-sand-200 dark:border-ink-600/20`}
     >
       <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 max-w-[1440px] mx-auto">
-        <div className="md:hidden flex items-center gap-3 ml-10">
-          <img src="/logo-mark.svg" alt="Telos" className="h-8 w-8 object-contain" />
+        <div className="md:hidden flex items-center gap-1 ml-10">
+          <img src="/logo-mark.svg" alt="Telos" className="h-7 w-7 object-contain" />
+          <span className="text-ink-400 dark:text-outline mx-1 select-none">|</span>
+          <span className="font-caption text-caption text-ink-500 dark:text-outline">
+            Purposeful Performance
+          </span>
         </div>
 
-        <div className="hidden md:flex items-center gap-2">
-          <img src="/logo-with-name.svg" alt="Telos AtomQuest" className="h-8 w-auto object-contain" />
-          <span className="font-body-sm text-body-sm text-ink-500 dark:text-outline ml-2">
+        <div className="hidden md:flex items-center gap-1">
+          <img src="/logo-with-name.svg" alt="Telos AtomQuest" className="h-7 w-auto object-contain" />
+          <span className="text-ink-400 dark:text-outline mx-1 select-none">|</span>
+          <span className="font-body-sm text-body-sm text-ink-500 dark:text-outline">
             Purposeful Performance
           </span>
         </div>
