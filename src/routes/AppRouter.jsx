@@ -17,6 +17,7 @@ import AnalyticsPage from '../pages/admin/AnalyticsPage'
 import ThrustAreasPage from '../pages/admin/ThrustAreasPage'
 import EscalationsPage from '../pages/admin/EscalationsPage'
 import UnlockGoalsPage from '../pages/admin/UnlockGoalsPage'
+import SettingsPage from '../pages/shared/SettingsPage'
 import FullScreenLoader from '../components/shared/FullScreenLoader'
 
 function ProtectedRoute({ allowedRoles, children }) {
@@ -174,6 +175,15 @@ export default function AppRouter() {
           element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
               <UnlockGoalsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute allowedRoles={['EMPLOYEE', 'MANAGER', 'ADMIN']}>
+              <SettingsPage />
             </ProtectedRoute>
           }
         />

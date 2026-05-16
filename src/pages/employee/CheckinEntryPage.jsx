@@ -5,6 +5,7 @@ import { getActiveCycle } from '../../api/cycles.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
+import ProgressScoreBadge from '../../components/goals/ProgressScoreBadge'
 import { GOAL_STATUSES, QUARTERS } from '../../utils/constants'
 
 const CHECKIN_PHASE_TO_QUARTER = {
@@ -175,18 +176,24 @@ export default function CheckinEntryPage() {
                         {goal.thrustArea} | Target: {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}
                       </p>
                     </div>
-                    <label className="grid gap-2 text-sm text-ink-700">
-                      Actual
-                      <input
-                        type={goal.uomType === 'TIMELINE' ? 'date' : 'number'}
-                        disabled={!canEdit || goal.isShared}
-                        value={goal.uomType === 'TIMELINE' ? draft.actualDate : draft.actualAchievement}
-                        onChange={(event) =>
-                          updateDraft(goal.id, goal.uomType === 'TIMELINE' ? 'actualDate' : 'actualAchievement', event.target.value)
-                        }
-                        className="rounded-lg border border-ink-200 bg-white px-3 py-2 disabled:bg-sand-100"
-                      />
-                    </label>
+                    {goal.isShared && (draft.actualAchievement === '' || draft.actualAchievement === null) ? (
+                      <div className="flex items-center text-sm text-amber-700">
+                        <span className="rounded-lg bg-amber-50 px-3 py-2">Awaiting owner update</span>
+                      </div>
+                    ) : (
+                      <label className="grid gap-2 text-sm text-ink-700">
+                        Actual
+                        <input
+                          type={goal.uomType === 'TIMELINE' ? 'date' : 'number'}
+                          disabled={!canEdit || goal.isShared}
+                          value={goal.uomType === 'TIMELINE' ? draft.actualDate : draft.actualAchievement}
+                          onChange={(event) =>
+                            updateDraft(goal.id, goal.uomType === 'TIMELINE' ? 'actualDate' : 'actualAchievement', event.target.value)
+                          }
+                          className="rounded-lg border border-ink-200 bg-white px-3 py-2 disabled:bg-sand-100"
+                        />
+                      </label>
+                    )}
                     <label className="grid gap-2 text-sm text-ink-700">
                       Status
                       <select
@@ -210,11 +217,13 @@ export default function CheckinEntryPage() {
                       />
                     </label>
                     <div className="flex items-end gap-3">
-                      <div className="text-sm font-semibold text-ink-800">
-                        {checkin?.progressScore === null || checkin?.progressScore === undefined
-                          ? 'N/A'
-                          : `${Number(checkin.progressScore).toFixed(1)}%`}
-                      </div>
+                      <ProgressScoreBadge
+                        uomType={goal.uomType}
+                        target={goal.target}
+                        targetDate={goal.targetDate}
+                        actual={checkin?.actualAchievement}
+                        actualDate={checkin?.actualDate}
+                      />
                       <button
                         disabled={!canEdit || savingId === goal.id}
                         onClick={() => saveGoal(goal)}

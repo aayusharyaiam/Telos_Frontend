@@ -1,5 +1,5 @@
 export function computeScore({ uomType, target, actual, targetDate, actualDate }) {
-  if (actual === null && actualDate === null) return null
+  if (actual == null && actualDate == null) return null
 
   switch (uomType) {
     case 'NUMERIC_MIN':

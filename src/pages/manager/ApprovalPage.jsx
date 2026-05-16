@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { approveGoalSheet, getGoalSheet, getTeamGoalSheets, returnGoalSheet } from '../../api/goalSheets.api'
 import { updateGoal } from '../../api/goals.api'
@@ -11,18 +11,21 @@ export default function ApprovalPage() {
   const { sheetId } = useParams()
   const navigate = useNavigate()
   const [sheet, setSheet] = useState(null)
+  const [originals, setOriginals] = useState({})
   const [reason, setReason] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [confirmApprove, setConfirmApprove] = useState(false)
   const [confirmReturn, setConfirmReturn] = useState(false)
+  const [showDiff, setShowDiff] = useState(false)
+  const diffRef = useRef(null)
 
   async function loadSheet() {
     setLoading(true)
     setError('')
     try {
-      if (sheetId === 'demo') {
+      if (sheetId === 'active') {
         const team = await getTeamGoalSheets()
         setSheet(team.find((item) => item.status === 'SUBMITTED') || team[0] || null)
       } else {
@@ -39,9 +42,25 @@ export default function ApprovalPage() {
     loadSheet()
   }, [sheetId])
 
+  useEffect(() => {
+    if (sheet?.goals) {
+      const orig = {}
+      for (const goal of sheet.goals) {
+        orig[goal.id] = { weightage: goal.weightage, target: goal.target, targetDate: goal.targetDate }
+      }
+      setOriginals(orig)
+    }
+  }, [sheet?.goals])
+
   const goals = sheet?.goals || []
   const totalWeightage = goals.reduce((sum, goal) => sum + Number(goal.weightage || 0), 0)
   const canApprove = sheet?.status === 'SUBMITTED'
+
+  const editedGoals = goals.filter(goal => {
+    const orig = originals[goal.id]
+    if (!orig) return false
+    return orig.weightage !== goal.weightage || orig.target !== goal.target
+  })
 
   const handleWeightageChange = async (goal, value) => {
     setSheet((prev) => ({
@@ -100,7 +119,12 @@ export default function ApprovalPage() {
         <PageHeader
           title="Approval Review"
           subtitle={sheet ? `Reviewing ${sheet.user.name}'s goal sheet.` : 'No sheet selected.'}
-          chips={<Badge tone={canApprove ? 'amber' : 'slate'}>{sheet?.status || 'None'}</Badge>}
+          chips={
+            <div className="flex items-center gap-2">
+              <Badge tone={canApprove ? 'amber' : 'slate'}>{sheet?.status || 'None'}</Badge>
+              {editedGoals.length > 0 ? <Badge tone="amber">{editedGoals.length} edited</Badge> : null}
+            </div>
+          }
           actions={
             <button
               className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
@@ -115,7 +139,9 @@ export default function ApprovalPage() {
         <ConfirmModal
           open={confirmApprove}
           title="Approve Goal Sheet"
-          message={`Are you sure you want to approve ${sheet?.user?.name}'s goal sheet? All goals will be locked.`}
+          message={`Are you sure you want to approve ${sheet?.user?.name}'s goal sheet? All goals will be locked.${
+            editedGoals.length > 0 ? ` You have modified ${editedGoals.length} goal(s).` : ''
+          }`}
           confirmLabel="Approve"
           onConfirm={handleApprove}
           onCancel={() => setConfirmApprove(false)}
@@ -149,36 +175,105 @@ export default function ApprovalPage() {
               <p className="mt-2 text-xs text-ink-500">
                 Managers can adjust weightage while the sheet is submitted.
               </p>
+              {editedGoals.length > 0 ? (
+                <button
+                  ref={diffRef}
+                  onClick={() => setShowDiff(!showDiff)}
+                  className="mt-3 text-xs font-semibold text-primary-600 hover:text-primary-700"
+                >
+                  {showDiff ? 'Hide diff view' : `Show diff view (${editedGoals.length} goal(s) modified)`}
+                </button>
+              ) : null}
             </div>
+
+            {showDiff && editedGoals.length > 0 ? (
+              <div className="rounded-2xl bg-amber-50/80 p-4 shadow-sm ring-1 ring-amber-200">
+                <p className="mb-3 text-sm font-semibold text-amber-900">Changes Made (Original → Edited)</p>
+                <div className="space-y-2">
+                  {editedGoals.map((goal) => {
+                    const orig = originals[goal.id]
+                    return (
+                      <div key={goal.id} className="rounded-xl bg-white px-4 py-3 text-sm">
+                        <p className="font-semibold text-ink-900">{goal.title}</p>
+                        <div className="mt-1 grid grid-cols-2 gap-4 text-xs">
+                          {orig.weightage !== goal.weightage ? (
+                            <div>
+                              <span className="text-ink-500">Weightage: </span>
+                              <span className="text-red-500 line-through">{orig.weightage}%</span>
+                              {' → '}
+                              <span className="text-accent-600 font-semibold">{goal.weightage}%</span>
+                            </div>
+                          ) : (
+                            <div><span className="text-ink-500">Weightage: </span>{goal.weightage}%</div>
+                          )}
+                          {orig.target !== goal.target ? (
+                            <div>
+                              <span className="text-ink-500">Target: </span>
+                              <span className="text-red-500 line-through">{orig.target}</span>
+                              {' → '}
+                              <span className="text-accent-600 font-semibold">{goal.target}</span>
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ) : null}
 
             <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-ink-100">
               <div className="border-b border-ink-100 px-6 py-4">
                 <p className="text-sm font-semibold text-ink-900">Goals Under Review</p>
               </div>
               <div className="divide-y divide-ink-100">
-                {goals.map((goal) => (
-                  <div key={goal.id} className="grid gap-4 px-6 py-5 md:grid-cols-[2fr_1fr_1fr]">
-                    <div>
-                      <p className="text-sm font-semibold text-ink-900">{goal.title}</p>
-                      <p className="text-xs text-ink-500">{goal.thrustArea}</p>
+                {goals.map((goal) => {
+                  const isEdited = originals[goal.id] && (
+                    originals[goal.id].weightage !== goal.weightage ||
+                    originals[goal.id].target !== goal.target
+                  )
+                  return (
+                    <div
+                      key={goal.id}
+                      className={`grid gap-4 px-6 py-5 md:grid-cols-[2fr_1fr_1fr] ${
+                        isEdited ? 'bg-amber-50/40' : ''
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-ink-900">{goal.title}</p>
+                          {isEdited ? <Badge tone="amber">Edited</Badge> : null}
+                        </div>
+                        <p className="text-xs text-ink-500">{goal.thrustArea}</p>
+                      </div>
+                      <div className={`rounded-xl px-3 py-2 text-sm text-ink-700 ${isEdited ? 'bg-amber-100' : 'bg-sand-100'}`}>
+                        Target: {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}
+                        {isEdited && originals[goal.id]?.target !== goal.target ? (
+                          <span className="ml-2 text-xs text-red-500 line-through">
+                            orig: {originals[goal.id]?.target}
+                          </span>
+                        ) : null}
+                      </div>
+                      <label className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-ink-700 ${isEdited ? 'bg-amber-100' : 'bg-sand-100'}`}>
+                        Weightage
+                        <input
+                          type="number"
+                          min="10"
+                          value={goal.weightage}
+                          disabled={!canApprove}
+                          onChange={(event) => handleWeightageChange(goal, Number(event.target.value))}
+                          className="w-20 rounded-lg border border-ink-200 bg-white px-2 py-1 disabled:bg-sand-100"
+                        />
+                        %
+                        {isEdited && originals[goal.id]?.weightage !== goal.weightage ? (
+                          <span className="ml-1 text-xs text-red-500 line-through">
+                            {originals[goal.id]?.weightage}%
+                          </span>
+                        ) : null}
+                      </label>
                     </div>
-                    <div className="rounded-xl bg-sand-100 px-3 py-2 text-sm text-ink-700">
-                      Target: {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}
-                    </div>
-                    <label className="flex items-center gap-2 rounded-xl bg-sand-100 px-3 py-2 text-sm text-ink-700">
-                      Weightage
-                      <input
-                        type="number"
-                        min="10"
-                        value={goal.weightage}
-                        disabled={!canApprove}
-                        onChange={(event) => handleWeightageChange(goal, Number(event.target.value))}
-                        className="w-20 rounded-lg border border-ink-200 bg-white px-2 py-1 disabled:bg-sand-100"
-                      />
-                      %
-                    </label>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
 

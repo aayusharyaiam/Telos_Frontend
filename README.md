@@ -13,47 +13,60 @@ C:\Users\aayus\working-ly\Telos_AtomQuest\README.md
 - React 19
 - Vite
 - React Router
-- Tailwind CSS v4
+- Tailwind CSS v4 (CSS-based theme in `src/index.css`)
 - Firebase client auth
 - Axios
 - Heroicons
 - Recharts
+- date-fns
+- react-hot-toast
 
-## Main Frontend Areas
+## Project Structure
 
-- Auth:
-  - `src/pages/auth/LoginPage.jsx`
-  - `src/context/AuthContext.jsx`
-  - `src/firebase/config.js`
-- Routing:
-  - `src/routes/AppRouter.jsx`
-- API wrappers:
-  - `src/api`
-- Layout:
-  - `src/components/layout/AppShell.jsx`
-  - `src/components/layout/Navbar.jsx`
-  - `src/components/layout/Sidebar.jsx`
-- Shared UI:
-  - `src/components/shared`
-- Employee pages:
-  - `src/pages/employee/MyGoalsPage.jsx`
-  - `src/pages/employee/GoalSheetPage.jsx`
-  - `src/pages/employee/CheckinEntryPage.jsx`
-- Manager pages:
-  - `src/pages/manager/TeamDashboardPage.jsx`
-  - `src/pages/manager/ApprovalPage.jsx`
-  - `src/pages/manager/ManagerCheckinPage.jsx`
-  - `src/pages/manager/SharedGoalsPage.jsx`
-- Admin pages:
-  - `src/pages/admin/AdminDashboardPage.jsx`
-  - `src/pages/admin/UserManagementPage.jsx`
-  - `src/pages/admin/CycleConfigPage.jsx`
-  - `src/pages/admin/ThrustAreasPage.jsx`
-  - `src/pages/admin/UnlockGoalsPage.jsx`
-  - `src/pages/admin/EscalationsPage.jsx`
-  - `src/pages/admin/CompletionDashboardPage.jsx`
-  - `src/pages/admin/AuditLogPage.jsx`
-  - `src/pages/admin/AnalyticsPage.jsx`
+```txt
+src/
+├── api/                    # 11 API wrappers (axiosInstance, auth, goals, checkins, etc.)
+├── components/
+│   ├── layout/             # AppShell, Navbar, Sidebar, NotificationDrawer, PageHeader
+│   ├── goals/              # WeightageBar, GoalCard, ProgressScoreBadge
+│   └── shared/             # Badge, ConfirmModal, Modal, Table, EmptyState, StatCard, FullScreenLoader
+├── context/                # AuthContext (Firebase auth + app user sync)
+├── firebase/               # Firebase config
+├── hooks/                  # useAuth, useGoalSheet, useCurrentCycle, useWindowStatus
+├── pages/
+│   ├── auth/               # LoginPage
+│   ├── employee/           # MyGoalsPage, GoalSheetPage, CheckinEntryPage
+│   ├── manager/            # TeamDashboardPage, ApprovalPage, ManagerCheckinPage, SharedGoalsPage
+│   ├── admin/              # AdminDashboardPage, UserManagementPage, CycleConfigPage,
+│   │                       # ThrustAreasPage, UnlockGoalsPage, EscalationsPage,
+│   │                       # CompletionDashboardPage, AuditLogPage, AnalyticsPage
+│   └── shared/             # SettingsPage
+├── routes/                 # AppRouter (18 routes with ProtectedRoute)
+└── utils/                  # constants, dateHelpers, navigation, scoreComputer
+```
+
+## Pages & Routes
+
+| Route | Page | Role |
+|---|---|---|
+| `/login` | LoginPage | Public |
+| `/goals` | MyGoalsPage | Employee |
+| `/goals/sheet/:sheetId` | GoalSheetPage | Employee |
+| `/goals/sheet/:sheetId/checkin` | CheckinEntryPage | Employee |
+| `/manager/team` | TeamDashboardPage | Manager |
+| `/manager/approve/:sheetId` | ApprovalPage (diff view) | Manager |
+| `/manager/checkin/:employeeId` | ManagerCheckinPage | Manager |
+| `/manager/shared-goals` | SharedGoalsPage | Manager |
+| `/admin` | AdminDashboardPage | Admin |
+| `/admin/users` | UserManagementPage | Admin |
+| `/admin/cycles` | CycleConfigPage | Admin |
+| `/admin/thrust-areas` | ThrustAreasPage | Admin |
+| `/admin/unlock` | UnlockGoalsPage | Admin |
+| `/admin/escalations` | EscalationsPage | Admin |
+| `/admin/completion` | CompletionDashboardPage | Admin |
+| `/admin/audit` | AuditLogPage | Admin |
+| `/admin/analytics` | AnalyticsPage | Admin |
+| `/settings` | SettingsPage | All |
 
 ## Environment
 
@@ -84,11 +97,7 @@ npm install
 npm run dev
 ```
 
-Open:
-
-```txt
-http://localhost:5173/login
-```
+Open: `http://localhost:5173/login`
 
 ## Build
 
@@ -98,13 +107,42 @@ npm.cmd run build
 ```
 
 Current status:
+- Production build passes (949 KB gzip: 269 KB).
+- Vite shows a non-blocking large-chunk warning.
+- 1391 modules transformed.
 
-- Production build passes.
-- Vite shows a non-blocking large chunk warning.
+## Key Components Added
+
+### Layout
+- **`NotificationDrawer`** — Standalone notification drawer with polling, mark-all-read, click-outside-close, and navigation on click.
+- **`Navbar`** — Uses NotificationDrawer component; role-based mobile nav links.
+
+### Goals
+- **`WeightageBar`** — Visual bar showing allocation progress (green=100%, red=over, primary=under).
+- **`GoalCard`** — Single goal row with title, shared badge, weightage input, delete/locked actions.
+- **`ProgressScoreBadge`** — Color-coded score display (green≥80%, yellow≥50%, red<50%, "N/A" for no data).
+
+### Shared
+- **`Modal`** — Generic modal with overlay, escape key, and click-outside-to-close.
+- **`Table`** — Generic data table with column config, render functions, and empty state.
+
+## Custom Hooks
+
+- **`useGoalSheet`** — Fetches/creates goal sheet, provides `loading`, `error`, `refetch`, `ensureSheet`.
+- **`useCurrentCycle`** — Fetches active cycle with windows.
+- **`useWindowStatus`** — Computes whether a given quarter window is open/closed/forced.
+
+## Key Features
+
+- **Employee**: Goal sheet creation, weightage health bar, >90% warning, auto-save (30s + on-blur), quarterly check-in entry, shared goal "Awaiting owner update" indicator.
+- **Manager**: Team overview, approval with diff view (yellow highlight on edits, strikethrough originals), check-in completion, shared goals push.
+- **Admin**: Full CRUD users, force open/close windows, unlock goals, escalation rules, audit trail with filters, analytics with Recharts charts, CSV/XLSX export.
+- **All**: Settings page, notification drawer with 30s polling, role-based navigation.
 
 ## Notes
 
-- Tailwind v4 theme tokens live in `src/index.css`.
-- Do not move theme tokens back only to `tailwind.config.js`.
+- Tailwind v4 theme tokens live in `src/index.css` (v3 `tailwind.config.js` removed — all config via `@theme` CSS directives).
 - The app expects the backend API at `VITE_API_URL`.
 - Role-based navigation is defined in `src/utils/navigation.js`.
+- Score computation formulas mirror backend (`src/utils/scoreComputer.js`).
+- No test files yet — manual smoke tests are in the root README.

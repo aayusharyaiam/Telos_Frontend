@@ -12,6 +12,8 @@ import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
 import ConfirmModal from '../../components/shared/ConfirmModal'
+import WeightageBar from '../../components/goals/WeightageBar'
+import GoalCard from '../../components/goals/GoalCard'
 import { THRUST_AREAS, UOM_TYPES } from '../../utils/constants'
 
 const buildEmptyGoal = (thrustAreas) => ({
@@ -38,7 +40,7 @@ export default function GoalSheetPage() {
     setLoading(true)
     setError('')
     try {
-      if (sheetId === 'active' || sheetId === 'demo') {
+      if (sheetId === 'active') {
         const mine = (await getMyGoalSheet()) || (await createGoalSheet())
         setSheet(mine)
       } else {
@@ -54,6 +56,30 @@ export default function GoalSheetPage() {
   useEffect(() => {
     loadSheet()
   }, [sheetId])
+
+  useEffect(() => {
+    const saved = localStorage.getItem('telos_goal_draft')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (parsed.thrustArea) setDraft(parsed)
+      } catch { }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!draft.title && !draft.target) return
+    const timer = setTimeout(() => {
+      localStorage.setItem('telos_goal_draft', JSON.stringify(draft))
+    }, 30000)
+    return () => clearTimeout(timer)
+  }, [draft])
+
+  const handleBlurAutoSave = () => {
+    if (draft.title || draft.target) {
+      localStorage.setItem('telos_goal_draft', JSON.stringify(draft))
+    }
+  }
 
   useEffect(() => {
     let mounted = true
@@ -96,8 +122,7 @@ export default function GoalSheetPage() {
   const goals = sheet?.goals || []
   const totalWeightage = goals.reduce((sum, goal) => sum + Number(goal.weightage || 0), 0)
   const canEdit = sheet && ['DRAFT', 'RETURNED'].includes(sheet.status)
-  const weightageColor =
-    totalWeightage === 100 ? 'bg-accent-500' : totalWeightage > 100 ? 'bg-red-500' : 'bg-primary-500'
+  const heavyGoals = goals.filter(g => Number(g.weightage) > 90)
 
   const handleDraftChange = (field, value) => {
     setDraft((prev) => ({ ...prev, [field]: value }))
@@ -207,23 +232,12 @@ export default function GoalSheetPage() {
           </p>
         ) : null}
 
-        <div className="rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-ink-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-ink-900">Weightage Health</p>
-              <p className="text-xs text-ink-500">Total must equal 100% to submit.</p>
-            </div>
-            <Badge tone={totalWeightage === 100 ? 'emerald' : 'amber'}>
-              {totalWeightage}% allocated
-            </Badge>
-          </div>
-          <div className="mt-4 h-2 w-full rounded-full bg-sand-200">
-            <div
-              className={`h-2 rounded-full ${weightageColor}`}
-              style={{ width: `${Math.min(totalWeightage, 100)}%` }}
-            />
-          </div>
-        </div>
+        <WeightageBar totalWeightage={totalWeightage} />
+        {heavyGoals.length > 0 ? (
+          <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Warning: {heavyGoals.map(g => g.title).join(', ')} {'>'}90% weightage — this leaves very little room for other goals.
+          </p>
+        ) : null}
 
         {canEdit ? (
           <div className="rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-ink-100">
@@ -235,6 +249,7 @@ export default function GoalSheetPage() {
                   className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
                   value={draft.title}
                   onChange={(event) => handleDraftChange('title', event.target.value)}
+                  onBlur={handleBlurAutoSave}
                 />
               </label>
               <label className="grid gap-2 text-sm font-semibold text-ink-700">
@@ -277,9 +292,11 @@ export default function GoalSheetPage() {
                 <input
                   type="number"
                   min="10"
+                  max="100"
                   className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
                   value={draft.weightage}
                   onChange={(event) => handleDraftChange('weightage', event.target.value)}
+                  onBlur={handleBlurAutoSave}
                 />
               </label>
               <div className="flex items-end">
@@ -301,40 +318,13 @@ export default function GoalSheetPage() {
           </div>
           <div className="divide-y divide-ink-100">
             {goals.map((goal) => (
-              <div key={goal.id} className="grid gap-4 px-6 py-5 md:grid-cols-[2fr_1fr_1fr_auto]">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-ink-900">{goal.title}</p>
-                    {goal.isShared ? <Badge tone="indigo">Shared</Badge> : null}
-                  </div>
-                  <p className="text-xs text-ink-500">{goal.thrustArea}</p>
-                </div>
-                <div className="text-sm text-ink-700">Target: {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}</div>
-                <label className="flex items-center gap-2 text-sm text-ink-700">
-                  Weightage
-                  <input
-                    type="number"
-                    min="10"
-                    value={goal.weightage}
-                    disabled={!canEdit}
-                    onChange={(event) => handleUpdateGoal(goal, 'weightage', Number(event.target.value))}
-                    className="w-20 rounded-lg border border-ink-200 bg-white px-2 py-1 text-sm disabled:bg-sand-100"
-                  />
-                  %
-                </label>
-                {canEdit && !goal.isShared ? (
-                  <button
-                    className="text-sm font-semibold text-red-600"
-                    onClick={() => handleDeleteGoal(goal.id)}
-                  >
-                    Delete
-                  </button>
-                ) : canEdit && goal.isShared ? (
-                  <Badge tone="indigo">Target Locked</Badge>
-                ) : (
-                  <Badge tone={goal.isLocked ? 'emerald' : 'slate'}>{goal.isLocked ? 'Locked' : sheet.status}</Badge>
-                )}
-              </div>
+              <GoalCard
+                key={goal.id}
+                goal={goal}
+                canEdit={canEdit}
+                onUpdateWeightage={(g, value) => handleUpdateGoal(g, 'weightage', value)}
+                onDelete={handleDeleteGoal}
+              />
             ))}
           </div>
         </div>

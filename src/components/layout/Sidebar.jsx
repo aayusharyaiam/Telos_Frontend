@@ -24,7 +24,7 @@ export default function Sidebar() {
           const Icon = link.icon
           return (
             <NavLink
-              key={link.to}
+              key={link.label}
               to={link.to}
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition ${
@@ -41,12 +41,19 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="rounded-2xl border border-ink-100 bg-sand-100 px-4 py-4 text-sm">
-        <div className="flex items-center gap-2 text-ink-700">
-          <SETTINGS_LINK.icon className="h-4 w-4" />
-          {SETTINGS_LINK.label}
-        </div>
-      </div>
+      <NavLink
+        to={SETTINGS_LINK.to}
+        className={({ isActive }) =>
+          `flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition ${
+            isActive
+              ? 'bg-primary-600 text-white'
+              : 'text-ink-700 hover:bg-sand-100'
+          }`
+        }
+      >
+        <SETTINGS_LINK.icon className="h-5 w-5" />
+        {SETTINGS_LINK.label}
+      </NavLink>
     </aside>
   )
 }
