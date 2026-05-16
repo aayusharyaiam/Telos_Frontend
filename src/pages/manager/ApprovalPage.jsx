@@ -5,6 +5,7 @@ import { updateGoal } from '../../api/goals.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
+import ConfirmModal from '../../components/shared/ConfirmModal'
 
 export default function ApprovalPage() {
   const { sheetId } = useParams()
@@ -14,6 +15,8 @@ export default function ApprovalPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [confirmApprove, setConfirmApprove] = useState(false)
+  const [confirmReturn, setConfirmReturn] = useState(false)
 
   async function loadSheet() {
     setLoading(true)
@@ -56,6 +59,7 @@ export default function ApprovalPage() {
 
   const handleApprove = async () => {
     if (!sheet) return
+    setConfirmApprove(false)
     setSaving(true)
     setError('')
     try {
@@ -69,6 +73,7 @@ export default function ApprovalPage() {
 
   const handleReturn = async () => {
     if (!sheet) return
+    setConfirmReturn(false)
     setSaving(true)
     setError('')
     try {
@@ -100,11 +105,32 @@ export default function ApprovalPage() {
             <button
               className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
               disabled={!canApprove || saving || totalWeightage !== 100}
-              onClick={handleApprove}
+              onClick={() => setConfirmApprove(true)}
             >
               Approve Goal Sheet
             </button>
           }
+        />
+
+        <ConfirmModal
+          open={confirmApprove}
+          title="Approve Goal Sheet"
+          message={`Are you sure you want to approve ${sheet?.user?.name}'s goal sheet? All goals will be locked.`}
+          confirmLabel="Approve"
+          onConfirm={handleApprove}
+          onCancel={() => setConfirmApprove(false)}
+          loading={saving}
+        />
+
+        <ConfirmModal
+          open={confirmReturn}
+          title="Return Goal Sheet"
+          message={`Are you sure you want to return ${sheet?.user?.name}'s goal sheet with the provided reason?`}
+          confirmLabel="Return"
+          tone="warning"
+          onConfirm={handleReturn}
+          onCancel={() => setConfirmReturn(false)}
+          loading={saving}
         />
 
         {error ? <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
@@ -172,7 +198,7 @@ export default function ApprovalPage() {
                   <button
                     className="rounded-xl border border-ink-200 bg-white px-4 py-2 text-sm font-semibold text-ink-700 disabled:opacity-60"
                     disabled={saving || reason.trim().length < 20}
-                    onClick={handleReturn}
+                    onClick={() => setConfirmReturn(true)}
                   >
                     Return with Reason
                   </button>

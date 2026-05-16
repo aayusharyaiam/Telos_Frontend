@@ -6,29 +6,33 @@ import {
   getMyGoalSheet,
   submitGoalSheet,
 } from '../../api/goalSheets.api'
+import { getActiveThrustAreas } from '../../api/admin.api'
 import { createGoal, deleteGoal, updateGoal } from '../../api/goals.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
+import ConfirmModal from '../../components/shared/ConfirmModal'
 import { THRUST_AREAS, UOM_TYPES } from '../../utils/constants'
 
-const emptyGoal = {
-  thrustArea: THRUST_AREAS[0],
+const buildEmptyGoal = (thrustAreas) => ({
+  thrustArea: thrustAreas[0] || THRUST_AREAS[0],
   title: '',
   description: '',
   uomType: 'NUMERIC_MIN',
   target: '',
   targetDate: '',
   weightage: 10,
-}
+})
 
 export default function GoalSheetPage() {
   const { sheetId } = useParams()
   const [sheet, setSheet] = useState(null)
-  const [draft, setDraft] = useState(emptyGoal)
+  const [thrustAreas, setThrustAreas] = useState(THRUST_AREAS)
+  const [draft, setDraft] = useState(() => buildEmptyGoal(THRUST_AREAS))
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [confirmSubmit, setConfirmSubmit] = useState(false)
 
   async function loadSheet() {
     setLoading(true)
@@ -51,6 +55,44 @@ export default function GoalSheetPage() {
     loadSheet()
   }, [sheetId])
 
+  useEffect(() => {
+    let mounted = true
+
+    async function loadThrustAreas() {
+      try {
+        const areas = await getActiveThrustAreas()
+        const activeAreas = Array.from(
+          new Set(
+            areas
+              .filter((area) => area.isActive !== false)
+              .map((area) => area.name)
+              .filter(Boolean)
+          )
+        )
+
+        const nextAreas = activeAreas.length ? activeAreas : THRUST_AREAS
+        if (!mounted) return
+        setThrustAreas(nextAreas)
+        setDraft((prev) => ({
+          ...prev,
+          thrustArea: nextAreas.includes(prev.thrustArea) ? prev.thrustArea : nextAreas[0],
+        }))
+      } catch (err) {
+        if (!mounted) return
+        setThrustAreas(THRUST_AREAS)
+        setDraft((prev) => ({
+          ...prev,
+          thrustArea: THRUST_AREAS.includes(prev.thrustArea) ? prev.thrustArea : THRUST_AREAS[0],
+        }))
+      }
+    }
+
+    loadThrustAreas()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
   const goals = sheet?.goals || []
   const totalWeightage = goals.reduce((sum, goal) => sum + Number(goal.weightage || 0), 0)
   const canEdit = sheet && ['DRAFT', 'RETURNED'].includes(sheet.status)
@@ -72,7 +114,7 @@ export default function GoalSheetPage() {
         target: draft.uomType === 'TIMELINE' ? undefined : draft.target,
         targetDate: draft.uomType === 'TIMELINE' ? draft.targetDate : undefined,
       })
-      setDraft(emptyGoal)
+      setDraft(buildEmptyGoal(thrustAreas))
       await loadSheet()
     } catch (err) {
       setError(err.response?.data?.error?.message || 'Could not add goal')
@@ -109,6 +151,7 @@ export default function GoalSheetPage() {
 
   const handleSubmit = async () => {
     if (!sheet) return
+    setConfirmSubmit(false)
     setSaving(true)
     setError('')
     try {
@@ -139,7 +182,7 @@ export default function GoalSheetPage() {
             <button
               className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
               disabled={!sheet || saving || totalWeightage !== 100 || !goals.length || !canEdit}
-              onClick={handleSubmit}
+              onClick={() => setConfirmSubmit(true)}
             >
               Submit for Approval
             </button>
@@ -147,6 +190,17 @@ export default function GoalSheetPage() {
         />
 
         {error ? <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+
+        <ConfirmModal
+          open={confirmSubmit}
+          title="Submit Goal Sheet"
+          message="Are you sure you want to submit your goal sheet for manager approval? You won't be able to edit goals after submission."
+          confirmLabel="Submit"
+          onConfirm={handleSubmit}
+          onCancel={() => setConfirmSubmit(false)}
+          loading={saving}
+        />
+
         {sheet?.returnReason ? (
           <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
             Return reason: {sheet.returnReason}
@@ -190,7 +244,7 @@ export default function GoalSheetPage() {
                   value={draft.thrustArea}
                   onChange={(event) => handleDraftChange('thrustArea', event.target.value)}
                 >
-                  {THRUST_AREAS.map((area) => (
+                  {thrustAreas.map((area) => (
                     <option key={area} value={area}>{area}</option>
                   ))}
                 </select>

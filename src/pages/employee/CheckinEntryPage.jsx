@@ -1,20 +1,49 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { getCheckins, upsertCheckin } from '../../api/checkins.api'
+import { getActiveCycle } from '../../api/cycles.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
-import { GOAL_STATUSES } from '../../utils/constants'
+import { GOAL_STATUSES, QUARTERS } from '../../utils/constants'
 
-const quarter = 'Q2'
+const CHECKIN_PHASE_TO_QUARTER = {
+  Q1_CHECKIN: 'Q1',
+  Q2_CHECKIN: 'Q2',
+  Q3_CHECKIN: 'Q3',
+  Q4_CHECKIN: 'Q4',
+}
 
 function currentCheckin(goal) {
   return goal.checkins?.[0] || null
 }
 
+function formatDeadline(value) {
+  if (!value) return 'the deadline'
+  return new Date(value).toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+function getOpenCheckinWindow(cycle, quarter) {
+  const now = new Date()
+  return cycle?.windows?.find((window) => {
+    if (CHECKIN_PHASE_TO_QUARTER[window.phase] !== quarter) return false
+    if (window.status === 'FORCE_OPEN') return true
+    if (window.status === 'FORCE_CLOSED') return false
+    return window.status === 'OPEN' && now >= new Date(window.opensAt) && now <= new Date(window.closesAt)
+  })
+}
+
 export default function CheckinEntryPage() {
   const { sheetId } = useParams()
+  const [searchParams] = useSearchParams()
+  const requestedQuarter = searchParams.get('quarter')?.toUpperCase()
   const [data, setData] = useState(null)
+  const [activeCycle, setActiveCycle] = useState(null)
+  const [quarter, setQuarter] = useState(QUARTERS.includes(requestedQuarter) ? requestedQuarter : 'Q2')
   const [drafts, setDrafts] = useState({})
   const [loading, setLoading] = useState(true)
   const [savingId, setSavingId] = useState('')
@@ -24,8 +53,9 @@ export default function CheckinEntryPage() {
     setLoading(true)
     setError('')
     try {
-      const next = await getCheckins({ sheetId, quarter })
+      const [next, nextCycle] = await Promise.all([getCheckins({ sheetId, quarter }), getActiveCycle()])
       setData(next)
+      setActiveCycle(nextCycle)
       const nextDrafts = {}
       for (const goal of next.sheet.goals) {
         const checkin = currentCheckin(goal)
@@ -46,7 +76,7 @@ export default function CheckinEntryPage() {
 
   useEffect(() => {
     load()
-  }, [sheetId])
+  }, [sheetId, quarter])
 
   const updateDraft = (goalId, field, value) => {
     setDrafts((prev) => ({
@@ -87,6 +117,7 @@ export default function CheckinEntryPage() {
   const sheet = data?.sheet
   const goals = sheet?.goals || []
   const canEdit = data?.windowOpen && sheet?.status === 'APPROVED'
+  const openWindow = getOpenCheckinWindow(activeCycle, quarter)
 
   return (
     <AppShell>
@@ -95,9 +126,26 @@ export default function CheckinEntryPage() {
           title={`${quarter} Check-in`}
           subtitle="Capture achievements to date. Entries are cumulative per quarter."
           chips={<Badge tone={canEdit ? 'emerald' : 'slate'}>{canEdit ? 'Window Open' : 'Read Only'}</Badge>}
+          actions={
+            <select
+              className="rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm"
+              value={quarter}
+              onChange={(event) => setQuarter(event.target.value)}
+            >
+              {QUARTERS.map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          }
         />
 
         {error ? <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+        {openWindow ? (
+          <div className="rounded-2xl border border-accent-200 bg-accent-50 px-5 py-4 shadow-sm">
+            <p className="text-sm font-semibold text-accent-900">{quarter} Check-in is open</p>
+            <p className="text-sm text-accent-800">This window closes on {formatDeadline(openWindow.closesAt)}.</p>
+          </div>
+        ) : null}
         {sheet?.status !== 'APPROVED' ? (
           <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
             Your goal sheet must be approved before check-ins can be entered.

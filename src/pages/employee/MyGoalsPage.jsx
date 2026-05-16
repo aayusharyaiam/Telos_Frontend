@@ -1,14 +1,42 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { createGoalSheet, getMyGoalSheet } from '../../api/goalSheets.api'
+import { getActiveCycle } from '../../api/cycles.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import StatCard from '../../components/shared/StatCard'
 import Badge from '../../components/shared/Badge'
 import EmptyState from '../../components/shared/EmptyState'
 
+const CHECKIN_PHASE_TO_QUARTER = {
+  Q1_CHECKIN: 'Q1',
+  Q2_CHECKIN: 'Q2',
+  Q3_CHECKIN: 'Q3',
+  Q4_CHECKIN: 'Q4',
+}
+
+function formatDeadline(value) {
+  if (!value) return 'the deadline'
+  return new Date(value).toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+function getOpenCheckinWindow(cycle) {
+  const now = new Date()
+  return cycle?.windows?.find((window) => {
+    if (!CHECKIN_PHASE_TO_QUARTER[window.phase]) return false
+    if (window.status === 'FORCE_OPEN') return true
+    if (window.status === 'FORCE_CLOSED') return false
+    return window.status === 'OPEN' && now >= new Date(window.opensAt) && now <= new Date(window.closesAt)
+  })
+}
+
 export default function MyGoalsPage() {
   const [sheet, setSheet] = useState(null)
+  const [activeCycle, setActiveCycle] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -16,7 +44,9 @@ export default function MyGoalsPage() {
     setLoading(true)
     setError('')
     try {
-      setSheet(await getMyGoalSheet())
+      const [nextSheet, nextCycle] = await Promise.all([getMyGoalSheet(), getActiveCycle()])
+      setSheet(nextSheet)
+      setActiveCycle(nextCycle)
     } catch (err) {
       setError(err.response?.data?.error?.message || 'Could not load goal sheet')
     } finally {
@@ -41,6 +71,8 @@ export default function MyGoalsPage() {
   const goals = sheet?.goals || []
   const totalWeightage = goals.reduce((sum, goal) => sum + Number(goal.weightage || 0), 0)
   const nextSheetLink = sheet ? `/goals/sheet/${sheet.id}` : '/goals/sheet/active'
+  const openWindow = getOpenCheckinWindow(activeCycle)
+  const openQuarter = openWindow ? CHECKIN_PHASE_TO_QUARTER[openWindow.phase] : null
 
   return (
     <AppShell>
@@ -70,6 +102,22 @@ export default function MyGoalsPage() {
         />
 
         {error ? <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+        {openWindow ? (
+          <div className="rounded-2xl border border-accent-200 bg-accent-50 px-5 py-4 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-accent-900">{openQuarter} Check-in is open</p>
+                <p className="text-sm text-accent-800">Update your achievements by {formatDeadline(openWindow.closesAt)}.</p>
+              </div>
+              <Link
+                to={`${nextSheetLink}/checkin?quarter=${openQuarter}`}
+                className="rounded-xl bg-accent-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-700"
+              >
+                Open Check-in
+              </Link>
+            </div>
+          </div>
+        ) : null}
 
         <div className="grid gap-4 md:grid-cols-3">
           <StatCard title="Goal Sheet Status" value={loading ? 'Loading' : sheet?.status || 'Not Created'} caption={sheet?.cycle?.name || 'Active cycle'} />

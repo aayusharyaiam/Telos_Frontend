@@ -3,6 +3,7 @@ import { getActiveCycle, updateCycleWindow } from '../../api/cycles.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
+import ConfirmModal from '../../components/shared/ConfirmModal'
 
 const phaseLabels = {
   GOAL_SETTING: 'Goal Setting',
@@ -15,6 +16,8 @@ const phaseLabels = {
 export default function CycleConfigPage() {
   const [cycle, setCycle] = useState(null)
   const [error, setError] = useState('')
+  const [pendingWindowChange, setPendingWindowChange] = useState(null)
+  const [saving, setSaving] = useState(false)
 
   async function loadCycle() {
     try {
@@ -29,9 +32,18 @@ export default function CycleConfigPage() {
     loadCycle()
   }, [])
 
-  const setWindowStatus = async (window, status) => {
-    await updateCycleWindow(cycle.id, window.phase, status)
-    await loadCycle()
+  const setWindowStatus = async () => {
+    if (!pendingWindowChange) return
+    setSaving(true)
+    try {
+      await updateCycleWindow(cycle.id, pendingWindowChange.window.phase, pendingWindowChange.status)
+      setPendingWindowChange(null)
+      await loadCycle()
+    } catch (err) {
+      setError(err.response?.data?.error?.message || 'Could not update cycle window')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -43,6 +55,21 @@ export default function CycleConfigPage() {
         />
 
         {error ? <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+
+        <ConfirmModal
+          open={Boolean(pendingWindowChange)}
+          title="Update Cycle Window"
+          message={
+            pendingWindowChange
+              ? `Are you sure you want to ${pendingWindowChange.status === 'FORCE_OPEN' ? 'force open' : 'force close'} ${phaseLabels[pendingWindowChange.window.phase] || pendingWindowChange.window.phase}?`
+              : ''
+          }
+          confirmLabel={pendingWindowChange?.status === 'FORCE_OPEN' ? 'Force Open' : 'Force Close'}
+          tone={pendingWindowChange?.status === 'FORCE_OPEN' ? 'primary' : 'warning'}
+          onConfirm={setWindowStatus}
+          onCancel={() => setPendingWindowChange(null)}
+          loading={saving}
+        />
 
         <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-ink-100">
           <div className="border-b border-ink-100 px-6 py-4">
@@ -63,13 +90,13 @@ export default function CycleConfigPage() {
                   </Badge>
                 </div>
                 <button
-                  onClick={() => setWindowStatus(window, 'FORCE_OPEN')}
+                  onClick={() => setPendingWindowChange({ window, status: 'FORCE_OPEN' })}
                   className="text-left text-sm font-semibold text-primary-700"
                 >
                   Force Open
                 </button>
                 <button
-                  onClick={() => setWindowStatus(window, 'FORCE_CLOSED')}
+                  onClick={() => setPendingWindowChange({ window, status: 'FORCE_CLOSED' })}
                   className="text-left text-sm font-semibold text-ink-600"
                 >
                   Force Close

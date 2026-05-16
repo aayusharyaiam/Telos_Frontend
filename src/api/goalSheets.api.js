@@ -15,6 +15,11 @@ export async function getTeamGoalSheets() {
   return res.data.data
 }
 
+export async function getTeamOverview() {
+  const res = await api.get('/goal-sheets/team-overview')
+  return res.data.data
+}
+
 export async function getGoalSheet(id) {
   const res = await api.get(`/goal-sheets/${id}`)
   return res.data.data
@@ -32,5 +37,15 @@ export async function approveGoalSheet(id) {
 
 export async function returnGoalSheet(id, reason) {
   const res = await api.patch(`/goal-sheets/${id}/return`, { reason })
+  return res.data.data
+}
+
+export async function unlockGoalSheet(id, reason) {
+  const res = await api.patch(`/goal-sheets/${id}/unlock`, { reason })
+  return res.data.data
+}
+
+export async function unlockGoal(goalId, reason) {
+  const res = await api.patch(`/goals/${goalId}/unlock`, { reason })
   return res.data.data
 }

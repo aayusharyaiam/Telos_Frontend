@@ -5,6 +5,11 @@ export async function getUsers() {
   return res.data.data
 }
 
+export async function createUser(payload) {
+  const res = await api.post('/users', payload)
+  return res.data.data
+}
+
 export async function updateUser(id, payload) {
   const res = await api.patch(`/users/${id}`, payload)
   return res.data.data

@@ -14,6 +14,9 @@ import CycleConfigPage from '../pages/admin/CycleConfigPage'
 import AuditLogPage from '../pages/admin/AuditLogPage'
 import CompletionDashboardPage from '../pages/admin/CompletionDashboardPage'
 import AnalyticsPage from '../pages/admin/AnalyticsPage'
+import ThrustAreasPage from '../pages/admin/ThrustAreasPage'
+import EscalationsPage from '../pages/admin/EscalationsPage'
+import UnlockGoalsPage from '../pages/admin/UnlockGoalsPage'
 import FullScreenLoader from '../components/shared/FullScreenLoader'
 
 function ProtectedRoute({ allowedRoles, children }) {
@@ -147,6 +150,30 @@ export default function AppRouter() {
           element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
               <AnalyticsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/thrust-areas"
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <ThrustAreasPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/escalations"
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <EscalationsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/unlock"
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <UnlockGoalsPage />
             </ProtectedRoute>
           }
         />

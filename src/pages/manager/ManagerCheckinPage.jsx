@@ -4,8 +4,7 @@ import { getTeamCheckinSummary, submitManagerCheckin } from '../../api/checkins.
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
-
-const quarter = 'Q2'
+import { QUARTERS } from '../../utils/constants'
 
 function currentCheckin(goal) {
   return goal.checkins?.[0] || null
@@ -14,6 +13,7 @@ function currentCheckin(goal) {
 export default function ManagerCheckinPage() {
   const { employeeId } = useParams()
   const [data, setData] = useState(null)
+  const [quarter, setQuarter] = useState('Q2')
   const [comments, setComments] = useState({})
   const [loading, setLoading] = useState(true)
   const [savingId, setSavingId] = useState('')
@@ -42,10 +42,11 @@ export default function ManagerCheckinPage() {
 
   useEffect(() => {
     load()
-  }, [employeeId])
+  }, [employeeId, quarter])
 
   const sheet = data?.sheets?.[0] || null
   const goals = sheet?.goals || []
+  const canEdit = Boolean(data?.windowOpen)
 
   const updateComment = (checkinId, value) => {
     setComments((prev) => ({ ...prev, [checkinId]: value }))
@@ -76,9 +77,20 @@ export default function ManagerCheckinPage() {
     <AppShell>
       <div className="space-y-8">
         <PageHeader
-          title="Manager Check-in"
+          title={`${quarter} Check-in`}
           subtitle={sheet ? `Reviewing ${sheet.user.name}'s ${quarter} achievements.` : 'No approved sheet found.'}
-          chips={<Badge tone="emerald">{quarter} Window Open</Badge>}
+          chips={<Badge tone={canEdit ? 'emerald' : 'slate'}>{canEdit ? 'Window Open' : 'Read Only'}</Badge>}
+          actions={
+            <select
+              className="rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm"
+              value={quarter}
+              onChange={(event) => setQuarter(event.target.value)}
+            >
+              {QUARTERS.map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          }
         />
 
         {error ? <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
@@ -115,7 +127,7 @@ export default function ManagerCheckinPage() {
                     <label className="grid gap-2 text-sm text-ink-700">
                       Manager Comment
                       <input
-                        disabled={!checkin?.id}
+                        disabled={!checkin?.id || !canEdit}
                         value={checkin?.id ? comments[checkin.id] || '' : ''}
                         onChange={(event) => updateComment(checkin.id, event.target.value)}
                         className="rounded-lg border border-ink-200 bg-white px-3 py-2 disabled:bg-sand-100"
@@ -129,7 +141,7 @@ export default function ManagerCheckinPage() {
                           : `${Number(checkin.progressScore).toFixed(1)}%`}
                       </div>
                       <button
-                        disabled={!checkin?.id || savingId === checkin.id}
+                        disabled={!checkin?.id || !canEdit || savingId === checkin.id}
                         onClick={() => saveComment(checkin.id)}
                         className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
                       >

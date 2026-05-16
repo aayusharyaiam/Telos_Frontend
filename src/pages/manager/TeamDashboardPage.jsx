@@ -1,13 +1,29 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getTeamGoalSheets } from '../../api/goalSheets.api'
+import { getTeamOverview } from '../../api/goalSheets.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import StatCard from '../../components/shared/StatCard'
 import Badge from '../../components/shared/Badge'
 
+const STATUS_LABELS = {
+  DRAFT: 'Draft',
+  SUBMITTED: 'Submitted',
+  APPROVED: 'Approved',
+  RETURNED: 'Returned',
+}
+
+const STATUS_TONES = {
+  DRAFT: 'slate',
+  SUBMITTED: 'amber',
+  APPROVED: 'emerald',
+  RETURNED: 'rose',
+  NOT_STARTED: 'slate',
+}
+
 export default function TeamDashboardPage() {
-  const [sheets, setSheets] = useState([])
+  const [reports, setReports] = useState([])
+  const [cycleName, setCycleName] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -16,7 +32,9 @@ export default function TeamDashboardPage() {
       setLoading(true)
       setError('')
       try {
-        setSheets(await getTeamGoalSheets())
+        const payload = await getTeamOverview()
+        setReports(payload.reports || [])
+        setCycleName(payload.cycleName || '')
       } catch (err) {
         setError(err.response?.data?.error?.message || 'Could not load team')
       } finally {
@@ -27,21 +45,25 @@ export default function TeamDashboardPage() {
     load()
   }, [])
 
-  const submitted = sheets.filter((sheet) => sheet.status === 'SUBMITTED')
-  const approved = sheets.filter((sheet) => sheet.status === 'APPROVED')
-  const nextSheet = submitted[0] || sheets[0]
+  const submitted = reports.filter((report) => report.goalSheetStatus === 'SUBMITTED')
+  const approved = reports.filter((report) => report.goalSheetStatus === 'APPROVED')
+  const nextReview =
+    reports.find((report) => report.goalSheetStatus === 'SUBMITTED') ||
+    reports.find((report) => report.goalSheetId)
 
   return (
     <AppShell>
       <div className="space-y-8">
         <PageHeader
           title="Team Overview"
-          subtitle="Review submissions, approvals, and goal sheet status across direct reports."
+          subtitle={`Review submissions, approvals, and goal sheet status across direct reports.${
+            cycleName ? ` Active cycle: ${cycleName}.` : ''
+          }`}
           actions={
-            nextSheet ? (
+            nextReview?.goalSheetId ? (
               <Link
                 className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-semibold text-white"
-                to={`/manager/approve/${nextSheet.id}`}
+                to={`/manager/approve/${nextReview.goalSheetId}`}
               >
                 Review Next Sheet
               </Link>
@@ -52,7 +74,7 @@ export default function TeamDashboardPage() {
         {error ? <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
 
         <div className="grid gap-4 md:grid-cols-3">
-          <StatCard title="Goal Sheets" value={loading ? '...' : String(sheets.length)} caption="In active cycle" />
+          <StatCard title="Direct Reports" value={loading ? '...' : String(reports.length)} caption="In your team" />
           <StatCard title="Approvals" value={String(approved.length)} caption="Approved" tone="emerald" />
           <StatCard title="Pending Review" value={String(submitted.length)} caption="Submitted" />
         </div>
@@ -62,36 +84,44 @@ export default function TeamDashboardPage() {
             <p className="text-sm font-semibold text-ink-900">Direct Reports</p>
           </div>
           <div className="divide-y divide-ink-100">
-            {sheets.length === 0 ? (
-              <div className="px-6 py-6 text-sm text-ink-600">No team goal sheets yet.</div>
+            {reports.length === 0 ? (
+              <div className="px-6 py-6 text-sm text-ink-600">No direct reports yet.</div>
             ) : (
-              sheets.map((sheet) => (
-                <div key={sheet.id} className="flex items-center justify-between px-6 py-4">
-                  <div>
-                    <p className="text-sm font-semibold text-ink-900">{sheet.user.name}</p>
-                    <p className="text-xs text-ink-500">{sheet.goals.length} goals</p>
+              reports.map((report) => {
+                const statusKey = report.goalSheetStatus || 'NOT_STARTED'
+                const statusLabel = STATUS_LABELS[statusKey] || 'Not Started'
+                const tone = STATUS_TONES[statusKey] || 'slate'
+
+                return (
+                  <div key={report.userId} className="flex items-center justify-between px-6 py-4">
+                    <div>
+                      <p className="text-sm font-semibold text-ink-900">{report.name}</p>
+                      <p className="text-xs text-ink-500">{report.goalsCount || 0} goals</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge tone={tone}>{statusLabel}</Badge>
+                      {report.goalSheetStatus === 'APPROVED' ? (
+                        <Link
+                          className="text-sm font-semibold text-primary-700"
+                          to={`/manager/checkin/${report.userId}`}
+                        >
+                          Check-in
+                        </Link>
+                      ) : null}
+                      {report.goalSheetId ? (
+                        <Link
+                          className="text-sm font-semibold text-primary-700"
+                          to={`/manager/approve/${report.goalSheetId}`}
+                        >
+                          Review
+                        </Link>
+                      ) : (
+                        <span className="text-sm font-semibold text-ink-400">No sheet yet</span>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Badge tone={sheet.status === 'APPROVED' ? 'emerald' : sheet.status === 'SUBMITTED' ? 'amber' : 'slate'}>
-                      {sheet.status}
-                    </Badge>
-                    {sheet.status === 'APPROVED' ? (
-                      <Link
-                        className="text-sm font-semibold text-primary-700"
-                        to={`/manager/checkin/${sheet.user.id}`}
-                      >
-                        Check-in
-                      </Link>
-                    ) : null}
-                    <Link
-                      className="text-sm font-semibold text-primary-700"
-                      to={`/manager/approve/${sheet.id}`}
-                    >
-                      Review
-                    </Link>
-                  </div>
-                </div>
-              ))
+                )
+              })
             )}
           </div>
         </div>

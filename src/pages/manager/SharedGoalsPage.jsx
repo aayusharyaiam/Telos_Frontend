@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getActiveThrustAreas } from '../../api/admin.api'
 import {
   createSharedGoal,
   getSharedGoalRecipients,
@@ -9,28 +10,42 @@ import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
 import StatCard from '../../components/shared/StatCard'
-import { THRUST_AREAS, UOM_TYPES } from '../../utils/constants'
+import { QUARTERS, THRUST_AREAS, UOM_TYPES } from '../../utils/constants'
 
-const emptyDraft = {
+const buildEmptyDraft = (thrustAreas) => ({
   title: '',
-  thrustArea: THRUST_AREAS[0],
+  thrustArea: thrustAreas[0] || THRUST_AREAS[0],
   description: '',
   uomType: 'NUMERIC_MIN',
   target: '',
   targetDate: '',
   defaultWeightage: 10,
   recipientIds: [],
-}
+  primaryOwnerId: '',
+})
 
 function targetLabel(goal) {
   return goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'
 }
 
+function getSharedGoalQuarterDraft(goal, quarter) {
+  const linkedCheckin = goal.linkedGoals
+    ?.flatMap((linkedGoal) => linkedGoal.checkins || [])
+    .find((checkin) => checkin.quarter === quarter)
+
+  return {
+    actualAchievement: linkedCheckin?.actualAchievement ?? goal.actualAchievement ?? '',
+    actualDate: linkedCheckin?.actualDate?.slice(0, 10) ?? goal.actualDate?.slice(0, 10) ?? '',
+  }
+}
+
 export default function SharedGoalsPage() {
   const [sharedGoals, setSharedGoals] = useState([])
   const [recipients, setRecipients] = useState([])
-  const [draft, setDraft] = useState(emptyDraft)
+  const [thrustAreas, setThrustAreas] = useState(THRUST_AREAS)
+  const [draft, setDraft] = useState(() => buildEmptyDraft(THRUST_AREAS))
   const [achievementDrafts, setAchievementDrafts] = useState({})
+  const [achievementQuarter, setAchievementQuarter] = useState('Q2')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -45,10 +60,7 @@ export default function SharedGoalsPage() {
 
       const nextAchievementDrafts = {}
       for (const goal of goals) {
-        nextAchievementDrafts[goal.id] = {
-          actualAchievement: goal.actualAchievement ?? '',
-          actualDate: goal.actualDate?.slice(0, 10) ?? '',
-        }
+        nextAchievementDrafts[goal.id] = getSharedGoalQuarterDraft(goal, achievementQuarter)
       }
       setAchievementDrafts(nextAchievementDrafts)
     } catch (err) {
@@ -62,6 +74,52 @@ export default function SharedGoalsPage() {
     Promise.resolve().then(load)
   }, [])
 
+  useEffect(() => {
+    const nextAchievementDrafts = {}
+    for (const goal of sharedGoals) {
+      nextAchievementDrafts[goal.id] = getSharedGoalQuarterDraft(goal, achievementQuarter)
+    }
+    setAchievementDrafts(nextAchievementDrafts)
+  }, [achievementQuarter, sharedGoals])
+
+  useEffect(() => {
+    let mounted = true
+
+    async function loadThrustAreas() {
+      try {
+        const areas = await getActiveThrustAreas()
+        const activeAreas = Array.from(
+          new Set(
+            areas
+              .filter((area) => area.isActive !== false)
+              .map((area) => area.name)
+              .filter(Boolean)
+          )
+        )
+
+        const nextAreas = activeAreas.length ? activeAreas : THRUST_AREAS
+        if (!mounted) return
+        setThrustAreas(nextAreas)
+        setDraft((prev) => ({
+          ...prev,
+          thrustArea: nextAreas.includes(prev.thrustArea) ? prev.thrustArea : nextAreas[0],
+        }))
+      } catch (err) {
+        if (!mounted) return
+        setThrustAreas(THRUST_AREAS)
+        setDraft((prev) => ({
+          ...prev,
+          thrustArea: THRUST_AREAS.includes(prev.thrustArea) ? prev.thrustArea : THRUST_AREAS[0],
+        }))
+      }
+    }
+
+    loadThrustAreas()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
   const updateDraft = (field, value) => {
     setDraft((prev) => ({ ...prev, [field]: value }))
   }
@@ -72,8 +130,14 @@ export default function SharedGoalsPage() {
       recipientIds: prev.recipientIds.includes(recipientId)
         ? prev.recipientIds.filter((id) => id !== recipientId)
         : [...prev.recipientIds, recipientId],
+      primaryOwnerId:
+        prev.primaryOwnerId === recipientId
+          ? prev.recipientIds.filter((id) => id !== recipientId)[0] || ''
+          : prev.primaryOwnerId || recipientId,
     }))
   }
+
+  const primaryRecipient = recipients.find((recipient) => recipient.id === (draft.primaryOwnerId || draft.recipientIds[0]))
 
   const handleCreate = async () => {
     setSaving(true)
@@ -83,8 +147,9 @@ export default function SharedGoalsPage() {
         ...draft,
         target: draft.uomType === 'TIMELINE' ? undefined : draft.target,
         targetDate: draft.uomType === 'TIMELINE' ? draft.targetDate : undefined,
+        primaryOwnerId: draft.primaryOwnerId || draft.recipientIds[0],
       })
-      setDraft(emptyDraft)
+      setDraft(buildEmptyDraft(thrustAreas))
       await load()
     } catch (err) {
       setError(err.response?.data?.error?.message || 'Could not create shared goal')
@@ -106,6 +171,7 @@ export default function SharedGoalsPage() {
     const next = achievementDrafts[goal.id] || {}
     try {
       await updateSharedGoalAchievement(goal.id, {
+        quarter: achievementQuarter,
         actualAchievement: goal.uomType === 'TIMELINE' ? undefined : next.actualAchievement,
         actualDate: goal.uomType === 'TIMELINE' ? next.actualDate : undefined,
       })
@@ -161,7 +227,7 @@ export default function SharedGoalsPage() {
                 value={draft.thrustArea}
                 onChange={(event) => updateDraft('thrustArea', event.target.value)}
               >
-                {THRUST_AREAS.map((area) => (
+                {thrustAreas.map((area) => (
                   <option key={area} value={area}>{area}</option>
                 ))}
               </select>
@@ -210,7 +276,12 @@ export default function SharedGoalsPage() {
           </div>
 
           <div className="mt-5">
-            <p className="text-sm font-semibold text-ink-700">Recipients</p>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm font-semibold text-ink-700">Recipients</p>
+              {primaryRecipient ? (
+                <p className="text-xs text-ink-500">Primary owner: {primaryRecipient.name}</p>
+              ) : null}
+            </div>
             <div className="mt-3 grid gap-2 md:grid-cols-3">
               {recipients.map((recipient) => (
                 <label
@@ -229,6 +300,22 @@ export default function SharedGoalsPage() {
                 </label>
               ))}
             </div>
+            {draft.recipientIds.length ? (
+              <label className="mt-4 grid gap-2 text-sm font-semibold text-ink-700 md:max-w-sm">
+                Primary Owner
+                <select
+                  className="rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm"
+                  value={draft.primaryOwnerId || draft.recipientIds[0]}
+                  onChange={(event) => updateDraft('primaryOwnerId', event.target.value)}
+                >
+                  {recipients
+                    .filter((recipient) => draft.recipientIds.includes(recipient.id))
+                    .map((recipient) => (
+                      <option key={recipient.id} value={recipient.id}>{recipient.name}</option>
+                    ))}
+                </select>
+              </label>
+            ) : null}
           </div>
 
           <div className="mt-5 flex justify-end">
@@ -243,8 +330,20 @@ export default function SharedGoalsPage() {
         </div>
 
         <div className="rounded-2xl bg-white/80 shadow-sm ring-1 ring-ink-100">
-          <div className="border-b border-ink-100 px-6 py-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink-100 px-6 py-4">
             <p className="text-sm font-semibold text-ink-900">Shared Goal Library</p>
+            <label className="flex items-center gap-2 text-sm font-semibold text-ink-700">
+              Actual Quarter
+              <select
+                className="rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm"
+                value={achievementQuarter}
+                onChange={(event) => setAchievementQuarter(event.target.value)}
+              >
+                {QUARTERS.map((quarter) => (
+                  <option key={quarter} value={quarter}>{quarter}</option>
+                ))}
+              </select>
+            </label>
           </div>
           <div className="divide-y divide-ink-100">
             {sharedGoals.length === 0 ? (
@@ -261,6 +360,7 @@ export default function SharedGoalsPage() {
                       </div>
                       <p className="text-xs text-ink-500">
                         {goal.thrustArea} | Target: {targetLabel(goal)} | {goal.linkedGoals.length} recipients
+                        {goal.primaryOwner?.name ? ` | Owner: ${goal.primaryOwner.name}` : ''}
                       </p>
                     </div>
                     <div className="text-sm text-ink-700">
