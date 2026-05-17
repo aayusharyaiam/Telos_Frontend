@@ -60,12 +60,3 @@ docker compose up -d    # http://localhost (nginx)
 - Skeleton loaders + empty states
 
 See [Full Documentation](../Telos_AtomQuest_Documentation.md) for architecture and feature details.
-
-## Screenshots
-
-<p><img src="docs/screenshots/manager-dashboard.png" alt="Manager Dashboard" width="600"/></p>
-<p><img src="docs/screenshots/manager-approval-diff.png" alt="Approval Diff" width="600"/></p>
-<p><img src="docs/screenshots/admin-analytics-overview.png" alt="Analytics Overview" width="600"/></p>
-<p><img src="docs/screenshots/admin-audit-trail.png" alt="Audit Trail" width="600"/></p>
-<p><img src="docs/screenshots/admin-email-logs.png" alt="Email Logs" width="600"/></p>
-<p><img src="docs/screenshots/admin-escalations.png" alt="Escalations" width="600"/></p>
