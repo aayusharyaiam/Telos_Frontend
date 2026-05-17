@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function ConfirmModal({
@@ -19,21 +20,38 @@ export default function ConfirmModal({
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
   }, [open, onCancel])
+
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [open])
+
   const toneClasses = {
     primary: 'bg-primary-container text-white hover:bg-primary',
     danger: 'bg-error text-white hover:bg-red-700',
     warning: 'bg-tertiary-fixed-dim text-ink-900 hover:bg-amber-500',
   }
 
-  return (
+  if (typeof document === 'undefined') return null
+
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/50 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/30 dark:bg-black/50 backdrop-blur-sm"
           onClick={onCancel}
+          style={{
+            alignItems: 'center',
+          }}
         >
           <motion.div
             initial={{ opacity: 0, y: 40, scale: 0.95 }}
@@ -41,13 +59,13 @@ export default function ConfirmModal({
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md rounded-2xl bg-white dark:bg-dark-surface p-6 shadow-xl ring-1 ring-ink-100/10 dark:ring-outline/20"
+            className="w-full max-w-sm rounded-2xl bg-white dark:bg-dark-surface p-5 shadow-xl ring-1 ring-ink-100/10 dark:ring-outline/20 max-h-[90vh] overflow-y-auto"
           >
             <h3 className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">
               {title}
             </h3>
             <p className="mt-2 font-body-md text-body-md text-ink-600 dark:text-outline">{message}</p>
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="mt-5 flex justify-end gap-2.5">
               <button
                 onClick={onCancel}
                 disabled={loading}
@@ -66,6 +84,7 @@ export default function ConfirmModal({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 }

@@ -11,6 +11,7 @@ export default function Notifier() {
   const [popups, setPopups] = useState([])
   const seenIds = useRef(new Set())
   const timers = useRef({})
+  const hoveredIds = useRef(new Set())
 
   const clearTimer = useCallback((id) => {
     if (timers.current[id]) {
@@ -21,6 +22,7 @@ export default function Notifier() {
 
   const dismissPopup = useCallback((id, markRead = false) => {
     clearTimer(id)
+    hoveredIds.current.delete(id)
     setPopups((prev) => prev.filter((p) => p.id !== id))
     if (markRead) {
       markNotificationRead(id).catch(() => {})
@@ -31,6 +33,26 @@ export default function Notifier() {
     dismissPopup(notification.id, true)
     if (notification.link) navigate(notification.link)
   }, [dismissPopup, navigate])
+
+  const startTimer = useCallback((id) => {
+    clearTimer(id)
+    const timer = setTimeout(() => {
+      dismissPopup(id, true) // Mark as read on auto-dismiss
+    }, AUTO_DISMISS_MS)
+    timers.current[id] = timer
+  }, [clearTimer, dismissPopup])
+
+  const pauseTimer = useCallback((id) => {
+    hoveredIds.current.add(id)
+    clearTimer(id)
+  }, [clearTimer])
+
+  const resumeTimer = useCallback((id) => {
+    if (hoveredIds.current.has(id)) {
+      hoveredIds.current.delete(id)
+      startTimer(id)
+    }
+  }, [startTimer])
 
   useEffect(() => {
     let mounted = true
@@ -47,12 +69,7 @@ export default function Notifier() {
 
           const popup = { ...n, timestamp: Date.now() }
           setPopups((prev) => [...prev, popup])
-
-          const timer = setTimeout(() => {
-            clearTimer(n.id)
-            setPopups((prev) => prev.filter((p) => p.id !== n.id))
-          }, AUTO_DISMISS_MS)
-          timers.current[n.id] = timer
+          startTimer(n.id)
         }
       } catch {
         /* polling error */
@@ -64,9 +81,9 @@ export default function Notifier() {
     return () => {
       mounted = false
       clearInterval(interval)
-      Object.values(timers.current).forEach(clearTimeout)
+      Object.values(timers.current).forEach(clearTimer)
     }
-  }, [clearTimer])
+  }, [startTimer, clearTimer])
 
   return (
     <div className="fixed top-20 right-4 z-[100] flex flex-col gap-2 w-80 pointer-events-none">
@@ -80,6 +97,8 @@ export default function Notifier() {
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             className="pointer-events-auto rounded-2xl bg-white dark:bg-dark-surface shadow-xl ring-1 ring-ink-100/10 dark:ring-outline/20 border-l-4 border-primary-container overflow-hidden cursor-pointer"
             onClick={() => handleClick(n)}
+            onMouseEnter={() => pauseTimer(n.id)}
+            onMouseLeave={() => resumeTimer(n.id)}
             layout
           >
             <div className="flex items-start justify-between p-3 pl-4">
@@ -99,6 +118,7 @@ export default function Notifier() {
                   dismissPopup(n.id, true)
                 }}
                 className="shrink-0 rounded-full p-1 text-ink-400 dark:text-outline hover:bg-sand-100 dark:hover:bg-dark-bg transition-colors"
+                title="Dismiss"
               >
                 <XMarkIcon className="h-4 w-4" />
               </button>
