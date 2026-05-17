@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { QUARTERS } from '../utils/constants'
 
 export function useWindowStatus(cycle, quarter) {
   return useMemo(() => {

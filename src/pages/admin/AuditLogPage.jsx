@@ -51,11 +51,6 @@ function formatDate(d) {
   })
 }
 
-function formatDateInput(d) {
-  if (!d) return ''
-  return new Date(d).toISOString().slice(0, 10)
-}
-
 export default function AuditLogPage() {
   const [logs, setLogs] = useState([])
   const [loading, setLoading] = useState(true)

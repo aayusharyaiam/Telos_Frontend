@@ -35,7 +35,9 @@ export function useGoalSheet(sheetId) {
         setGoalSheet(existing)
         return existing
       }
-    } catch { }
+    } catch {
+      // sheet doesn't exist, will create new one
+    }
     const created = await createGoalSheet(cycleId ? { cycleId } : {})
     setGoalSheet(created)
     return created

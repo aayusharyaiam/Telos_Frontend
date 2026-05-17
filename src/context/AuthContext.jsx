@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
         await syncUser()
         const me = await getMe()
         setAppUser(me)
-      } catch (err) {
+      } catch {
         setAppUser(null)
         if (!loading) {
           toast.error('Failed to load your profile. Please refresh the page.')
@@ -40,7 +40,7 @@ export function AuthProvider({ children }) {
     })
 
     return () => unsubscribe()
-  }, [])
+  }, [loading])
 
   const signInUser = async (email, password) => {
     await signInWithEmailAndPassword(auth, email, password)

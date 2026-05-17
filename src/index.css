@@ -265,3 +265,12 @@ h1, h2, h3, h4, h5, h6 {
 .custom-scrollbar:hover::-webkit-scrollbar-thumb {
   background: #6b7280;
 }
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

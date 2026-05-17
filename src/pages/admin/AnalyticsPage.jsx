@@ -22,8 +22,6 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -137,7 +135,7 @@ export default function AnalyticsPage() {
       setDownloading('csv')
       const blob = await getAchievementReport('csv', buildFilters())
       triggerDownload(blob, 'achievement-report.csv')
-    } catch (err) {
+    } catch {
       toast.error('Failed to download CSV')
     } finally {
       setDownloading('')
@@ -149,14 +147,14 @@ export default function AnalyticsPage() {
       setDownloading('xlsx')
       const blob = await getAchievementReport('xlsx', buildFilters())
       triggerDownload(blob, 'achievement-report.xlsx')
-    } catch (err) {
+    } catch {
       toast.error('Failed to download XLSX')
     } finally {
       setDownloading('')
     }
   }
 
-  const handleHeatmapClick = (dept, quarter, cellData) => {
+  const handleHeatmapClick = (dept, quarter) => {
     const deptData = departmentPerformance.find(d => d.department === dept)
     if (deptData) {
       setDrilldownData(deptData)

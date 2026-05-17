@@ -94,7 +94,7 @@ export default function LoginPage() {
               Click any account to fill the login form
             </p>
             {/* Horizontal scroll on mobile, grid on larger screens */}
-            <div className="flex gap-3 overflow-x-auto pb-2 lg:pb-0 lg:grid lg:grid-cols-3 lg:gap-4 -mx-1 px-1 lg:mx-0 lg:px-0 snap-x snap-mandatory lg:snap-none">
+            <div className="flex gap-3 overflow-x-auto pb-3 lg:pb-0 lg:grid lg:grid-cols-3 lg:gap-4 -mx-2 px-2 lg:mx-0 lg:px-0 snap-x snap-mandatory lg:snap-none scrollbar-hide">
               {credentials.map((c) => {
                 const Icon = iconMap[c.role]
                 return (
@@ -104,16 +104,16 @@ export default function LoginPage() {
                     whileTap={{ scale: 0.98 }}
                     type="button"
                     onClick={() => fillDemo(c.email)}
-                    className="h-full min-w-[140px] lg:min-w-0 snap-start text-left bg-white/60 dark:bg-dark-surface/60 backdrop-blur-md rounded-2xl p-4 lg:p-5 ring-1 ring-glass-border dark:ring-outline/20 hover:bg-white/80 dark:hover:bg-dark-surface/80 transition-all duration-200 shadow-sm flex flex-col items-start gap-2 lg:gap-3 shrink-0 lg:shrink"
+                    className="min-w-[160px] sm:min-w-[180px] lg:min-w-0 snap-start text-left bg-white dark:bg-dark-surface backdrop-blur-md rounded-2xl p-4 sm:p-5 lg:p-5 ring-1 ring-primary/30 dark:ring-primary/40 hover:ring-primary/60 dark:hover:ring-primary/60 hover:shadow-lg hover:shadow-primary/10 dark:hover:shadow-primary/20 transition-all duration-200 flex flex-col items-start gap-2.5 lg:gap-3 shrink-0"
                   >
-                    <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-surface-container-high dark:bg-dark-bg flex items-center justify-center text-primary dark:text-primary-fixed-dim shrink-0">
-                      <Icon className="h-4 w-4 lg:h-[18px] lg:w-[18px]" />
+                    <div className="w-10 h-10 sm:w-11 sm:h-11 lg:w-9 lg:h-9 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed shrink-0">
+                      <Icon className="h-5 w-5 sm:h-5 sm:w-5 lg:h-[18px] lg:w-[18px]" />
                     </div>
                     <div className="flex-1">
-                      <div className="font-display text-[14px] lg:text-[16px] leading-tight text-ink-900 dark:text-inverse-on-surface">
+                      <div className="font-display text-[15px] sm:text-[16px] lg:text-[16px] font-semibold leading-tight text-ink-900 dark:text-inverse-on-surface">
                         {c.role}
                       </div>
-                      <div className="font-caption text-caption text-ink-500 dark:text-outline mt-0.5">{c.desc}</div>
+                      <div className="font-caption text-xs sm:text-sm text-ink-600 dark:text-outline mt-1">{c.desc}</div>
                     </div>
                   </motion.button>
                 )

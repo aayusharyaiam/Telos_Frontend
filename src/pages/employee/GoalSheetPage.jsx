@@ -70,7 +70,9 @@ export default function GoalSheetPage() {
       try {
         const parsed = JSON.parse(saved)
         if (parsed.thrustArea) setDraft(parsed)
-      } catch { }
+      } catch {
+        // ignore parse errors
+      }
     }
   }, [])
 
@@ -110,7 +112,7 @@ export default function GoalSheetPage() {
           ...prev,
           thrustArea: nextAreas.includes(prev.thrustArea) ? prev.thrustArea : nextAreas[0],
         }))
-      } catch (err) {
+      } catch {
         if (!mounted) return
         toast.error('Could not load thrust areas. Using defaults.')
         setThrustAreas(THRUST_AREAS)

@@ -105,7 +105,7 @@ export default function SharedGoalsPage() {
           ...prev,
           thrustArea: nextAreas.includes(prev.thrustArea) ? prev.thrustArea : nextAreas[0],
         }))
-      } catch (err) {
+      } catch {
         if (!mounted) return
         toast.error('Could not load thrust areas. Using defaults.')
         setThrustAreas(THRUST_AREAS)

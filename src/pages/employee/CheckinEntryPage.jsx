@@ -10,7 +10,7 @@ import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
 import ProgressScoreBadge from '../../components/goals/ProgressScoreBadge'
 import { GOAL_STATUSES, QUARTERS } from '../../utils/constants'
-import { PaperClipIcon, DocumentIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { PaperClipIcon, DocumentIcon } from '@heroicons/react/24/outline'
 
 const rowVariants = {
   initial: { opacity: 0, y: 12 },

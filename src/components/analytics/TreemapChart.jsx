@@ -19,7 +19,6 @@ export default function TreemapChart({ data, onItemClick }) {
   }
 
   const total = data.reduce((sum, item) => sum + item.goals, 0)
-  let currentX = 0
 
   return (
     <div className="relative w-full h-64">
