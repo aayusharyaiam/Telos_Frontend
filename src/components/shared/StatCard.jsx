@@ -39,7 +39,7 @@ export default function StatCard({ title, value, caption, tone = 'indigo', delay
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
       whileHover={{ y: -4, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)' }}
-      className={`bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg rounded-2xl p-5 shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20 flex flex-col justify-between hover:shadow-md transition-shadow ${accentBorders[tone] || accentBorders.indigo}`}
+      className={`bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg rounded-2xl p-4 sm:p-5 shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20 flex flex-col justify-between hover:shadow-md transition-shadow ${accentBorders[tone] || accentBorders.indigo}`}
     >
       <div className="flex items-start justify-between mb-3">
         <span className="font-label-bold text-label-bold text-ink-500 dark:text-outline uppercase tracking-wider">

@@ -15,9 +15,9 @@ export default function PageHeader({ title, subtitle, actions, chips }) {
       variants={staggerContainer}
       initial="initial"
       animate="animate"
-      className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+      className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
     >
-      <div>
+      <div className="min-w-0 flex-1">
         <motion.div variants={staggerItem} className="flex flex-wrap items-center gap-2">
           <h1 className="font-display text-headline-lg-mobile md:text-headline-lg text-ink-900 dark:text-inverse-on-surface">
             {title}
@@ -31,7 +31,7 @@ export default function PageHeader({ title, subtitle, actions, chips }) {
         ) : null}
       </div>
       {actions ? (
-        <motion.div variants={staggerItem} className="flex flex-wrap gap-2">
+        <motion.div variants={staggerItem} className="flex flex-wrap gap-2 lg:shrink-0">
           {actions}
         </motion.div>
       ) : null}

@@ -27,8 +27,9 @@ export default function GoalCard({ goal, canEdit, onUpdateWeightage, onDelete, i
           </div>
           <p className="font-body-sm text-body-sm text-ink-500 dark:text-outline mt-1">{goal.thrustArea}</p>
         </div>
-        <div className="flex items-center font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
-          Target: {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}
+        <div className="flex items-center font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface min-w-[80px]">
+          <span className="text-ink-500 dark:text-outline mr-1">Target:</span>
+          <span className="font-semibold text-ink-900 dark:text-white">{goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}</span>
         </div>
         <label className="flex items-center gap-2 font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
           Weightage
@@ -39,7 +40,7 @@ export default function GoalCard({ goal, canEdit, onUpdateWeightage, onDelete, i
             value={goal.weightage}
             disabled={!canEdit}
             onChange={(event) => onUpdateWeightage(goal, Number(event.target.value))}
-            className="w-20 rounded-lg border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-bg/50 px-2 py-1 font-body-md text-body-md text-ink-900 dark:text-inverse-on-surface disabled:bg-sand-100 dark:disabled:bg-dark-bg disabled:opacity-60 focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all"
+            className="w-16 sm:w-20 rounded-lg border border-sand-200 dark:border-outline/50 bg-white dark:bg-dark-bg px-2 py-1 font-semibold text-sm text-ink-900 dark:text-white disabled:bg-sand-100 dark:disabled:bg-dark-surface disabled:opacity-60 focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all"
           />
           %
         </label>

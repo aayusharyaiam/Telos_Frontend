@@ -278,14 +278,14 @@ export default function ApprovalPage() {
                         </div>
                         <p className="font-body-sm text-body-sm text-ink-500 dark:text-outline">{goal.thrustArea}</p>
                       </div>
-                      <label className={`flex items-center gap-2 rounded-xl px-3 py-2 font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface ${isEdited ? 'bg-amber-100' : 'bg-sand-100'}`}>
+                      <label className={`flex items-center gap-2 rounded-xl px-3 py-2 font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface ${isEdited ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-sand-100 dark:bg-dark-surface'}`}>
                         Target
                         <input
                           type={goal.uomType === 'TIMELINE' ? 'date' : 'number'}
                           value={goalTargetValue(goal)}
                           disabled={!canApprove}
                           onChange={(event) => handleTargetChange(goal, event.target.value)}
-                          className="w-28 rounded-lg border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-2 py-1 disabled:bg-sand-100"
+                          className="w-28 rounded-lg border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-2 py-1 disabled:bg-sand-100 dark:disabled:bg-dark-surface/50 dark:text-inverse-on-surface"
                         />
                         {isEdited && (
                           originals[goal.id]?.target !== goal.target ||
@@ -296,7 +296,7 @@ export default function ApprovalPage() {
                           </span>
                         ) : null}
                       </label>
-                      <label className={`flex items-center gap-2 rounded-xl px-3 py-2 font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface ${isEdited ? 'bg-amber-100' : 'bg-sand-100'}`}>
+                      <label className={`flex items-center gap-2 rounded-xl px-3 py-2 font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface ${isEdited ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-sand-100 dark:bg-dark-surface'}`}>
                         Weightage
                         <input
                           type="number"
@@ -304,7 +304,7 @@ export default function ApprovalPage() {
                           value={goal.weightage}
                           disabled={!canApprove}
                           onChange={(event) => handleWeightageChange(goal, Number(event.target.value))}
-                          className="w-20 rounded-lg border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-2 py-1 disabled:bg-sand-100"
+                          className="w-20 rounded-lg border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-2 py-1 disabled:bg-sand-100 dark:disabled:bg-dark-surface/50 dark:text-inverse-on-surface"
                         />
                         %
                         {isEdited && originals[goal.id]?.weightage !== goal.weightage ? (

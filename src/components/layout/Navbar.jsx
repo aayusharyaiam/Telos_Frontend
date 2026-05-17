@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { ChevronDownIcon } from '@heroicons/react/24/outline'
-import { NavLink } from 'react-router-dom'
+import { ChevronDownIcon, ArrowLeftIcon } from '@heroicons/react/24/outline'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import useAuth from '../../hooks/useAuth'
 import NotificationDrawer from './NotificationDrawer'
@@ -12,8 +12,23 @@ export default function Navbar() {
   const { appUser, signOutUser } = useAuth()
   const [scrolled, setScrolled] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const location = useLocation()
+  const navigate = useNavigate()
   const role = appUser?.role || 'EMPLOYEE'
   const links = NAV_LINKS[role] || NAV_LINKS.EMPLOYEE
+
+  const showBackButton = location.pathname.split('/').filter(Boolean).length > 1
+
+  const getBackPath = () => {
+    const pathParts = location.pathname.split('/').filter(Boolean)
+    if (pathParts.length > 1) {
+      const basePath = '/' + pathParts[0]
+      const mainLink = links.find(l => l.to === basePath)
+      if (mainLink) return basePath
+      return '/'
+    }
+    return '/'
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)
@@ -33,21 +48,34 @@ export default function Navbar() {
       } border-b border-sand-200 dark:border-ink-600/20`}
     >
       <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 max-w-[1440px] mx-auto">
-        <div className="md:hidden flex items-center ml-10">
-          <img src="/logo-mark.svg" alt="Telos" className="h-7 w-7 object-contain" />
-          <span className="text-ink-400 dark:text-outline select-none">|</span>
-          <span className="font-caption text-caption text-ink-500 dark:text-outline">
-            Purposeful Performance
-          </span>
-        </div>
+        <div className="flex items-center gap-2">
+          {showBackButton && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate(getBackPath())}
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-sand-100 dark:bg-dark-surface hover:bg-sand-200 dark:hover:bg-dark-bg text-ink-700 dark:text-inverse-on-surface text-sm font-semibold transition-colors"
+            >
+              <ArrowLeftIcon className="h-4 w-4" />
+              <span className="hidden sm:inline">Back</span>
+            </motion.button>
+          )}
+          <div className="md:hidden flex items-center ml-2">
+            <img src="/logo-mark.svg" alt="Telos" className="h-7 w-7 object-contain" />
+            <span className="text-ink-400 dark:text-outline select-none">|</span>
+            <span className="font-caption text-caption text-ink-500 dark:text-outline">
+              Purposeful Performance
+            </span>
+          </div>
 
-        <div className="hidden md:flex items-center">
-          <img src="/logo-mark.svg" alt="Telos" className="h-7 w-7 object-contain" />
-          <span className="font-display text-headline-md font-bold text-ink-900 dark:text-surface-bright">Telos</span>
-          <span className="text-ink-400 dark:text-outline select-none">|</span>
-          <span className="font-body-sm text-body-sm text-ink-500 dark:text-outline">
-            Purposeful Performance
-          </span>
+          <div className="hidden md:flex items-center">
+            <img src="/logo-mark.svg" alt="Telos" className="h-7 w-7 object-contain" />
+            <span className="font-display text-headline-md font-bold text-ink-900 dark:text-surface-bright">Telos</span>
+            <span className="text-ink-400 dark:text-outline select-none">|</span>
+            <span className="font-body-sm text-body-sm text-ink-500 dark:text-outline">
+              Purposeful Performance
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-4">

@@ -12,7 +12,7 @@ const rowVariants = {
 export default function Table({ columns, rows, emptyMessage = 'No data available.' }) {
   if (!rows || rows.length === 0) {
     return (
-      <div className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 px-6 py-12 text-center font-body-md text-body-md text-ink-500 dark:text-outline shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
+      <div className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 px-4 sm:px-6 py-12 text-center font-body-md text-body-md text-ink-500 dark:text-outline shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
         {emptyMessage}
       </div>
     )
@@ -21,13 +21,13 @@ export default function Table({ columns, rows, emptyMessage = 'No data available
   return (
     <div className="overflow-hidden rounded-2xl bg-white/80 dark:bg-dark-surface/70 shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20">
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-[500px]">
           <thead>
             <tr className="border-b border-sand-200/50 dark:border-outline/20 bg-white/20 dark:bg-dark-bg/20">
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className="px-6 py-4 text-left font-label-bold text-label-bold text-ink-500 dark:text-outline uppercase tracking-wider"
+                  className="px-4 sm:px-6 py-3 sm:py-4 text-left font-label-bold text-label-bold text-ink-500 dark:text-outline uppercase tracking-wider whitespace-nowrap"
                 >
                   {col.label}
                 </th>
@@ -45,7 +45,7 @@ export default function Table({ columns, rows, emptyMessage = 'No data available
                 className="transition-colors hover:bg-white/50 dark:hover:bg-dark-bg/30 group"
               >
                 {columns.map((col) => (
-                  <td key={col.key} className="px-6 py-4 font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
+                  <td key={col.key} className="px-4 sm:px-6 py-3 sm:py-4 font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface whitespace-nowrap">
                     {col.render ? col.render(row) : row[col.key]}
                   </td>
                 ))}

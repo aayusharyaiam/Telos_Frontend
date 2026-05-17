@@ -32,11 +32,11 @@ export default function Modal({ open, onClose, title, children }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="w-full max-w-lg rounded-2xl bg-white dark:bg-dark-surface p-6 shadow-xl ring-1 ring-ink-100/10 dark:ring-outline/20"
+            className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-dark-surface p-4 sm:p-6 shadow-xl ring-1 ring-ink-100/10 dark:ring-outline/20"
           >
             {title ? (
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">
+                <h2 className="font-headline-md text-lg sm:text-xl text-ink-900 dark:text-inverse-on-surface">
                   {title}
                 </h2>
                 <button

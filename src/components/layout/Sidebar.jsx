@@ -119,7 +119,7 @@ export default function Sidebar() {
                 exit={{ x: -300 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 onClick={(e) => e.stopPropagation()}
-                className="fixed left-0 top-0 h-screen w-[280px] bg-white dark:bg-dark-bg p-5 shadow-xl z-50"
+                className="fixed left-0 top-0 h-screen w-[280px] sm:w-[320px] max-w-[85vw] bg-white dark:bg-dark-bg p-5 shadow-xl z-50"
               >
                 <button
                   onClick={() => setMobileOpen(false)}
