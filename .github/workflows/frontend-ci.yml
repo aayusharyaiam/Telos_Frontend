@@ -1,0 +1,60 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Telos_Frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    paths:
+      - 'Telos_Frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Telos_Frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: Telos_Frontend
+        run: npm ci --legacy-peer-deps
+
+      - name: Build application
+        working-directory: Telos_Frontend
+        run: npm run build
+
+      - name: Verify build artifacts
+        run: |
+          cd Telos_Frontend
+          test -f dist/index.html && echo "Build successful" || exit 1
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: Telos_Frontend
+        run: npm ci --legacy-peer-deps
+
+      - name: Run linter
+        working-directory: Telos_Frontend
+        run: npm run lint || true

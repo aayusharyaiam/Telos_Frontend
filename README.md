@@ -74,9 +74,9 @@ npm run build                  # production build
 
 | Feature | Implementation |
 |---|---|
-| **Logout Confirmation** | Sign-out button triggers a `ConfirmModal` with "Are you sure you want to sign out?" — prevents accidental logouts. |
+| **Logout Confirmation** | Sign-out button triggers a centered `ConfirmModal` with "Are you sure you want to sign out?" — prevents accidental logouts. Modal is mobile-friendly with proper centering. |
 | **Judge's Guide** | `/help` page with role-by-role feature overview, demo accounts table, and key features to verify. Public route — accessible without login. Link shown on LoginPage. |
-| **Notification Drawer** | Bell icon in navbar shows unread count. Drawer polls every 30s. Click to navigate + mark read. Mark all read button. |
+| **Notification Drawer** | Bell icon in navbar shows unread count. Popup toasts appear top-right, auto-dismiss after 4s, hover pauses timer, click navigates to link + marks read. Drawer polls every 15s. Click to navigate + mark read. Mark all read button. |
 | **Toast Notifications** | `react-hot-toast` for all success/error states across every page. |
 | **Settings** | Editable name, email, phone, department. Email changes sync to Firebase Auth. |
 | **Dark/Light Mode** | Toggle via sidebar. Persisted in localStorage. Full dark mode using Tailwind `dark:` variants. |
@@ -198,3 +198,33 @@ src/
 | `VITE_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket |
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase sender ID |
 | `VITE_FIREBASE_MEASUREMENT_ID` | Firebase measurement ID |
+
+---
+
+## Docker Deployment
+
+### Build & Run
+
+```powershell
+# Build and start
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop
+docker compose down
+```
+
+### Service
+
+| Port | Endpoint | Health Check |
+|------|----------|--------------|
+| 80 | http://localhost | /health (nginx) |
+
+### Build Args
+
+To override API URL at build time:
+```powershell
+docker build --build-arg VITE_API_URL=https://your-api.com/api/v1 .
+``` |

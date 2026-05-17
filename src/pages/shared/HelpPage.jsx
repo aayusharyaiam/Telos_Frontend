@@ -170,6 +170,30 @@ export default function HelpPage() {
             <li className="flex gap-2"><span className="text-primary shrink-0">→</span> <strong>Pre-seeded data:</strong> Employee already has a submitted goal sheet with 4 goals and Q1 check-in data. Manager has a sheet to review.</li>
           </ul>
         </motion.div>
+
+        {/* Integration Status */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20 p-6"
+        >
+          <h2 className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface mb-4">
+            Integrations
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              Email Notifications Enabled
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-primary-container/20 text-primary dark:bg-primary/20 dark:text-primary-300">
+              <span className="w-2 h-2 rounded-full bg-primary"></span>
+              Microsoft Teams Webhook
+            </span>
+          </div>
+          <p className="mt-3 font-body-sm text-body-sm text-ink-500 dark:text-outline">
+            Teams webhook notifications are sent for: Goal Sheet Submitted, Goal Sheet Approved, and Escalations.
+          </p>
+        </motion.div>
       </div>
     </div>
   )
