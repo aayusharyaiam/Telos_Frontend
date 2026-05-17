@@ -27,13 +27,16 @@ export function AuthProvider({ children }) {
 
       try {
         await syncUser()
+      } catch {
+        // sync failed, continue anyway - will retry on next call
+      }
+
+      try {
         const me = await getMe()
         setAppUser(me)
       } catch {
-        setAppUser(null)
-        if (!loading) {
-          toast.error('Failed to load your profile. Please refresh the page.')
-        }
+        // if getMe fails, still allow access with firebase user only
+        // this prevents login breaking on transient backend issues
       } finally {
         setLoading(false)
       }

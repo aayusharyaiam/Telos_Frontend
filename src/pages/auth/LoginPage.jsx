@@ -120,22 +120,22 @@ export default function LoginPage() {
               })}
             </div>
             {/* Mobile swipeable carousel */}
-            <div className="lg:hidden">
+            <div className="lg:hidden overflow-hidden -mx-4 px-4">
               <motion.div
                 className="flex gap-3 cursor-grab active:cursor-grabbing"
                 drag="x"
-                dragConstraints={{ left: -((credentials.length - 1) * 190), right: 0 }}
-                dragElastic={0.2}
+                dragConstraints={{ left: -((credentials.length - 1) * 188), right: 0 }}
+                dragElastic={0.15}
                 whileTap={{ scale: 0.98 }}
               >
-                {credentials.map((c, idx) => {
+                {credentials.map((c) => {
                   const Icon = iconMap[c.role]
                   return (
                     <motion.button
                       key={c.role}
                       type="button"
                       onClick={() => fillDemo(c.email)}
-                      className="min-w-[170px] text-left bg-white dark:bg-dark-surface backdrop-blur-md rounded-2xl p-5 ring-1 ring-primary/40 dark:ring-primary/50 hover:ring-primary/70 dark:hover:ring-primary/70 hover:shadow-lg hover:shadow-primary/15 dark:hover:shadow-primary/25 transition-all duration-200 flex flex-col items-start gap-2.5 shrink-0"
+                      className="min-w-[168px] text-left bg-white dark:bg-dark-surface backdrop-blur-md rounded-2xl p-5 ring-1 ring-primary/40 dark:ring-primary/50 hover:ring-primary/70 dark:hover:ring-primary/70 hover:shadow-lg hover:shadow-primary/15 dark:hover:shadow-primary/25 transition-all duration-200 flex flex-col items-start gap-2.5 shrink-0"
                     >
                       <div className="w-11 h-11 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed shrink-0">
                         <Icon className="h-5 w-5" />
