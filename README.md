@@ -1,6 +1,6 @@
 # Telos AtomQuest — Frontend
 
-React 19 + Vite + Tailwind CSS. See [Full Documentation](../Telos_AtomQuest_Documentation.md) for all features.
+React 19 + Vite + Tailwind CSS. See [Full Documentation](Telos_AtomQuest_Documentation.md) for all features.
 
 ## Quick Start
 
@@ -59,4 +59,4 @@ docker compose up -d    # http://localhost (nginx)
 - Weightage validation bar
 - Skeleton loaders + empty states
 
-See [Full Documentation](../Telos_AtomQuest_Documentation.md) for architecture and feature details.
+See [Full Documentation](Telos_AtomQuest_Documentation.md) for architecture and feature details.
