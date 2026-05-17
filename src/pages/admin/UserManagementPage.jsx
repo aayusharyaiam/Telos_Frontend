@@ -358,8 +358,19 @@ John,john@example.com,pass123,EMPLOYEE"
             animate={{ opacity: 1, y: 0 }}
             className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20"
           >
-            <div className="border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
+            <div className="border-b border-sand-200/50 dark:border-outline/20 px-6 py-4 flex items-center justify-between">
               <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Users ({users.length})</p>
+            </div>
+            {/* Column Headers */}
+            <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-4 px-6 py-3 bg-sand-50 dark:bg-dark-bg border-b border-sand-200 dark:border-outline/20">
+              <span className="font-label-bold text-label-bold text-ink-500 dark:text-outline">User</span>
+              <span className="font-label-bold text-label-bold text-ink-500 dark:text-outline text-center">Role</span>
+              <span className="font-label-bold text-label-bold text-ink-500 dark:text-outline text-center">Status</span>
+              <span className="font-label-bold text-label-bold text-ink-500 dark:text-outline text-center">
+                Email for Notifications
+                <span className="block font-body-xs text-body-xs font-normal text-ink-400 dark:text-outline-normal">Click to edit</span>
+              </span>
+              <span className="font-label-bold text-label-bold text-ink-500 dark:text-outline text-center">Actions</span>
             </div>
             <motion.div
               className="divide-y divide-sand-200/30 dark:divide-outline/10"
@@ -407,14 +418,14 @@ John,john@example.com,pass123,EMPLOYEE"
                             if (e.key === 'Enter') handleSaveNotifEmail(user.id)
                             if (e.key === 'Escape') setEditNotifEmail({ userId: null, value: '' })
                           }}
-                          placeholder="user@example.com"
+                          placeholder="real@email.com"
                           autoFocus
-                          className="w-full rounded-lg border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-2 py-1 text-xs shadow-sm"
+                          className="w-full rounded-lg border border-primary dark:border-primary-300 bg-white dark:bg-dark-surface px-3 py-1.5 text-sm shadow-sm focus:ring-2 focus:ring-primary-100"
                         />
                         <button
                           onClick={() => handleSaveNotifEmail(user.id)}
                           disabled={updatingUserId === user.id}
-                          className="shrink-0 rounded-lg p-1 text-emerald-600 hover:bg-emerald-50 transition-colors"
+                          className="shrink-0 rounded-lg p-1.5 text-emerald-600 hover:bg-emerald-50 transition-colors"
                         >
                           <CheckIcon className="h-4 w-4" />
                         </button>
@@ -422,12 +433,15 @@ John,john@example.com,pass123,EMPLOYEE"
                     ) : (
                       <button
                         onClick={() => setEditNotifEmail({ userId: user.id, value: user.notificationEmail || '' })}
-                        className="group flex items-center gap-1 font-body-sm text-body-sm text-ink-500 dark:text-outline hover:text-primary transition-colors"
+                        className="group flex items-center justify-center gap-1.5 font-body-sm text-body-sm text-primary dark:text-primary-300 hover:underline decoration-dotted underline-offset-2 cursor-pointer px-2 py-1 rounded-lg hover:bg-primary/10 transition-colors w-full"
+                        title="Click to set email for receiving notifications"
                       >
-                        <span className="truncate max-w-[120px]">
-                          {user.notificationEmail || <span className="italic">Not set</span>}
-                        </span>
-                        <PencilIcon className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                        {user.notificationEmail ? (
+                          <span className="truncate max-w-[140px]">{user.notificationEmail}</span>
+                        ) : (
+                          <span className="italic font-medium">+ Add notification email</span>
+                        )}
+                        <PencilIcon className="h-3.5 w-3.5 shrink-0" />
                       </button>
                     )}
                   </div>
