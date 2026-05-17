@@ -91,10 +91,10 @@ export default function LoginPage() {
               Quick Access Demos
             </h3>
             <p className="font-caption text-caption text-ink-500 dark:text-outline mb-3 lg:mb-4">
-              Click any account to fill the login form
+              Swipe to browse, tap to login
             </p>
-            {/* Horizontal scroll on mobile, grid on larger screens */}
-            <div className="flex gap-3 overflow-x-auto pb-3 lg:pb-0 lg:grid lg:grid-cols-3 lg:gap-4 -mx-2 px-2 lg:mx-0 lg:px-0 snap-x snap-mandatory lg:snap-none scrollbar-hide">
+            {/* Swipeable carousel on mobile, grid on larger screens */}
+            <div className="hidden lg:grid lg:grid-cols-3 lg:gap-4">
               {credentials.map((c) => {
                 const Icon = iconMap[c.role]
                 return (
@@ -104,20 +104,57 @@ export default function LoginPage() {
                     whileTap={{ scale: 0.98 }}
                     type="button"
                     onClick={() => fillDemo(c.email)}
-                    className="min-w-[160px] sm:min-w-[180px] lg:min-w-0 snap-start text-left bg-white dark:bg-dark-surface backdrop-blur-md rounded-2xl p-4 sm:p-5 lg:p-5 ring-1 ring-primary/30 dark:ring-primary/40 hover:ring-primary/60 dark:hover:ring-primary/60 hover:shadow-lg hover:shadow-primary/10 dark:hover:shadow-primary/20 transition-all duration-200 flex flex-col items-start gap-2.5 lg:gap-3 shrink-0"
+                    className="text-left bg-white dark:bg-dark-surface backdrop-blur-md rounded-2xl p-5 ring-1 ring-primary/30 dark:ring-primary/40 hover:ring-primary/60 dark:hover:ring-primary/60 hover:shadow-lg hover:shadow-primary/10 dark:hover:shadow-primary/20 transition-all duration-200 flex flex-col items-start gap-3"
                   >
-                    <div className="w-10 h-10 sm:w-11 sm:h-11 lg:w-9 lg:h-9 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed shrink-0">
-                      <Icon className="h-5 w-5 sm:h-5 sm:w-5 lg:h-[18px] lg:w-[18px]" />
+                    <div className="w-9 h-9 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed shrink-0">
+                      <Icon className="h-[18px] w-[18px]" />
                     </div>
                     <div className="flex-1">
-                      <div className="font-display text-[15px] sm:text-[16px] lg:text-[16px] font-semibold leading-tight text-ink-900 dark:text-inverse-on-surface">
+                      <div className="font-display text-[16px] font-semibold leading-tight text-ink-900 dark:text-inverse-on-surface">
                         {c.role}
                       </div>
-                      <div className="font-caption text-xs sm:text-sm text-ink-600 dark:text-outline mt-1">{c.desc}</div>
+                      <div className="font-caption text-sm text-ink-600 dark:text-outline mt-1">{c.desc}</div>
                     </div>
                   </motion.button>
                 )
               })}
+            </div>
+            {/* Mobile swipeable carousel */}
+            <div className="lg:hidden">
+              <motion.div
+                className="flex gap-3 cursor-grab active:cursor-grabbing"
+                drag="x"
+                dragConstraints={{ left: -((credentials.length - 1) * 190), right: 0 }}
+                dragElastic={0.2}
+                whileTap={{ scale: 0.98 }}
+              >
+                {credentials.map((c, idx) => {
+                  const Icon = iconMap[c.role]
+                  return (
+                    <motion.button
+                      key={c.role}
+                      type="button"
+                      onClick={() => fillDemo(c.email)}
+                      className="min-w-[170px] text-left bg-white dark:bg-dark-surface backdrop-blur-md rounded-2xl p-5 ring-1 ring-primary/40 dark:ring-primary/50 hover:ring-primary/70 dark:hover:ring-primary/70 hover:shadow-lg hover:shadow-primary/15 dark:hover:shadow-primary/25 transition-all duration-200 flex flex-col items-start gap-2.5 shrink-0"
+                    >
+                      <div className="w-11 h-11 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed shrink-0">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-display text-[16px] font-semibold leading-tight text-ink-900 dark:text-inverse-on-surface">
+                          {c.role}
+                        </div>
+                        <div className="font-caption text-sm text-ink-600 dark:text-outline mt-1">{c.desc}</div>
+                      </div>
+                    </motion.button>
+                  )
+                })}
+              </motion.div>
+              <div className="flex justify-center gap-1.5 mt-3">
+                {credentials.map((_, idx) => (
+                  <div key={idx} className="w-1.5 h-1.5 rounded-full bg-ink-300 dark:bg-outline/50" />
+                ))}
+              </div>
             </div>
           </motion.div>
         </motion.div>
