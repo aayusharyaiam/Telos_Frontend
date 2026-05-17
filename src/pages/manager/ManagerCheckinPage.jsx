@@ -8,6 +8,7 @@ import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
 import { QUARTERS } from '../../utils/constants'
+import { DocumentIcon, EyeIcon } from '@heroicons/react/24/outline'
 
 function currentCheckin(goal) {
   return goal.checkins?.[0] || null
@@ -110,49 +111,69 @@ export default function ManagerCheckinPage() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="grid grid-cols-1 gap-3 sm:gap-4 px-4 sm:px-6 py-5 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1.4fr_auto] hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
+                    className="space-y-4 px-4 sm:px-6 py-5 hover:bg-white/50 dark:hover:bg-dark-bg/30 transition-colors"
                   >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">{goal.title}</p>
-                        {goal.isShared ? <Badge tone="indigo">Shared</Badge> : null}
+                    <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1.4fr_auto]">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">{goal.title}</p>
+                          {goal.isShared ? <Badge tone="indigo">Shared</Badge> : null}
+                        </div>
+                        <p className="font-body-sm text-body-sm text-ink-500 dark:text-outline">
+                          Planned: {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}
+                        </p>
                       </div>
-                      <p className="font-body-sm text-body-sm text-ink-500 dark:text-outline">
-                        Planned: {goal.target ?? goal.targetDate?.slice(0, 10) ?? '--'}
-                      </p>
-                    </div>
-                    <div className="font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
-                      Actual: {checkin?.actualAchievement ?? checkin?.actualDate?.slice(0, 10) ?? '--'}
-                    </div>
-                    <div>
-                      <Badge tone={checkin?.checkinCompleted ? 'emerald' : 'amber'}>
-                        {checkin?.checkinCompleted ? 'Complete' : checkin?.goalStatus || 'Pending'}
-                      </Badge>
-                    </div>
-                    <label className="grid gap-2 font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
-                      Manager Comment
-                      <input
-                        disabled={!checkin?.id || !canEdit}
-                        value={checkin?.id ? comments[checkin.id] || '' : ''}
-                        onChange={(event) => updateComment(checkin.id, event.target.value)}
-                        className="rounded-lg border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-2 disabled:bg-sand-100"
-                        placeholder={checkin?.id ? 'Add comment' : 'Employee has not saved this check-in'}
-                      />
-                    </label>
-                    <div className="flex items-end gap-3">
-                      <div className="font-headline-md text-headline-md text-ink-800">
-                        {checkin?.progressScore === null || checkin?.progressScore === undefined
-                          ? 'N/A'
-                          : `${Number(checkin.progressScore).toFixed(1)}%`}
+                      <div className="font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
+                        Actual: {checkin?.actualAchievement ?? checkin?.actualDate?.slice(0, 10) ?? '--'}
                       </div>
-                      <button
-                        disabled={!checkin?.id || !canEdit || savingId === checkin.id}
-                        onClick={() => saveComment(checkin.id)}
-                        className="rounded-xl bg-primary-container px-4 py-2 font-headline-md text-headline-md text-white hover:scale-[1.02] disabled:opacity-60"
-                      >
-                        Submit
-                      </button>
+                      <div>
+                        <Badge tone={checkin?.checkinCompleted ? 'emerald' : 'amber'}>
+                          {checkin?.checkinCompleted ? 'Complete' : checkin?.goalStatus || 'Pending'}
+                        </Badge>
+                      </div>
+                      <label className="grid gap-2 font-body-md text-body-md text-ink-700 dark:text-inverse-on-surface">
+                        Manager Comment
+                        <input
+                          disabled={!checkin?.id || !canEdit}
+                          value={checkin?.id ? comments[checkin.id] || '' : ''}
+                          onChange={(event) => updateComment(checkin.id, event.target.value)}
+                          className="rounded-lg border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-2 disabled:bg-sand-100"
+                          placeholder={checkin?.id ? 'Add comment' : 'Employee has not saved this check-in'}
+                        />
+                      </label>
+                      <div className="flex items-end gap-3">
+                        <div className="font-headline-md text-headline-md text-ink-800">
+                          {checkin?.progressScore === null || checkin?.progressScore === undefined
+                            ? 'N/A'
+                            : `${Number(checkin.progressScore).toFixed(1)}%`}
+                        </div>
+                        <button
+                          disabled={!checkin?.id || !canEdit || savingId === checkin.id}
+                          onClick={() => saveComment(checkin.id)}
+                          className="rounded-xl bg-primary-container px-4 py-2 font-headline-md text-headline-md text-white hover:scale-[1.02] disabled:opacity-60"
+                        >
+                          Submit
+                        </button>
+                      </div>
                     </div>
+
+                    {checkin?.evidenceUrl && (
+                      <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-sand-50 dark:bg-dark-bg border border-sand-200 dark:border-outline/20">
+                        <DocumentIcon className="w-5 h-5 text-primary dark:text-primary-300" />
+                        <span className="text-sm font-medium text-ink-700 dark:text-inverse-on-surface">
+                          Evidence: {checkin.evidenceFileName || 'Attached file'}
+                        </span>
+                        <a
+                          href={checkin.evidenceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-sm text-primary dark:text-primary-300 hover:underline"
+                        >
+                          <EyeIcon className="w-4 h-4" />
+                          View
+                        </a>
+                      </div>
+                    )}
                   </motion.div>
                 )
               })}

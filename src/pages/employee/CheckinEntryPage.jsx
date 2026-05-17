@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import toast from 'react-hot-toast'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { getCheckins, upsertCheckin } from '../../api/checkins.api'
+import { getCheckins, upsertCheckin, uploadEvidence } from '../../api/checkins.api'
 import { getActiveCycle } from '../../api/cycles.api'
 import { SkeletonPage } from '../../components/shared/Skeleton'
 import AppShell from '../../components/layout/AppShell'
@@ -10,6 +10,7 @@ import PageHeader from '../../components/layout/PageHeader'
 import Badge from '../../components/shared/Badge'
 import ProgressScoreBadge from '../../components/goals/ProgressScoreBadge'
 import { GOAL_STATUSES, QUARTERS } from '../../utils/constants'
+import { PaperClipIcon, DocumentIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 const rowVariants = {
   initial: { opacity: 0, y: 12 },
@@ -46,6 +47,13 @@ function getOpenCheckinWindow(cycle, quarter) {
   })
 }
 
+function formatFileSize(bytes) {
+  if (!bytes) return ''
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
 export default function CheckinEntryPage() {
   const { sheetId } = useParams()
   const [searchParams] = useSearchParams()
@@ -56,6 +64,8 @@ export default function CheckinEntryPage() {
   const [drafts, setDrafts] = useState({})
   const [loading, setLoading] = useState(true)
   const [savingId, setSavingId] = useState('')
+  const [uploadingFiles, setUploadingFiles] = useState({})
+  const fileInputRefs = useRef({})
 
   async function load() {
     setLoading(true)
@@ -71,6 +81,8 @@ export default function CheckinEntryPage() {
           actualDate: checkin?.actualDate?.slice(0, 10) ?? '',
           goalStatus: checkin?.goalStatus || 'NOT_STARTED',
           employeeNotes: checkin?.employeeNotes || '',
+          evidenceUrl: checkin?.evidenceUrl || null,
+          evidenceFileName: checkin?.evidenceFileName || null,
         }
       }
       setDrafts(nextDrafts)
@@ -111,6 +123,33 @@ export default function CheckinEntryPage() {
     } finally {
       setSavingId('')
     }
+  }
+
+  const handleFileUpload = async (goalId, checkinId, file) => {
+    if (!checkinId) {
+      toast.error('Please save the check-in first before uploading evidence')
+      return
+    }
+    setUploadingFiles((prev) => ({ ...prev, [goalId]: true }))
+    try {
+      const result = await uploadEvidence(checkinId, file)
+      updateDraft(goalId, 'evidenceUrl', result.evidenceUrl)
+      updateDraft(goalId, 'evidenceFileName', result.evidenceFileName)
+      toast.success('Evidence uploaded')
+      await load()
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Could not upload evidence')
+    } finally {
+      setUploadingFiles((prev) => ({ ...prev, [goalId]: false }))
+    }
+  }
+
+  const handleFileChange = (goalId, checkinId) => (event) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      handleFileUpload(goalId, checkinId, file)
+    }
+    event.target.value = ''
   }
 
   if (loading) {
@@ -250,6 +289,56 @@ export default function CheckinEntryPage() {
                             Save
                           </button>
                         </div>
+                      </div>
+
+                      <div className="px-4 sm:px-6 pb-5 border-t border-sand-100 dark:border-outline/10 mt-2 pt-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="file"
+                              ref={(el) => (fileInputRefs.current[goal.id] = el)}
+                              onChange={handleFileChange(goal.id, checkin?.id)}
+                              accept="image/*,.pdf,.doc,.docx,.txt"
+                              disabled={!canEdit || uploadingFiles[goal.id]}
+                              className="hidden"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => fileInputRefs.current[goal.id]?.click()}
+                              disabled={!canEdit || uploadingFiles[goal.id]}
+                              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-sand-200 dark:border-outline/30 text-sm font-medium text-ink-700 dark:text-inverse-on-surface hover:bg-sand-50 dark:hover:bg-dark-bg disabled:opacity-50 transition-colors"
+                            >
+                              <PaperClipIcon className="w-4 h-4" />
+                              {uploadingFiles[goal.id] ? 'Uploading...' : 'Attach Evidence'}
+                            </button>
+                          </label>
+
+                          {draft.evidenceUrl && (
+                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                              <DocumentIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                              <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400 truncate max-w-[150px]">
+                                {draft.evidenceFileName || 'Evidence'}
+                              </span>
+                              <a
+                                href={draft.evidenceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-emerald-600 dark:text-emerald-400 underline hover:no-underline"
+                              >
+                                View
+                              </a>
+                            </div>
+                          )}
+
+                          {checkin?.evidenceFileSize && (
+                            <span className="text-xs text-ink-400 dark:text-outline">
+                              {formatFileSize(checkin.evidenceFileSize)}
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-2 text-xs text-ink-400 dark:text-outline">
+                          Attach supporting documents, screenshots, or images as evidence of achievement
+                        </p>
                       </div>
                     </motion.div>
                   )

@@ -41,7 +41,7 @@ npm run build                  # production build
 | **Weightage Bar** | Real-time visual bar — shows allocated/total percentage. Green at 100%, red if over, yellow warning >90%. |
 | **Validation** | At least 1 goal, max 8, min 10% per goal, total must equal exactly 100% before submission. |
 | **Goal Lifecycle** | Goals editable in DRAFT/RETURNED states. Submitted goals locked. Approved goals require admin unlock. |
-| **Quarterly Check-ins** | Enter actual achievement, actual date, status, and notes per goal per quarter. Quarter selector loads historical data. |
+| **Quarterly Check-ins** | Enter actual achievement, actual date, status, and notes per goal per quarter. Quarter selector loads historical data. Evidence attachment button for uploading images, PDFs, or documents as achievement proof. |
 | **Shared Goals** | "Shared" badge, read-only title/target, editable weightage only. "Awaiting owner update" indicator when primary owner hasn't entered data. |
 | **Progress Score** | Auto-computed per UoM type (see Backend README for formulas). Displayed as color-coded badge (green≥80%, yellow≥50%, red<50%). |
 
@@ -52,7 +52,7 @@ npm run build                  # production build
 | **Team Dashboard** | List all direct reports with goal sheet status (Not Started, Draft, Submitted, Approved, Returned). |
 | **Approval with Diff View** | Inline target/weightage edits on submitted sheets. Changes highlighted with yellow background + strikethrough original values. Collapsible "Show diff view" panel. |
 | **Approve / Return** | Approve locks goals. Return requires reason (min 20 chars). Both create notifications + emails. |
-| **Manager Check-in** | View employee planned vs actual data per quarter. Add manager comments and mark check-in complete. |
+| **Manager Check-in** | View employee planned vs actual data per quarter. Add manager comments, view attached evidence files, and mark check-in complete. |
 | **Shared Goals Push** | Create shared goals, select recipients from direct reports, set primary owner. Pushes linked goal rows to recipient sheets. |
 
 ### Admin
@@ -67,7 +67,7 @@ npm run build                  # production build
 | **Thrust Areas** | CRUD thrust areas used in goal creation forms. Graceful fallback to defaults if API fails. |
 | **Escalation Rules** | Create/enable/disable rules. Manual run button. Patterns: goal setting overdue, approval overdue, check-in overdue. |
 | **Audit Trail** | Filterable log of all admin actions: post-lock edits, role changes, unlocks, window changes, escalations. |
-| **Analytics & Export** | Overview cards, quarter trend chart (Recharts), goal distribution. Export reports as JSON, CSV, or XLSX. |
+| **Analytics & Export** | Overview cards, quarter trend chart (area chart with score + volume), goal distribution (treemap), department×quarter heatmap with clickable drill-down, goal timeline (on-time vs late stacked bars), UoM pie chart, manager effectiveness (dual-bar chart), department performance. Export reports as JSON, CSV, or XLSX. |
 | **Completion Dashboard** | Per-quarter completion status rows for all employees. |
 
 ### All Users
@@ -85,6 +85,7 @@ npm run build                  # production build
 | **Role-Based Navigation** | Sidebar shows different links per role. Unauthorized routes redirect to home. |
 | **Skeleton Loaders** | All async pages show animated skeleton placeholders during data fetch. |
 | **Empty States** | Friendly empty-state cards when no data exists (no goals, no users, no emails, etc.). |
+| **Evidence Attachments** | File upload UI in quarterly check-ins. Supports images (JPG, PNG, GIF, WEBP), PDF, DOC, DOCX, TXT up to 10MB. Displays uploaded file with view link. Managers see evidence in review. |
 
 ---
 
@@ -156,7 +157,8 @@ src/
 ├── components/
 │   ├── layout/        # AppShell, Navbar, Sidebar, NotificationDrawer, Notifier, PageHeader
 │   ├── goals/         # WeightageBar (animated), GoalCard, ProgressScoreBadge
-│   └── shared/        # Badge, Modal, ConfirmModal, Table, EmptyState, StatCard, Skeleton
+│   ├── shared/        # Badge, Modal, ConfirmModal, Table, EmptyState, StatCard, Skeleton
+│   └── analytics/     # HeatmapChart, GoalTimelineChart, TreemapChart, DrilldownModal
 ├── context/           # AuthContext (Firebase auth ↔ app user sync), ThemeContext
 ├── firebase/          # Firebase config init
 ├── hooks/             # useAuth, useGoalSheet, useCurrentCycle, useWindowStatus

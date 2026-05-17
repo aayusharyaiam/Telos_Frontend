@@ -47,3 +47,23 @@ export async function getManagerEffectiveness() {
   const res = await api.get('/reports/analytics/manager-effectiveness')
   return res.data.data
 }
+
+export async function getAnalyticsHeatmap() {
+  const res = await api.get('/reports/analytics/heatmap')
+  return res.data.data
+}
+
+export async function getDepartmentPerformance() {
+  const res = await api.get('/reports/analytics/department-performance')
+  return res.data.data
+}
+
+export async function getEmployeeDrilldown(employeeId) {
+  const res = await api.get('/reports/analytics/employee-drilldown', { params: { employeeId } })
+  return res.data.data
+}
+
+export async function getGoalTimeline() {
+  const res = await api.get('/reports/analytics/goal-timeline')
+  return res.data.data
+}

@@ -19,3 +19,13 @@ export async function submitManagerCheckin(id, managerComment) {
   const res = await api.patch(`/checkins/${id}/manager`, { managerComment })
   return res.data.data
 }
+
+export async function uploadEvidence(checkinId, file) {
+  const formData = new FormData()
+  formData.append('evidence', file)
+  formData.append('checkinId', checkinId)
+  const res = await api.post('/checkins/evidence', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return res.data.data
+}
