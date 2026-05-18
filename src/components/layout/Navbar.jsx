@@ -17,7 +17,10 @@ export default function Navbar() {
   const role = appUser?.role || 'EMPLOYEE'
   const links = NAV_LINKS[role] || NAV_LINKS.EMPLOYEE
 
-  const showBackButton = location.pathname.split('/').filter(Boolean).length > 1
+  const mainNavPaths = links.map(l => l.to)
+  const isMainNavRoute = mainNavPaths.includes(location.pathname) || mainNavPaths.some(p => location.pathname.startsWith(p + '/'))
+  const pathSegments = location.pathname.split('/').filter(Boolean)
+  const showBackButton = pathSegments.length > 1 && !isMainNavRoute && !mainNavPaths.includes('/' + pathSegments[0])
 
   const getBackPath = () => {
     const pathParts = location.pathname.split('/').filter(Boolean)
@@ -78,20 +81,25 @@ export default function Navbar() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <NotificationDrawer />
-          <div className="flex items-center gap-3">
-            <div className="text-right hidden sm:block">
-              <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface">
-                {appUser?.name || 'Guest'}
-              </p>
-              <Badge tone="indigo">{appUser?.role || 'EMPLOYEE'}</Badge>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2">
+              <div className="text-right">
+                <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface">
+                  {appUser?.name || 'Guest'}
+                </p>
+                <Badge tone="indigo" className="hidden sm:inline">{appUser?.role || 'EMPLOYEE'}</Badge>
+              </div>
+              <Badge tone="indigo" className="sm:hidden">
+                {appUser?.role?.[0] || 'E'}
+              </Badge>
             </div>
             <button
               onClick={() => setShowLogoutConfirm(true)}
               className="flex items-center gap-1 rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-3 py-1.5 font-label-bold text-label-bold text-ink-700 dark:text-inverse-on-surface hover:scale-[1.02] transition-all duration-200 hover:shadow-sm"
             >
-              Sign out
+              <span className="hidden sm:inline">Sign out</span>
               <ChevronDownIcon className="h-4 w-4" />
             </button>
           </div>

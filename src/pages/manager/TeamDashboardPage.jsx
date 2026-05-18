@@ -55,6 +55,9 @@ export default function TeamDashboardPage() {
 
   const submitted = reports.filter((report) => report.goalSheetStatus === 'SUBMITTED')
   const approved = reports.filter((report) => report.goalSheetStatus === 'APPROVED')
+  const draft = reports.filter((report) => report.goalSheetStatus === 'DRAFT' || !report.goalSheetStatus)
+  const returned = reports.filter((report) => report.goalSheetStatus === 'RETURNED')
+  const totalGoals = reports.reduce((sum, report) => sum + (report.goalsCount || 0), 0)
   const nextReview =
     reports.find((report) => report.goalSheetStatus === 'SUBMITTED') ||
     reports.find((report) => report.goalSheetId)
@@ -76,10 +79,13 @@ export default function TeamDashboardPage() {
         }
       />
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard title="Direct Reports" value={loading ? '...' : String(reports.length)} caption="In your team" />
-        <StatCard title="Approvals" value={String(approved.length)} caption="Approved" tone="emerald" />
-        <StatCard title="Pending Review" value={String(submitted.length)} caption="Submitted" />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+        <StatCard title="Team Members" value={loading ? '...' : String(reports.length)} caption="Direct reports" tone="emerald" />
+        <StatCard title="Total Goals" value={String(totalGoals)} caption={`${reports.length} sheets`} tone="indigo" />
+        <StatCard title="Draft" value={String(draft.length)} caption="In progress" tone="slate" />
+        <StatCard title="Submitted" value={String(submitted.length)} caption="Awaiting review" tone="amber" />
+        <StatCard title="Approved" value={String(approved.length)} caption="Completed" tone="emerald" />
+        <StatCard title="Returned" value={String(returned.length)} caption="Needs revision" tone="red" />
       </div>
 
       <motion.div

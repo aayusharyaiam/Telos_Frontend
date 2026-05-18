@@ -73,6 +73,11 @@ export default function MyGoalsPage() {
   const openWindow = getOpenCheckinWindow(activeCycle)
   const openQuarter = openWindow ? CHECKIN_PHASE_TO_QUARTER[openWindow.phase] : null
 
+  const isSubmitted = sheet?.status === 'SUBMITTED'
+  const isApproved = sheet?.status === 'APPROVED'
+  const isReturned = sheet?.status === 'RETURNED'
+  const isDraft = sheet?.status === 'DRAFT' || !sheet?.status
+
   return (
     <AppShell>
       <PageHeader
@@ -124,23 +129,36 @@ export default function MyGoalsPage() {
         </motion.div>
       ) : null}
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <StatCard
-          title="Goal Sheet Status"
-          value={loading ? 'Loading' : sheet?.status || 'Not Created'}
-          caption={sheet?.cycle?.name || 'Active cycle'}
+          title="Goals Created"
+          value={String(goals.length)}
+          caption={loading ? 'Loading...' : sheet ? `${goals.length} goals` : 'No sheet'}
+          tone={goals.length > 0 ? 'emerald' : 'slate'}
         />
         <StatCard
           title="Total Weightage"
           value={`${totalWeightage}%`}
           caption="Target: 100%"
-          tone={totalWeightage === 100 ? 'emerald' : 'indigo'}
+          tone={totalWeightage === 100 ? 'emerald' : totalWeightage > 0 ? 'indigo' : 'slate'}
         />
         <StatCard
-          title="Goals"
-          value={String(goals.length)}
-          caption="Maximum 8 goals"
-          tone="emerald"
+          title="Sheet Status"
+          value={loading ? 'Loading' : sheet?.status || 'Not Created'}
+          caption={isSubmitted ? 'Awaiting approval' : isApproved ? 'Approved' : isReturned ? 'Needs revision' : isDraft ? 'In progress' : 'No sheet'}
+          tone={isApproved ? 'emerald' : isSubmitted ? 'amber' : isReturned ? 'red' : 'slate'}
+        />
+        <StatCard
+          title="Submitted"
+          value={isSubmitted ? 'Yes' : 'No'}
+          caption={isSubmitted ? 'Awaiting manager review' : 'Not submitted'}
+          tone={isSubmitted ? 'amber' : 'slate'}
+        />
+        <StatCard
+          title="Approved"
+          value={isApproved ? 'Yes' : 'No'}
+          caption={isApproved ? 'Goals approved' : isSubmitted ? 'Pending review' : 'Not yet'}
+          tone={isApproved ? 'emerald' : 'slate'}
         />
       </div>
 

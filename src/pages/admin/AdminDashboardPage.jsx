@@ -115,7 +115,7 @@ export default function AdminDashboardPage() {
         }
       />
 
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <StatCard
           title="Active Cycle"
           value={s.activeCycleName || '—'}
@@ -125,17 +125,40 @@ export default function AdminDashboardPage() {
           title="Active Users"
           value={s.totalActiveUsers ?? '—'}
           caption="Total enrolled"
+          tone="emerald"
         />
         <StatCard
           title="Goal Sheets"
           value={s.totalGoalSheets ?? '—'}
-          caption={`${s.submittedCount ?? 0} submitted · ${s.approvedCount ?? 0} approved`}
+          caption="Total sheets"
+          tone="indigo"
         />
+        <StatCard
+          title="Submitted"
+          value={s.submittedCount ?? '—'}
+          caption="Awaiting approval"
+          tone="amber"
+        />
+        <StatCard
+          title="Approved"
+          value={s.approvedCount ?? '—'}
+          caption="Completed"
+          tone="emerald"
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
         <StatCard
           title={`${s.dashboardQuarter || 'Check-in'} Completion`}
           value={s.selectedCompletionRate != null ? `${s.selectedCompletionRate}%` : '—'}
-          caption={`${s.selectedCompletedCount ?? 0} sheets completed`}
+          caption={`${s.selectedCompletedCount ?? 0} of ${s.totalGoalSheets ?? 0} sheets completed`}
           tone="emerald"
+        />
+        <StatCard
+          title="Pending Approval"
+          value={String((s.submittedCount ?? 0) - (s.approvedCount ?? 0))}
+          caption="Sheets awaiting review"
+          tone="amber"
         />
       </div>
 
