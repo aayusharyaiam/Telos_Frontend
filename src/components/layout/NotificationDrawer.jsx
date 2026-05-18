@@ -1,13 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BellIcon,
   CheckCircleIcon,
   XMarkIcon,
+  SignalIcon,
 } from '@heroicons/react/24/outline'
 import { getNotifications, markAllNotificationsRead } from '../../api/notifications.api'
 import { formatDistanceToNow } from 'date-fns'
+import { useSocket } from '../../context/SocketContext.jsx'
 
 export default function NotificationDrawer() {
   const navigate = useNavigate()
@@ -17,8 +19,9 @@ export default function NotificationDrawer() {
   const [bounce, setBounce] = useState(false)
   const drawerRef = useRef(null)
   const prevCount = useRef(0)
+  const { isConnected } = useSocket()
 
-  async function load() {
+  const load = useCallback(async () => {
     try {
       const data = await getNotifications()
       setNotifications(data)
@@ -30,13 +33,33 @@ export default function NotificationDrawer() {
       prevCount.current = count
       setUnreadCount(count)
     } catch { /* ignore polling error */ }
-  }
+  }, [])
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     load()
-    const interval = setInterval(load, 30000)
+    const interval = setInterval(load, 90000) // Reduced polling - now backup (90s)
     return () => clearInterval(interval)
+  }, [load])
+
+  // Listen for realtime notifications
+  useEffect(() => {
+    const handleRealtimeNotification = (event) => {
+      const notification = event.detail
+      console.log('📥 Received realtime notification:', notification)
+      
+      // Add to top of list
+      setNotifications(prev => [notification, ...prev])
+      
+      // Increment unread count
+      setUnreadCount(prev => prev + 1)
+      
+      // Bounce animation
+      setBounce(true)
+      setTimeout(() => setBounce(false), 600)
+    }
+
+    window.addEventListener('realtime-notification', handleRealtimeNotification)
+    return () => window.removeEventListener('realtime-notification', handleRealtimeNotification)
   }, [])
 
   useEffect(() => {
@@ -90,9 +113,17 @@ export default function NotificationDrawer() {
             className="absolute right-0 top-12 z-50 w-80 overflow-hidden rounded-2xl bg-white dark:bg-dark-surface shadow-xl ring-1 ring-ink-100/10 dark:ring-outline/20"
           >
             <div className="flex items-center justify-between border-b border-sand-200/50 dark:border-outline/20 px-4 py-3">
-              <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface">
-                Notifications
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="font-body-md text-body-md font-semibold text-ink-900 dark:text-inverse-on-surface">
+                  Notifications
+                </p>
+                {isConnected && (
+                  <span className="flex items-center gap-1 text-[10px] text-secondary">
+                    <SignalIcon className="h-3 w-3" />
+                    Live
+                  </span>
+                )}
+              </div>
               <div className="flex items-center gap-2">
                 {unreadCount > 0 ? (
                   <button

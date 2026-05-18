@@ -6,6 +6,7 @@ import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
+import { SocketProvider } from './context/SocketContext.jsx'
 
 const queryClient = new QueryClient()
 
@@ -14,8 +15,10 @@ createRoot(document.getElementById('root')).render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider>
-          <App />
-          <Toaster position="top-right" />
+          <SocketProvider>
+            <App />
+            <Toaster position="top-right" />
+          </SocketProvider>
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>

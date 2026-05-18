@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { getAdminSummary } from '../../api/reports.api'
+import { syncUser } from '../../api/auth.api'
 import AppShell from '../../components/layout/AppShell'
 import PageHeader from '../../components/layout/PageHeader'
 import StatCard from '../../components/shared/StatCard'
@@ -22,17 +23,63 @@ const cardSlideRight = {
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState(null)
+  const [isSyncing, setIsSyncing] = useState(false)
+
+  async function loadStats() {
+    try {
+      setStats(await getAdminSummary())
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Could not load dashboard data')
+    }
+  }
 
   useEffect(() => {
-    async function load() {
-      try {
-        setStats(await getAdminSummary())
-      } catch (err) {
-        toast.error(err.response?.data?.error?.message || 'Could not load dashboard data')
-      }
-    }
-    load()
+    loadStats()
   }, [])
+
+  function exportCSV() {
+    if (!stats) {
+      toast.error('No data available to export')
+      return
+    }
+
+    const s = stats
+    const rows = [
+      ['Metric', 'Value'],
+      ['Active Cycle', s.activeCycleName || '-'],
+      ['Active Users', s.totalActiveUsers ?? 0],
+      ['Total Goal Sheets', s.totalGoalSheets ?? 0],
+      ['Submitted Sheets', s.submittedCount ?? 0],
+      ['Approved Sheets', s.approvedCount ?? 0],
+      ['Completion Rate', s.selectedCompletionRate != null ? `${s.selectedCompletionRate}%` : '-'],
+      ['Completed Count', s.selectedCompletedCount ?? 0],
+      ['Dashboard Quarter', s.dashboardQuarter || '-'],
+    ]
+
+    const csvContent = rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `admin-report-${new Date().toISOString().split('T')[0]}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+    toast.success('Report exported successfully')
+  }
+
+  async function handleSync() {
+    if (isSyncing) return
+    setIsSyncing(true)
+    try {
+      await syncUser()
+      await loadStats()
+      toast.success(`Systems synced and updated at ${new Date().toLocaleTimeString()}`)
+    } catch (err) {
+      toast.error('Failed to sync systems. Please try again.')
+    } finally {
+      setIsSyncing(false)
+    }
+  }
 
   const s = stats || {}
 
@@ -43,11 +90,26 @@ export default function AdminDashboardPage() {
         subtitle="System overview and priority operations."
         actions={
           <div className="flex gap-3">
-            <button className="inline-flex items-center rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-2 font-label-bold text-label-bold text-ink-700 dark:text-inverse-on-surface transition hover:scale-[1.02]">
+            <button 
+              onClick={exportCSV}
+              className="inline-flex items-center rounded-xl border border-sand-200 dark:border-outline/30 bg-white/50 dark:bg-dark-surface/50 px-4 py-2 font-label-bold text-label-bold text-ink-700 dark:text-inverse-on-surface transition hover:scale-[1.02]"
+            >
               Export Report
             </button>
-            <button className="inline-flex items-center rounded-xl bg-primary-container px-4 py-2 font-label-bold text-label-bold text-white shadow-sm transition hover:bg-primary hover:scale-[1.02]">
-              Sync Systems
+            <button 
+              onClick={handleSync}
+              disabled={isSyncing}
+              className="inline-flex items-center rounded-xl bg-primary-container px-4 py-2 font-label-bold text-label-bold text-white shadow-sm transition hover:bg-primary hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSyncing ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Syncing...
+                </span>
+              ) : 'Sync Systems'}
             </button>
           </div>
         }
@@ -90,7 +152,7 @@ export default function AdminDashboardPage() {
         >
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Priority Actions</h3>
-            <button className="font-label-bold text-label-bold text-primary dark:text-primary-fixed-dim hover:underline">View All</button>
+            <button onClick={() => toast('Priority actions list coming soon!')} className="font-label-bold text-label-bold text-primary dark:text-primary-fixed-dim hover:underline">View All</button>
           </div>
           <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar">
             <div className="flex items-center justify-between p-3 rounded-xl bg-sand-50 dark:bg-dark-bg hover:bg-sand-100 dark:hover:bg-ink-800 transition-colors border border-sand-200/50 dark:border-outline/10 cursor-pointer">
