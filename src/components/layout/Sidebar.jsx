@@ -26,6 +26,7 @@ export default function Sidebar() {
   const isActive = (to) => {
     if (to === '/admin') return location.pathname === '/admin'
     if (to === '/manager/team') return location.pathname === '/manager/team'
+    if (to === '/goals') return location.pathname === '/goals'
     return location.pathname.startsWith(to)
   }
 
