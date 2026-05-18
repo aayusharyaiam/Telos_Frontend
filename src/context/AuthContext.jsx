@@ -2,8 +2,10 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
 } from 'firebase/auth'
+import { OAuthProvider } from 'firebase/auth'
 import toast from 'react-hot-toast'
 import { auth } from '../firebase/config'
 import { getMe, syncUser } from '../api/auth.api'
@@ -49,6 +51,13 @@ export function AuthProvider({ children }) {
     await signInWithEmailAndPassword(auth, email, password)
   }
 
+  const signInWithMicrosoft = async () => {
+    const provider = new OAuthProvider('microsoft.com')
+    provider.addScope('email')
+    provider.addScope('profile')
+    await signInWithPopup(auth, provider)
+  }
+
   const signOutUser = async () => {
     try {
       await signOut(auth)
@@ -68,7 +77,7 @@ export function AuthProvider({ children }) {
   }
 
   const value = useMemo(
-    () => ({ firebaseUser, appUser, loading, signInUser, signOutUser, refreshUser }),
+    () => ({ firebaseUser, appUser, loading, signInUser, signInWithMicrosoft, signOutUser, refreshUser }),
     [firebaseUser, appUser, loading]
   )
 

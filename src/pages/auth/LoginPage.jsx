@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { motion } from 'framer-motion'
 import { QuestionMarkCircleIcon, UserIcon, UsersIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
 import useAuth from '../../hooks/useAuth'
+import ForgotPasswordModal from '../../components/auth/ForgotPasswordModal'
 
 const stagger = {
   animate: { transition: { staggerChildren: 0.08 } },
@@ -28,9 +29,11 @@ const credentials = [
 ]
 
 export default function LoginPage() {
-  const { appUser, signInUser } = useAuth()
+  const { appUser, signInUser, signInWithMicrosoft } = useAuth()
   const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const [isMicrosoftLoading, setIsMicrosoftLoading] = useState(false)
   const [shake, setShake] = useState(false)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
   const {
     register,
     handleSubmit,
@@ -48,6 +51,26 @@ export default function LoginPage() {
       setShake(true)
       setTimeout(() => setShake(false), 400)
       setIsLoggingIn(false)
+    }
+  }
+
+  const handleMicrosoftSignIn = async () => {
+    setIsMicrosoftLoading(true)
+    try {
+      await signInWithMicrosoft()
+    } catch (err) {
+      const code = err?.code
+      if (code === 'auth/popup-closed-by-user') {
+        toast.error('Sign-in cancelled.')
+      } else if (code === 'auth/account-exists-with-different-credential') {
+        toast.error('An account already exists with this email using a different sign-in method.')
+      } else if (code === 'auth/unauthorized-continue-uri') {
+        toast.error('Sign-in not authorized. Contact Admin.')
+      } else {
+        toast.error('Microsoft sign-in failed. Please try again.')
+      }
+    } finally {
+      setIsMicrosoftLoading(false)
     }
   }
 
@@ -94,67 +117,52 @@ export default function LoginPage() {
               Swipe to browse, tap to login
             </p>
             {/* Swipeable carousel on mobile, grid on larger screens */}
-            <div className="hidden lg:grid lg:grid-cols-3 lg:gap-4">
+                <div className="hidden lg:grid lg:grid-cols-3 lg:gap-4">
+                  {credentials.map((c) => {
+                    const Icon = iconMap[c.role]
+                    return (
+                      <button
+                        key={c.role}
+                        type="button"
+                        onClick={() => fillDemo(c.email)}
+                        className="text-left bg-white dark:bg-dark-surface backdrop-blur-md rounded-2xl p-5 ring-1 ring-primary/30 dark:ring-primary/40 hover:ring-primary/60 dark:hover:ring-primary/60 hover:shadow-lg hover:shadow-primary/10 dark:hover:shadow-primary/20 transition-all duration-200 flex flex-col items-start gap-3 active:scale-95"
+                      >
+                        <div className="w-9 h-9 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed shrink-0">
+                          <Icon className="h-[18px] w-[18px]" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-display text-[16px] font-semibold leading-tight text-ink-900 dark:text-inverse-on-surface">
+                            {c.role}
+                          </div>
+                          <div className="font-caption text-sm text-ink-600 dark:text-outline mt-1">{c.desc}</div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+            {/* Mobile: Stack vertically */}
+            <div className="lg:hidden flex flex-col gap-3 mt-2">
               {credentials.map((c) => {
                 const Icon = iconMap[c.role]
                 return (
-                  <motion.button
+                  <button
                     key={c.role}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
                     type="button"
                     onClick={() => fillDemo(c.email)}
-                    className="text-left bg-white dark:bg-dark-surface backdrop-blur-md rounded-2xl p-5 ring-1 ring-primary/30 dark:ring-primary/40 hover:ring-primary/60 dark:hover:ring-primary/60 hover:shadow-lg hover:shadow-primary/10 dark:hover:shadow-primary/20 transition-all duration-200 flex flex-col items-start gap-3"
+                    className="w-full text-left bg-white dark:bg-dark-surface backdrop-blur-md rounded-2xl p-4 ring-1 ring-primary/40 dark:ring-primary/50 hover:ring-primary/70 dark:hover:ring-primary/70 shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-3 active:scale-95"
                   >
-                    <div className="w-9 h-9 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed shrink-0">
-                      <Icon className="h-[18px] w-[18px]" />
+                    <div className="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed shrink-0">
+                      <Icon className="h-5 w-5" />
                     </div>
-                    <div className="flex-1">
+                    <div>
                       <div className="font-display text-[16px] font-semibold leading-tight text-ink-900 dark:text-inverse-on-surface">
                         {c.role}
                       </div>
-                      <div className="font-caption text-sm text-ink-600 dark:text-outline mt-1">{c.desc}</div>
+                      <div className="font-caption text-sm text-ink-600 dark:text-outline">{c.desc}</div>
                     </div>
-                  </motion.button>
+                  </button>
                 )
               })}
-            </div>
-            {/* Mobile swipeable carousel */}
-            <div className="lg:hidden overflow-hidden -mx-4 px-4">
-              <motion.div
-                className="flex gap-3 cursor-grab active:cursor-grabbing"
-                drag="x"
-                dragConstraints={{ left: -((credentials.length - 1) * 188), right: 0 }}
-                dragElastic={0.15}
-                whileTap={{ scale: 0.98 }}
-              >
-                {credentials.map((c) => {
-                  const Icon = iconMap[c.role]
-                  return (
-                    <motion.button
-                      key={c.role}
-                      type="button"
-                      onClick={() => fillDemo(c.email)}
-                      className="min-w-[168px] text-left bg-white dark:bg-dark-surface backdrop-blur-md rounded-2xl p-5 ring-1 ring-primary/40 dark:ring-primary/50 hover:ring-primary/70 dark:hover:ring-primary/70 hover:shadow-lg hover:shadow-primary/15 dark:hover:shadow-primary/25 transition-all duration-200 flex flex-col items-start gap-2.5 shrink-0"
-                    >
-                      <div className="w-11 h-11 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary dark:text-primary-fixed shrink-0">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-display text-[16px] font-semibold leading-tight text-ink-900 dark:text-inverse-on-surface">
-                          {c.role}
-                        </div>
-                        <div className="font-caption text-sm text-ink-600 dark:text-outline mt-1">{c.desc}</div>
-                      </div>
-                    </motion.button>
-                  )
-                })}
-              </motion.div>
-              <div className="flex justify-center gap-1.5 mt-3">
-                {credentials.map((_, idx) => (
-                  <div key={idx} className="w-1.5 h-1.5 rounded-full bg-ink-300 dark:bg-outline/50" />
-                ))}
-              </div>
             </div>
           </motion.div>
         </motion.div>
@@ -242,9 +250,13 @@ export default function LoginPage() {
                   </label>
                 </div>
                 <div className="font-caption text-caption">
-                  <a href="#" className="font-bold text-primary dark:text-primary-fixed-dim hover:text-primary-fixed-dim transition-colors">
+                  <button 
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="font-bold text-primary dark:text-primary-fixed-dim hover:text-primary-fixed-dim transition-colors"
+                  >
                     Forgot password?
-                  </a>
+                  </button>
                 </div>
               </div>
 
@@ -265,6 +277,41 @@ export default function LoginPage() {
                   </span>
                 ) : 'Sign in to Dashboard'}
               </motion.button>
+
+              <div className="relative my-4 sm:my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-sand-200 dark:border-outline/30" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-3 bg-white/80 dark:bg-dark-surface/70 text-ink-500 dark:text-outline">
+                    or
+                  </span>
+                </div>
+              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                onClick={handleMicrosoftSignIn}
+                disabled={isMicrosoftLoading || isLoggingIn}
+                className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white dark:bg-dark-bg border border-sand-200 dark:border-outline/40 rounded-xl shadow-sm font-display text-[16px] font-semibold text-ink-900 dark:text-inverse-on-surface hover:bg-sand-50 dark:hover:bg-dark-surface/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-container transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isMicrosoftLoading ? (
+                  <svg className="animate-spin h-5 w-5 text-ink-600 dark:text-outline" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                ) : (
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0H11.317V11.317H0V0Z" fill="#F25022" />
+                    <path d="M12.683 0H23.999V11.317H12.683V0Z" fill="#7FBA00" />
+                    <path d="M0 12.683H11.317V24H0V12.683Z" fill="#00A4EF" />
+                    <path d="M12.683 12.683H23.999V24H12.683V12.683Z" fill="#FFB900" />
+                  </svg>
+                )}
+                {isMicrosoftLoading ? 'Signing in...' : 'Continue with Microsoft'}
+              </motion.button>
             </form>
 
             <div className="mt-6 sm:mt-8 text-center space-y-2">
@@ -282,6 +329,11 @@ export default function LoginPage() {
           </motion.div>
         </motion.div>
       </div>
+
+      <ForgotPasswordModal 
+        isOpen={showForgotPassword} 
+        onClose={() => setShowForgotPassword(false)} 
+      />
     </div>
   )
 }

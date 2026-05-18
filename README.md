@@ -39,7 +39,7 @@ docker compose up -d    # http://localhost (nginx)
 - React Router v6 (protected routes)
 - React Query + react-hook-form
 - Framer Motion (animations)
-- Firebase Auth
+- Firebase Auth (Email/Password + Microsoft OAuth via Azure Entra ID)
 - Recharts (lazy-loaded)
 - Heroicons + react-hot-toast
 
