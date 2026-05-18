@@ -32,7 +32,7 @@ const itemVariants = {
   }),
 }
 
-export default function TeamDashboardPage() {
+export default function TeamDashboardPage({ view = 'team' }) {
   const [reports, setReports] = useState([])
   const [cycleName, setCycleName] = useState('')
   const [loading, setLoading] = useState(true)
@@ -62,13 +62,26 @@ export default function TeamDashboardPage() {
     reports.find((report) => report.goalSheetStatus === 'SUBMITTED') ||
     reports.find((report) => report.goalSheetId)
 
+  const isApprovalsView = view === 'approvals'
+  const isCheckinsView = view === 'checkins'
+
+  const pageTitle = isApprovalsView ? 'Pending Approvals' : isCheckinsView ? 'Team Check-ins' : 'Team Overview'
+  const pageSubtitle = isApprovalsView 
+    ? `Review and approve goal sheets from direct reports.${cycleName ? ` Active cycle: ${cycleName}.` : ''}`
+    : isCheckinsView 
+    ? `Monitor quarterly check-in progress across your team.${cycleName ? ` Active cycle: ${cycleName}.` : ''}`
+    : `Review submissions, approvals, and goal sheet status across direct reports.${cycleName ? ` Active cycle: ${cycleName}.` : ''}`
+
+  const filteredReports = isApprovalsView ? submitted : isCheckinsView ? approved : reports
+  const emptyMessage = isApprovalsView ? 'No pending approvals.' : isCheckinsView ? 'No approved sheets yet for check-ins.' : 'No direct reports yet.'
+
   return (
     <AppShell>
       <PageHeader
-        title="Team Overview"
-        subtitle={`Review submissions, approvals, and goal sheet status across direct reports.${cycleName ? ` Active cycle: ${cycleName}.` : ''}`}
+        title={pageTitle}
+        subtitle={pageSubtitle}
         actions={
-          nextReview?.goalSheetId ? (
+          !isCheckinsView && nextReview?.goalSheetId ? (
             <Link
               className="inline-flex items-center rounded-xl bg-primary-container px-4 py-2 font-label-bold text-label-bold text-white transition hover:bg-primary hover:scale-[1.02]"
               to={`/manager/approve/${nextReview.goalSheetId}`}
@@ -95,13 +108,15 @@ export default function TeamDashboardPage() {
         className="rounded-2xl bg-white/80 dark:bg-dark-surface/70 backdrop-blur-lg shadow-sm ring-1 ring-ink-100/10 dark:ring-outline/20"
       >
         <div className="border-b border-sand-200/50 dark:border-outline/20 px-6 py-4">
-          <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">Direct Reports</p>
+          <p className="font-headline-md text-headline-md text-ink-900 dark:text-inverse-on-surface">
+            {isApprovalsView ? 'Pending Approval' : isCheckinsView ? 'Approved Sheets' : 'Direct Reports'}
+          </p>
         </div>
         <div className="divide-y divide-sand-200/30 dark:divide-outline/10">
-          {reports.length === 0 ? (
-            <div className="px-6 py-6 font-body-md text-body-md text-ink-600 dark:text-outline">No direct reports yet.</div>
+          {filteredReports.length === 0 ? (
+            <div className="px-6 py-6 font-body-md text-body-md text-ink-600 dark:text-outline">{emptyMessage}</div>
           ) : (
-            reports.map((report, i) => {
+            filteredReports.map((report, i) => {
               const statusKey = report.goalSheetStatus || 'NOT_STARTED'
               const statusLabel = STATUS_LABELS[statusKey] || 'Not Started'
               const tone = STATUS_TONES[statusKey] || 'slate'
@@ -121,15 +136,14 @@ export default function TeamDashboardPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <Badge tone={tone}>{statusLabel}</Badge>
-                    {report.goalSheetStatus === 'APPROVED' ? (
+                    {isCheckinsView ? (
                       <Link
                         className="font-label-bold text-label-bold text-primary dark:text-primary-fixed-dim hover:underline"
                         to={`/manager/checkin/${report.userId}`}
                       >
-                        Check-in
+                        View Check-ins
                       </Link>
-                    ) : null}
-                    {report.goalSheetId ? (
+                    ) : isApprovalsView ? (
                       <Link
                         className="font-label-bold text-label-bold text-primary dark:text-primary-fixed-dim hover:underline"
                         to={`/manager/approve/${report.goalSheetId}`}
@@ -137,7 +151,26 @@ export default function TeamDashboardPage() {
                         Review
                       </Link>
                     ) : (
-                      <span className="font-label-bold text-label-bold text-ink-400 dark:text-outline">No sheet yet</span>
+                      <>
+                        {report.goalSheetStatus === 'APPROVED' ? (
+                          <Link
+                            className="font-label-bold text-label-bold text-primary dark:text-primary-fixed-dim hover:underline"
+                            to={`/manager/checkin/${report.userId}`}
+                          >
+                            Check-in
+                          </Link>
+                        ) : null}
+                        {report.goalSheetId ? (
+                          <Link
+                            className="font-label-bold text-label-bold text-primary dark:text-primary-fixed-dim hover:underline"
+                            to={`/manager/approve/${report.goalSheetId}`}
+                          >
+                            Review
+                          </Link>
+                        ) : (
+                          <span className="font-label-bold text-label-bold text-ink-400 dark:text-outline">No sheet yet</span>
+                        )}
+                      </>
                     )}
                   </div>
                 </motion.div>

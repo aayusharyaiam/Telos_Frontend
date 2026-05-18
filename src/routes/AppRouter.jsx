@@ -72,23 +72,47 @@ function AnimatedRoutes() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/goals/sheet/:sheetId/checkin"
-          element={
-            <ProtectedRoute allowedRoles={['EMPLOYEE', 'MANAGER', 'ADMIN']}>
-              <CheckinEntryPage />
-            </ProtectedRoute>
-          }
-        />
+<Route
+            path="/goals/sheet/:sheetId/checkin"
+            element={
+              <ProtectedRoute allowedRoles={['EMPLOYEE', 'MANAGER', 'ADMIN']}>
+                <CheckinEntryPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/goals/checkins"
+            element={
+              <ProtectedRoute allowedRoles={['EMPLOYEE', 'MANAGER', 'ADMIN']}>
+                <CheckinEntryPage />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/manager/team"
-          element={
-            <ProtectedRoute allowedRoles={['MANAGER', 'ADMIN']}>
-              <TeamDashboardPage />
-            </ProtectedRoute>
-          }
-        />
+<Route
+            path="/manager/team"
+            element={
+              <ProtectedRoute allowedRoles={['MANAGER', 'ADMIN']}>
+                <TeamDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/team/approvals"
+            element={
+              <ProtectedRoute allowedRoles={['MANAGER', 'ADMIN']}>
+                <TeamDashboardPage view="approvals" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/manager/team/checkins"
+            element={
+              <ProtectedRoute allowedRoles={['MANAGER', 'ADMIN']}>
+                <TeamDashboardPage view="checkins" />
+              </ProtectedRoute>
+            }
+          />
         <Route
           path="/manager/approve/:sheetId"
           element={
