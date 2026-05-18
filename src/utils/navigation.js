@@ -17,12 +17,9 @@ import {
 export const NAV_LINKS = {
   EMPLOYEE: [
     { label: 'My Goals', to: '/goals', icon: ClipboardDocumentListIcon },
-    { label: 'Check-ins', to: '/goals', icon: ClipboardDocumentCheckIcon },
   ],
   MANAGER: [
     { label: 'Team Overview', to: '/manager/team', icon: UsersIcon },
-    { label: 'Approvals', to: '/manager/team', icon: ClipboardDocumentCheckIcon },
-    { label: 'Check-ins', to: '/manager/team', icon: ClipboardDocumentListIcon },
     { label: 'Shared Goals', to: '/manager/shared-goals', icon: ShareIcon },
   ],
   ADMIN: [
