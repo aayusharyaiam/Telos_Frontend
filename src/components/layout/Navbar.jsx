@@ -22,6 +22,13 @@ export default function Navbar() {
   const pathSegments = location.pathname.split('/').filter(Boolean)
   const showBackButton = pathSegments.length > 1 && !isMainNavRoute && !mainNavPaths.includes('/' + pathSegments[0])
 
+  const isNavActive = (to) => {
+    if (to === '/admin') return location.pathname === '/admin'
+    if (to === '/manager/team') return location.pathname === '/manager/team'
+    if (to === '/goals') return location.pathname === '/goals'
+    return location.pathname === to
+  }
+
   const getBackPath = () => {
     const pathParts = location.pathname.split('/').filter(Boolean)
     if (pathParts.length > 1) {
@@ -117,21 +124,22 @@ export default function Navbar() {
       />
 
       <div className="flex gap-2 overflow-x-auto border-t border-sand-200/50 dark:border-outline/10 px-4 py-2 md:hidden">
-        {links.map((link) => (
-          <NavLink
-            key={link.label}
-            to={link.to}
-            className={({ isActive }) =>
-              `whitespace-nowrap rounded-full px-3 py-1.5 font-label-bold text-label-bold transition-all duration-200 ${
-                isActive
+        {links.map((link) => {
+          const active = isNavActive(link.to)
+          return (
+            <NavLink
+              key={link.label}
+              to={link.to}
+              className={`whitespace-nowrap rounded-full px-3 py-1.5 font-label-bold text-label-bold transition-all duration-200 ${
+                active
                   ? 'bg-primary-container text-white'
                   : 'bg-sand-100 dark:bg-dark-surface text-ink-700 dark:text-inverse-on-surface'
-              }`
-            }
-          >
-            {link.label}
-          </NavLink>
-        ))}
+              }`}
+            >
+              {link.label}
+            </NavLink>
+          )
+        })}
       </div>
     </motion.header>
   )
